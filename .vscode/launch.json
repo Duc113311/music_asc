@@ -1,0 +1,30 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Muvik (dev)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "muvik",
+      "program": "lib/main.dart",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "Muvik (alpha)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "muvik",
+      "program": "lib/main.dart",
+      "args": ["--flavor", "alpha"]
+    },
+    {
+      "name": "Muvik (product, release)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "muvik",
+      "program": "lib/main.dart",
+      "flutterMode": "release",
+      "args": ["--flavor", "product"]
+    }
+  ]
+}
