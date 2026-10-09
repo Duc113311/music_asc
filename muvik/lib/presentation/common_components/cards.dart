@@ -274,10 +274,14 @@ class DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.title,
     this.actions = const [],
     this.onBack,
+    this.backgroundColor,
+    this.titleStyle,
   });
   final String title;
   final List<Widget> actions;
   final VoidCallback? onBack;
+  final Color? backgroundColor;
+  final TextStyle? titleStyle;
 
   @override
   Size get preferredSize => const Size.fromHeight(AppSizes.appBar);
@@ -286,12 +290,19 @@ class DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final c = context.colors;
     return AppBar(
+      backgroundColor: backgroundColor,
+      surfaceTintColor: backgroundColor == null ? null : Colors.transparent,
       leading: IconButton(
         tooltip: 'action_back'.tr,
         icon: Icon(Icons.arrow_back_rounded, color: c.textPrimary),
         onPressed: onBack ?? () => Get.back<void>(),
       ),
-      title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
+      title: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: titleStyle,
+      ),
       actions: actions,
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:muvik/models/data_models/playback_snapshot.dart';
+import 'package:muvik/models/data_models/song.dart';
 import 'package:muvik/models/data_models/playback_session.dart';
 import 'package:muvik/models/ui_models/app_error.dart';
 import 'package:muvik/models/ui_models/period_type.dart';
@@ -19,6 +20,26 @@ import 'helpers/test_env.dart';
 void main() {
   setUp(setUpTestDb);
   tearDown(tearDownTestDb);
+
+  test('genre column (DB v2) is stored and read back', () async {
+    expect(DbSchema.dbVersion, greaterThanOrEqualTo(2));
+    final repo = SongRepository();
+    final now = DateTime(2026, 10, 1);
+    final id = await repo.insert(
+      Song(
+        sourceId: 1,
+        identity: 'g1',
+        uri: 'content://g1',
+        title: 'g1',
+        folderPath: 'Music',
+        fileName: 'g1.mp3',
+        firstSeenAt: now,
+        updatedAt: now,
+        genre: 'Lo-Fi',
+      ),
+    );
+    expect((await repo.getById(id))?.genre, 'Lo-Fi');
+  });
 
   group('Playlist rules (P19-02)', () {
     late LibraryDataService lib;

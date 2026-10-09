@@ -4,7 +4,7 @@
 **Nguồn:** `APP_BASE_STRUCTURE (1).md`, nghiệp vụ Muvik mục 1.3 và Design System đã thống nhất.  
 **Cách dùng:** làm theo thứ tự; mỗi dòng là một việc. Chỉ đánh dấu `[x]` khi đã chạy và kiểm tra kết quả. Mỗi giai đoạn có điều kiện hoàn thành. Android là bản triển khai đầu tiên; iOS có checklist riêng cuối file.
 
-> **Trạng thái thi công (07/10/2026):** mã nguồn ở `muvik/`. `[x]` = đã kiểm chứng bằng `flutter analyze` (0 issue), `flutter test` (67 test pass) hoặc build APK debug. 🔧 = đã code đầy đủ nhưng **chưa** kiểm tra trên điện thoại thật nên chưa đánh dấu. ⛔ = bị chặn, ghi rõ lý do/dependency. Xem `muvik/README.md` và `muvik/docs/screen_map.md`.
+> **Trạng thái thi công (cập nhật 09/10/2026):** mã nguồn ở `muvik/`. `[x]` = đã kiểm chứng bằng `flutter analyze` (0 issue), `flutter test` (77 test pass) hoặc build APK debug / biên dịch Kotlin. 🔧 = đã code đầy đủ nhưng **chưa** kiểm tra trên điện thoại thật nên chưa đánh dấu. ⛔ = bị chặn, ghi rõ lý do/dependency. Xem `muvik/README.md` và `muvik/docs/screen_map.md`. Ghi chú `• 09/10:` trên từng mục = thay đổi của đợt đối chiếu thiết kế 08–09/10; nhật ký chi tiết ở mục 24.
 
 ## 0. Chốt phạm vi và nguyên tắc
 
@@ -124,18 +124,18 @@ Tên file trên là cấu trúc triển khai đề xuất, không phải mã ngu
 - [x] P03-02 Tạo AppTheme.light/dark và ThemeMode.system; bỏ cấu hình pin cả hai theme thành dark của mẫu.
 - [x] P03-03 Đăng ký font Be Vietnam Pro 400/500/600/700; fallback hệ thống cho ngôn ngữ chưa hỗ trợ.
 - [x] P03-04 Tạo typography, spacing, radius, icon sizes và motion constants; không rải số/màu ở từng màn.
-- [x] P03-05 Chuẩn hóa asset tên ASCII snake_case; ánh xạ asset → màn; giữ bản gốc ngoài bundle nếu quá nặng.
+- [x] P03-05 Chuẩn hóa asset tên ASCII snake_case; ánh xạ asset → màn; giữ bản gốc ngoài bundle nếu quá nặng. • 09/10: thêm asset cắt từ mockup: img_theme_cover, img_sleep_sunset, img_feedback_hero, img_scan_hero (đã xoá vòng tiến độ bằng inpaint), img_explore_replay/least/random; bg_on_01..03.webp xuất lại full-res từ PNG gốc.
 - [x] P03-06 Thêm logo không chữ, splash, ba onboarding, ba setup, ảnh fallback và background đúng theme.
 - [x] P03-07 Nén ảnh phù hợp, kiểm tra PNG alpha và kích thước; không đóng gói nhạc minh họa vào thư viện thật.
 - [x] P03-08 Khai báo assets/fonts/XML locale trong pubspec; kiểm tra đường dẫn và chữ hoa/thường.
 - [x] P03-09 Tạo PrimaryButton với normal/pressed/disabled/loading và chống bấm lặp.
 - [x] P03-10 Tạo AppIconButton/Touchable vùng chạm tối thiểu 48 × 48.
 - [x] P03-11 Tạo Input/SearchField/TextArea với focus, error, disabled và keyboard safe area.
-- [x] P03-12 Tạo radio/checkbox/switch, chip và segmented tabs; nhãn đọc được bằng screen reader.
+- [x] P03-12 Tạo radio/checkbox/switch, chip và segmented tabs; nhãn đọc được bằng screen reader. • 09/10: AppSwitch đổi núm trắng 44×25 (mọi mockup Cài đặt); AppRadio thêm tham số size.
 - [x] P03-13 Tạo SongTile, PlaylistCard, AlbumCard, SettingsTile, EmptyState, ErrorState, LoadingState.
 - [x] P03-14 Tạo PrimaryBottomSheet/PrimaryDialog/Toast; toast không che mini player/navbar.
 - [x] P03-15 Tạo MiniPlayer dùng stream của player chung; chiều cao có thể tăng theo font.
-- [x] P03-16 Tạo XML strings EN/VI cho toàn bộ label, lỗi, toast và dialog; không hardcode nội dung UI. — ✅ 478 key EN/VI, tool/check_strings.py báo 0 key thiếu
+- [x] P03-16 Tạo XML strings EN/VI cho toàn bộ label, lỗi, toast và dialog; không hardcode nội dung UI. — ✅ 512 key EN/VI (09/10, đã xoá 5 key không còn dùng), tool/check_strings.py báo 0 key thiếu
 - [ ] P03-17 Làm trang preview component trong debug; xem đủ dark/light và chữ lớn trước khi dựng màn. — 🔧 trang /debug/components (chỉ debug); chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 
 **Hoàn thành khi:** component tái sử dụng hiển thị đúng hai theme, asset không lỗi và UI không có mã màu rời rạc.
@@ -143,7 +143,7 @@ Tên file trên là cấu trúc triển khai đề xuất, không phải mã ngu
 ## 4. Database và dữ liệu local
 
 - [x] P04-01 Tạo DatabaseHelper singleton có Completer chống mở DB đồng thời; tên `muvik.db`, schema khởi đầu version 1.
-- [x] P04-02 Tạo bảng songs: ID ổn định, source ID, URI/media ID, metadata, duration, size, artwork reference, availability và favorite.
+- [x] P04-02 Tạo bảng songs: ID ổn định, source ID, URI/media ID, metadata, duration, size, artwork reference, availability và favorite. • 09/10: thêm cột genre (DB v2) cho chip tâm trạng Khám phá.
 - [x] P04-03 Tạo music_sources: URI/source type/display name, enabled, quyền truy cập và trạng thái scan.
 - [x] P04-04 Tạo playlists và playlist_songs; unique playlist + song, lưu thứ tự; xóa playlist không xóa song/file.
 - [x] P04-05 Tạo excluded_items để lưu bài/nguồn đã bỏ khỏi thư viện, không thêm lại khi scan.
@@ -155,7 +155,7 @@ Tên file trên là cấu trúc triển khai đề xuất, không phải mã ngu
 - [x] P04-11 Viết model immutable với toMap/fromMap/copyWith, enum mapping và fallback metadata.
 - [x] P04-12 Viết CRUD/query repository với whereArgs; transaction do application service điều phối.
 - [x] P04-13 Cho repository nhận transaction executor khi cần; không dùng DB ngoài transaction trong cùng nghiệp vụ.
-- [x] P04-14 Viết migration tăng version, bảo toàn dữ liệu; không dùng DROP/reset để sửa schema của bản đã phát hành. — ✅ cơ chế DbSchema.migrations cộng dồn; chưa có bản phát hành nên chưa có migration thật
+- [x] P04-14 Viết migration tăng version, bảo toàn dữ liệu; không dùng DROP/reset để sửa schema của bản đã phát hành. — ✅ cơ chế DbSchema.migrations cộng dồn. 09/10: migration thật v2 `ALTER TABLE songs ADD COLUMN genre TEXT` (chỉ thêm cột); test/database_test.dart kiểm tra lưu/đọc genre
 - [x] P04-15 Thêm fixture debug riêng; release không hiện bài hát/dữ liệu thống kê giả. — ✅ fixture chỉ nằm trong test/; release không có dữ liệu giả
 - [x] P04-16 Kiểm tra transaction thêm playlist và flush session; lỗi giữa chừng không lưu nửa dữ liệu.
 
@@ -163,20 +163,20 @@ Tên file trên là cấu trúc triển khai đề xuất, không phải mã ngu
 
 ## 5. Quyền truy cập và quét nhạc
 
-- [ ] P05-01 Triển khai MediaLibraryChannel/adapter: quyền audio, chọn nguồn, liệt kê tệp, đọc metadata/artwork. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
+- [ ] P05-01 Triển khai MediaLibraryChannel/adapter: quyền audio, chọn nguồn, liệt kê tệp, đọc metadata/artwork. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối) • 09/10: đọc thêm genre: MediaStore cột GENRE (Android 11+), bảng Audio.Genres cho Android ≤10 (cache 1 lần/lượt quét), METADATA_KEY_GENRE cho SAF; biên dịch Kotlin dev debug OK.
 - [ ] P05-02 Phân biệt MediaStore và SAF; kiểm tra quyền theo phiên bản Android/API được hỗ trợ, không xin quyền rộng không cần thiết. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [ ] P05-03 Với SAF, lưu persistable URI permission khi hệ thống cho phép; không biến content URI thành đường dẫn giả. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [x] P05-04 Chọn tất cả chỉ áp dụng nguồn đã được cấp quyền; không hiểu là toàn bộ bộ nhớ không được phép. — ✅ test/library_scan_test.dart
-- [x] P05-05 Tạo scan state idle/scanning/success/partial/error/cancelled và stream tiến độ/số tệp. — ✅ test/library_scan_test.dart
+- [x] P05-05 Tạo scan state idle/scanning/success/partial/error/cancelled và stream tiến độ/số tệp. — ✅ test/library_scan_test.dart • 09/10: ScanState thêm ScanPhase reading → albums → updating để màn Quét hiển thị 3 bước thật.
 - [x] P05-06 Chống scan đồng thời; thao tác quét lại đang chạy hiển thị trạng thái hiện tại. — ✅ test/library_scan_test.dart
 - [x] P05-07 Quét theo batch ngoài UI thread; upsert theo stable identity, tránh trùng giữa các nguồn chồng nhau. — ✅ test/library_scan_test.dart
 - [x] P05-08 Đọc tên bài/nghệ sĩ/album/duration/size/artwork; thiếu title dùng tên file, thiếu artist/album dùng nhãn fallback. — ✅ test/library_scan_test.dart
 - [ ] P05-09 Bỏ tệp không đọc được/không hỗ trợ có báo cáo; giới hạn artwork cache để tránh hết RAM. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [x] P05-10 Chỉ đánh dấu tệp mất sau scan thành công đầy đủ của nguồn đó; scan lỗi/hủy/thu hồi quyền không xóa hàng loạt. — ✅ test/library_scan_test.dart
-- [x] P05-11 Giữ favorite, playlist và history khi refresh metadata; bài unavailable vẫn có tham chiếu hợp lý. — ✅ test/library_scan_test.dart
+- [x] P05-11 Giữ favorite, playlist và history khi refresh metadata; bài unavailable vẫn có tham chiếu hợp lý. — ✅ test/library_scan_test.dart • 09/10: genre mới đọc được ghi vào DB nhưng không tính là "Cập nhật" trong kết quả quét.
 - [x] P05-12 Áp dụng exclusion trước khi upsert vào thư viện hiển thị; không tự thêm lại bài người dùng đã bỏ. — ✅ test/library_scan_test.dart
 - [ ] P05-13 Khi hủy scan, giữ dữ liệu hợp lệ đã có và báo kết quả chưa hoàn tất; không ghi setup thành công giả. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
-- [ ] P05-14 Khi app resume, kiểm tra nguồn/quyền và refresh nhẹ; không tự chạy full scan mỗi lần đổi tab. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
+- [ ] P05-14 Khi app resume, kiểm tra nguồn/quyền và refresh nhẹ; không tự chạy full scan mỗi lần đổi tab. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối) • 09/10: bootstrap chạy 1 lần quét nền sau khi nâng DB v2 để bổ sung genre (pref genre_backfill_done; cài mới bỏ qua vì setup đã quét với schema mới).
 - [ ] P05-15 Kiểm tra 0 bài, nhiều nghìn bài, tên Unicode, thẻ SD tháo/lắp, nguồn trùng và quyền bị thu hồi. — ⛔ chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 
 **Hoàn thành khi:** scan lại không trùng, mất nguồn không làm mất dữ liệu và content URI phát được trên máy thật.
@@ -186,9 +186,9 @@ Tên file trên là cấu trúc triển khai đề xuất, không phải mã ngu
 - [x] P06-01 Khởi tạo prefs/DB/theme/locale/audio theo thứ tự; auth lỗi không chặn bootstrap nghe local.
 - [ ] P06-02 Splash `sc_splash`: logo đúng UI, loading hữu hạn và lỗi khởi tạo có Thử lại; không polling vô hạn. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [ ] P06-03 Định tuyến: chưa onboarding → onboarding; đã onboarding/chưa setup → setup; đã hoàn tất → shell. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
-- [ ] P06-04 Tạo `sc_onBrg_01` với hình, tiêu đề, mô tả, dots, Bỏ qua/Tiếp tục. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
-- [ ] P06-05 Tạo `sc_onBrg_02` với Quay lại/Tiếp tục và giữ chỉ số trang. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
-- [ ] P06-06 Tạo `sc_onBrg_03` với Bắt đầu; không có navbar. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
+- [ ] P06-04 Tạo `sc_onBrg_01` với hình, tiêu đề, mô tả, dots, Bỏ qua/Tiếp tục. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối) • 09/10: làm lại giống mockup sc_onBrg_0x (logo Melo, nút/dots/màu riêng từng trang, chữ trên thẻ playlist trang 3, lọc màu nền theo mockup, màn 16:9 thu nhỏ khung); đối chiếu render 390×844 lệch ≤1.5pt.
+- [ ] P06-05 Tạo `sc_onBrg_02` với Quay lại/Tiếp tục và giữ chỉ số trang. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối) • 09/10: làm lại giống mockup sc_onBrg_0x (logo Melo, nút/dots/màu riêng từng trang, chữ trên thẻ playlist trang 3, lọc màu nền theo mockup, màn 16:9 thu nhỏ khung); đối chiếu render 390×844 lệch ≤1.5pt.
+- [ ] P06-06 Tạo `sc_onBrg_03` với Bắt đầu; không có navbar. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối) • 09/10: làm lại giống mockup sc_onBrg_0x (logo Melo, nút/dots/màu riêng từng trang, chữ trên thẻ playlist trang 3, lọc màu nền theo mockup, màn 16:9 thu nhỏ khung); đối chiếu render 390×844 lệch ≤1.5pt.
 - [ ] P06-07 Bỏ qua hoặc kết thúc onboarding đều lưu onboardingCompleted rồi mở setup, không bỏ qua quyền/nguồn. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [ ] P06-08 Setup controller tồn tại đủ ba bước, lưu tiến độ cần khôi phục khi app bị đóng. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [ ] P06-09 `sc_step_01`: Cho phép → yêu cầu quyền/system picker; cấp thành công → bước 2. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
@@ -274,19 +274,19 @@ Làm phần này trước khi nối UI player. Mọi nguồn lệnh đều đi v
 
 ## 11. Khám phá
 
-- [ ] P11-01 `sc_kham_pha`: hiển thị album/playlist/bài từ thư viện thiết bị, không gọi nhạc online. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
+- [ ] P11-01 `sc_kham_pha`: hiển thị album/playlist/bài từ thư viện thiết bị, không gọi nhạc online. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối) • 09/10: làm lại theo mockup mới: header logo Melo + tagline, tiêu đề, ô tìm kiếm, 3 chip tâm trạng, 3 thẻ gợi ý có ảnh minh hoạ, Gần đây thêm vào; bỏ mục Album/Playlist (vẫn có ở tab Thư viện).
 - [ ] P11-02 Gợi ý Nghe lại/Ít nghe/Ngẫu nhiên dựa trên history thật và rule local đơn giản. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [ ] P11-03 Card gợi ý → danh sách chi tiết; play tạo queue snapshot từ tập kết quả. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
-- [x] P11-04 Mood/filter nếu có UI phải có quy tắc local rõ; không suy đoán AI nếu chưa có dữ liệu/tag. — ✅ không có nhãn cảm xúc → bỏ chip mood, ghi trong screen_map.md
+- [x] P11-04 Mood/filter nếu có UI phải có quy tắc local rõ; không suy đoán AI nếu chưa có dữ liệu/tag. — ✅ chip mood lọc theo thể loại (genre) đọc từ file nhạc, quy tắc từ khoá cố định trong `mood_rules.dart`; không suy đoán AI. Ghi trong screen_map.md
 - [ ] P11-05 Gần đây thêm vào dùng thời điểm phát hiện/tệp phù hợp, không reset mọi bài thành mới sau scan lại. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
-- [ ] P11-06 Nút Thống kê → màn thống kê, không tạo tab thứ năm. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
+- [ ] P11-06 Nút Thống kê → màn thống kê, không tạo tab thứ năm. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối) • 09/10: nút Thống kê đổi thành biểu tượng sóng ở góc phải header (vẫn mở màn Thống kê).
 - [ ] P11-07 Search dùng màn chung; dữ liệu trống có CTA Quét nhạc/Chọn nguồn. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 
 **Hoàn thành khi:** toàn bộ khám phá dùng local và mọi vùng bấm có luồng thật.
 
 ## 12. Màn Đang phát và bottom sheets
 
-- [ ] P12-01 `Sc_phat_nhac`: header/back/queue, ảnh bìa, title/artist, progress, duration và controls đúng UI. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
+- [ ] P12-01 `Sc_phat_nhac`: header/back/queue, ảnh bìa, title/artist, progress, duration và controls đúng UI. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối) • 09/10: nền trình phát theo cài đặt "Ảnh nền trình phát": mờ từ ảnh bìa (mặc định) hoặc màu đơn.
 - [ ] P12-02 Play/Pause/Next/Previous/seek gửi lệnh chung; thể hiện loading/error/current state. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [ ] P12-03 Shuffle → sheet Theo thứ tự/Ngẫu nhiên, áp dụng và đổi icon ngay. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [ ] P12-04 Repeat → sheet Tắt/Lặp tất cả/Lặp một bài, áp dụng ngay. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
@@ -305,7 +305,7 @@ Làm phần này trước khi nối UI player. Mọi nguồn lệnh đều đi v
 
 ## 13. Hẹn giờ tắt nhạc
 
-- [ ] P13-01 `sc_hen_gio_tat`: 15/30/45/60 phút, tùy chỉnh giờ/phút, đợi hết bài, dự kiến giờ dừng và CTA. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
+- [ ] P13-01 `sc_hen_gio_tat`: 15/30/45/60 phút, tùy chỉnh giờ/phút, đợi hết bài, dự kiến giờ dừng và CTA. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối) • 09/10: làm lại giống mockup: hàng đang chọn tô nền, dropdown giờ/phút đúng font, thẻ "Nhạc sẽ dừng lúc" có ảnh hoàng hôn + "Còn khoảng X phút nữa.", nút bo tròn chữ tối.
 - [x] P13-02 Validate thời lượng >0 và giới hạn hợp lý; không cho bắt đầu với giá trị rỗng/sai. — ✅ test/sleep_timer_test.dart
 - [x] P13-03 SleepTimerService thuộc audio/background service, không đặt timer chỉ trong widget/controller route. — ✅ test/sleep_timer_test.dart
 - [x] P13-04 Lưu deadline và tùy chọn, tính countdown từ deadline; không chỉ trừ mỗi giây dựa trên UI tick. — ✅ test/sleep_timer_test.dart
@@ -319,8 +319,8 @@ Làm phần này trước khi nối UI player. Mọi nguồn lệnh đều đi v
 
 ## 14. Settings và các màn con
 
-- [ ] P14-01 `sc_cat_dat`: đủ nhóm theo 1.3 và khu vực Google login; dữ liệu giá trị hiện tại đúng prefs/service. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
-- [ ] P14-02 Tiện ích → Quét nhạc `sc_quet_thu_vien`: nguồn chọn, scan progress, tổng bài/album/nghệ sĩ và kết quả lỗi. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
+- [ ] P14-01 `sc_cat_dat`: đủ nhóm theo 1.3 và khu vực Google login; dữ liệu giá trị hiện tại đúng prefs/service. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối) • 09/10: làm lại giống mockup sc_cat_dat: nền sóng bg_theme_dark/light, thẻ tài khoản (avatar viền gradient, nút Google trắng có logo G), nhóm thẻ navy, icon nét viền gradient, hàng gọn, mũi tên thẳng cột; "Quét nhạc" → "Quét thư mục".
+- [ ] P14-02 Tiện ích → Quét nhạc `sc_quet_thu_vien`: nguồn chọn, scan progress, tổng bài/album/nghệ sĩ và kết quả lỗi. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối) • 09/10: làm lại giống mockup: vòng tiến độ % trên ảnh hoàng hôn, số bài/album/nghệ sĩ, thư mục hiện tại, 3 bước có thể mở chi tiết, Chạy nền/Dừng quét; khi không quét giữ chọn nguồn + Quét lại.
 - [ ] P14-03 Thêm/chọn/bỏ nguồn qua picker phù hợp; scan lại dùng service chung, không xóa file. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [ ] P14-04 Tiện ích → Hẹn giờ mở màn P13 và hiển thị giá trị đang chạy ở Settings. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [ ] P14-05 Âm thanh → EQ `sc_bo_chinh_am`: enable/preset/sliders/bass/surround theo capability thiết bị. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
@@ -329,12 +329,12 @@ Làm phần này trước khi nối UI player. Mọi nguồn lệnh đều đi v
 - [ ] P14-08 Thiết bị không hỗ trợ hiệu ứng nào thì disable có lý do; không hứa hỗ trợ giả. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [ ] P14-09 Đặt lại EQ → `Sc_dat_lai_bo_chinh_am`; reset thông số mặc định đã định nghĩa và áp dụng thật. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [ ] P14-10 `sc_chat_luong_phat`: format/bitrate/sample rate của file nếu đọc được; unknown có fallback; không giả nâng chất lượng. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
-- [ ] P14-11 `sc_phat_qua_tai_nghe`: các option đúng ảnh UI, ngắt tai nghe pause; tự tiếp tục khi kết nối lại chỉ khi người dùng bật. — 🔧 chuyển đầu ra dùng bảng media của hệ thống (Android không có API công khai ổn định); chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
-- [ ] P14-12 Giao diện → `sc_theme`: Sáng/Tối/Hệ thống; lưu và đổi ngay, không restart player. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
+- [ ] P14-11 `sc_phat_qua_tai_nghe`: các option đúng ảnh UI, ngắt tai nghe pause; tự tiếp tục khi kết nối lại chỉ khi người dùng bật. — 🔧 chuyển đầu ra dùng bảng media của hệ thống (Android không có API công khai ổn định); chờ QA trên điện thoại thật (chưa có thiết bị kết nối) • 09/10: làm lại giống mockup (hình img_tai_nghe, nhãn mục, thẻ toggle, thiết bị phát chỉ đọc); bỏ dòng ghi chú đầu ra vì mockup không có.
+- [ ] P14-12 Giao diện → `sc_theme`: Sáng/Tối/Hệ thống; lưu và đổi ngay, không restart player. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối) • 09/10: làm lại sc_theme "Giao diện": 2 mockup trình phát Tối/Sáng vẽ bằng code, màu nhấn chọn trực tiếp, thêm "Ảnh nền trình phát" (mờ/màu đơn) và "Hiệu ứng chuyển màn" (middleware tắt animation mọi route) — cả hai lưu pref và hoạt động thật. Bỏ lựa chọn "Theo hệ thống" theo mockup (radio phản ánh giao diện đang hiển thị).
 - [ ] P14-13 Màu nhấn → sheet preview/chọn/áp dụng; đảm bảo onPrimary tương phản theo màu chọn. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [ ] P14-14 Quyền truy cập → trạng thái thực + Mở cài đặt; quay lại cập nhật và hướng dẫn chọn nguồn nếu cần. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
-- [ ] P14-15 Giới thiệu → tên/phiên bản/build, chính sách, hỗ trợ và điểm mở Feedback. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
-- [ ] P14-16 Feedback `sc_feedback`: loại phản hồi nếu có, nội dung, email tùy chọn, validate và mở email composer. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
+- [ ] P14-15 Giới thiệu → tên/phiên bản/build, chính sách, hỗ trợ và điểm mở Feedback. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối) • 09/10: làm lại giống mockup sc_gioi_thieu: logo 5 thanh sóng, "Nhạc của bạn, mọi lúc", "Phiên bản x.y.z" (bỏ số build).
+- [ ] P14-16 Feedback `sc_feedback`: loại phản hồi nếu có, nội dung, email tùy chọn, validate và mở email composer. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối) • 09/10: làm lại giống mockup Gửi phản hồi: nền sóng, hình bong bóng chat, 3 nút loại (mặc định Báo lỗi), ô nội dung 0/1000 (giới hạn 2000 → 1000), email có icon, ghi chú cần mạng, nút gradient. ⛔ Phần "Ảnh đính kèm" chưa làm: cần thêm thư viện chọn ảnh + gửi mail có đính kèm (mailto không đính kèm được) — chờ duyệt.
 - [ ] P14-17 Gửi đến `contact.support@asctechsoft.com`; compose kèm phiên bản/thiết bị tối thiểu, không tự đính kèm thư viện nhạc. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [ ] P14-18 Nếu không có email app: thông báo + sao chép địa chỉ; không báo Đã gửi khi chỉ mở composer. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
 - [ ] P14-19 Rate dialog `sc_rate_app`: sao, Đánh giá/Để sau/đóng; mọi số sao đều được mở store, không chặn đánh giá thấp. — 🔧 đã code, chờ QA trên điện thoại thật (chưa có thiết bị kết nối)
@@ -492,3 +492,36 @@ Không mặc định iOS đọc toàn bộ thư viện file như Android. Phải
 - Luồng quan trọng phải chạy end-to-end bằng dữ liệu thật trước khi coi màn hoàn thiện.
 - Sau mỗi giai đoạn cập nhật README, ma trận screen→route và các quyết định kiến trúc đã chốt.
 - Thứ tự ưu tiên: nền tảng → dữ liệu/scan → setup → playback → shell/library/player → playlist/explore → settings/stats/OS → QA/release. Có thể làm UI song song sau khi contract service ổn định, nhưng không bỏ qua nghiệm thu.
+
+## 24. Nhật ký cập nhật
+
+### 08–09/10/2026 — Đối chiếu giao diện với mockup mới
+
+Kiểm chứng: mỗi màn được render bằng widget test ở 390×844 (font + ảnh thật) và đặt cạnh mockup; `flutter analyze` 0 issue; `flutter test` 77 pass; Kotlin `compileDevDebugKotlin` thành công. **Chưa** chạy trên điện thoại thật nên các mục liên quan vẫn giữ 🔧.
+
+| Màn / phần | Việc đã làm | Mục |
+|---|---|---|
+| Onboarding 1–3 | Làm lại giống mockup; logo Melo dùng chung `melo_logo.dart`; ảnh nền full-res | P06-04..06 |
+| Tab Cài đặt | Nền sóng, thẻ tài khoản, nhóm thẻ, icon gradient, căn thẳng mũi tên | P14-01 |
+| Giao diện (sc_theme) | Mockup trình phát Tối/Sáng, màu nhấn, Ảnh nền trình phát, Hiệu ứng chuyển màn | P14-12, P12-01 |
+| Quét thư viện | Vòng tiến độ, 3 bước quét thật (ScanPhase), Chạy nền/Dừng quét | P14-02, P05-05 |
+| Hẹn giờ tắt nhạc | Giao diện theo mockup, thẻ giờ dừng có ảnh, sửa font dropdown | P13-01 |
+| Phát qua tai nghe | Giao diện theo mockup, hình img_tai_nghe | P14-11 |
+| Gửi phản hồi | Giao diện theo mockup, giới hạn 1000 ký tự, mặc định Báo lỗi | P14-16 |
+| Giới thiệu | Giao diện theo mockup | P14-15 |
+| Khám phá | Giao diện theo mockup + chip tâm trạng lọc theo genre | P11-01, P11-04, P11-06 |
+| Dữ liệu genre | Native đọc genre, DB v2, quét bổ sung 1 lần, quy tắc `mood_rules.dart` + test | P04-02, P04-14, P05-01, P05-14 |
+| Component dùng chung | AppSwitch núm trắng, AppRadio có size, DetailAppBar nhận màu nền/kiểu chữ, `settings_detail_widgets.dart` (bảng màu màn chi tiết) | P03-12 |
+
+**Quyết định / chỗ khác mockup (có chủ ý):**
+- Các màn chi tiết trong Cài đặt dùng bảng màu riêng của mockup (nền `#0F131C`, thẻ `#141926`), chỉ ở theme tối; token chung của app không đổi.
+- Mini player và thanh điều hướng dưới giữ kiểu hiện tại: mockup Trang chủ và mockup Cài đặt vẽ hai kiểu khác nhau.
+- Hàng trong tab Cài đặt cao ≈37pt theo mockup (thấp hơn mức khuyến nghị 48pt).
+- Tên hiển thị trong app vẫn là "Muvik" (mockup ghi "Melo"); riêng logo/wordmark trong onboarding, mockup trình phát và header Khám phá ghi "Melo" theo thiết kế.
+- Chip tâm trạng chỉ chứa bài có thẻ genre khớp từ khoá; bài không có genre không được xếp vào tâm trạng nào (P11-04).
+
+**Còn chờ quyết định:**
+- [ ] Ảnh đính kèm trong Gửi phản hồi (cần thêm 2 thư viện: chọn ảnh, gửi mail có đính kèm).
+- [ ] Đổi tên hiển thị toàn app "Muvik" → "Melo" hay giữ nguyên.
+- [ ] Thống nhất kiểu mini player / thanh điều hướng theo mockup Trang chủ hay mockup Cài đặt.
+- [ ] QA trên điện thoại thật cho toàn bộ màn đã làm lại và lần quét bổ sung genre sau khi nâng cấp.

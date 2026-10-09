@@ -51,6 +51,6 @@ Figma keys are kept exactly as in the business spec (§1.3), typos included.
 - Mockups show the working name **"Melo"**; the app uses **Muvik** everywhere (P00-01).
 - Mockups `sc_step_01/02/03` show a bottom navigation bar and step 3 shows a theme choice; the spec (§1.4) forbids both, so setup has no navbar and step 3 shows the library result.
 - `sc_chat_luong_phat` mockup offers "Cân bằng / Tiết kiệm pin"; the spec forbids fake quality options, so the screen shows the real file properties and "Gốc" only.
-- `sc_kham_pha` mood chips (Êm dịu / Tập trung / Sôi động) are omitted: songs carry no mood tags (P11-04).
+- `sc_kham_pha` mood chips (Êm dịu / Tập trung / Sôi động) filter by the song's genre tag with fixed keyword rules (`lib/utils/mood_rules.dart`, P11-04). Genre is read at scan time (DB v2); existing libraries are rescanned once in the background after the upgrade.
 - `sc_thong_ke_*` mockups show a 5-tab bar with "Thống kê"; the app keeps 4 tabs and opens Statistics from Explore.
 - Folder names `image_sư_dung` / `scream_new` differ from the checklist (`image_su_dung` / `screen_new`); assets were converted to ASCII snake_case WebP under `assets/images/webp/`.

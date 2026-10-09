@@ -17,6 +17,7 @@ import '../services/application/listening_stats_service.dart';
 import '../services/application/playlist_service.dart';
 import '../services/application/song_identity.dart';
 import '../services/storage/pref_store.dart';
+import '../utils/mood_rules.dart';
 import '../utils/toast_utils.dart';
 
 /// Library-wide state for every screen: songs, groups, playlists, history,
@@ -176,6 +177,11 @@ class LibraryController extends GetxController {
 
   /// Ordered by first discovery, so rescans don't make everything "new"
   /// (P11-05).
+  /// Songs whose genre tag matches [mood] (rules in mood_rules.dart).
+  List<Song> songsByMood(Mood mood) =>
+      songs.where((s) => s.available && mood.matches(s)).toList()
+        ..sort(SongSort.titleAsc.compare);
+
   List<Song> recentlyAdded({int limit = 50}) {
     final list = [...songs]..sort(SongSort.recentlyAdded.compare);
     return list.take(limit).toList();

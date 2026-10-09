@@ -15,6 +15,13 @@ class SettingsController extends GetxController {
   final Rx<ThemeMode> themeMode = ThemeMode.system.obs;
   final Rx<AccentColor> accent = AccentColor.lavender.obs;
 
+  /// Now Playing background: blurred cover art, or the fixed theme gradient.
+  final RxBool playerBlurBackground =
+      (PrefDefaults.playerBackground == 'blur').obs;
+
+  /// Route animations on/off (applied by AppPages' transition middleware).
+  final RxBool screenTransitions = PrefDefaults.screenTransitions.obs;
+
   final RxBool pauseOnDisconnect = PrefDefaults.headphonePauseOnDisconnect.obs;
   final RxBool resumeOnConnect = PrefDefaults.headphoneResumeOnConnect.obs;
   final RxBool headphoneButtons = PrefDefaults.headphoneButtonsEnabled.obs;
@@ -27,6 +34,16 @@ class SettingsController extends GetxController {
     );
     accent.value = AccentColor.fromKey(
       PrefStore.getString(PrefConst.accentColor, PrefDefaults.accentColor),
+    );
+    playerBlurBackground.value =
+        PrefStore.getString(
+          PrefConst.playerBackground,
+          PrefDefaults.playerBackground,
+        ) ==
+        'blur';
+    screenTransitions.value = PrefStore.getBool(
+      PrefConst.screenTransitions,
+      PrefDefaults.screenTransitions,
     );
     pauseOnDisconnect.value = PrefStore.getBool(
       PrefConst.headphonePauseOnDisconnect,
@@ -68,6 +85,19 @@ class SettingsController extends GetxController {
   Future<void> setAccent(AccentColor a) async {
     accent.value = a;
     await PrefStore.setString(PrefConst.accentColor, a.key);
+  }
+
+  Future<void> setPlayerBlurBackground(bool blur) async {
+    playerBlurBackground.value = blur;
+    await PrefStore.setString(
+      PrefConst.playerBackground,
+      blur ? 'blur' : 'solid',
+    );
+  }
+
+  Future<void> setScreenTransitions(bool v) async {
+    screenTransitions.value = v;
+    await PrefStore.setBool(PrefConst.screenTransitions, v);
   }
 
   Future<void> setPauseOnDisconnect(bool v) async {

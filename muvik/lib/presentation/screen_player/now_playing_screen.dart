@@ -1,7 +1,11 @@
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controller/playback_controller.dart';
+import '../../controller/settings_controller.dart';
 import '../../models/ui_models/repeat_mode.dart';
 import '../../values/app_colors.dart';
 import '../../values/app_dimensions.dart';
@@ -29,14 +33,7 @@ class NowPlayingScreen extends StatelessWidget {
     final c = context.colors;
     final pc = PlaybackController.to;
     return Scaffold(
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [c.surfaceSelected, c.background],
-          ),
-        ),
+      body: _PlayerBackground(
         child: SafeArea(
           child: Obx(() {
             final s = pc.state.value;
@@ -293,6 +290,68 @@ class _Option extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Theme gradient, or a blurred copy of the playing cover when "Mờ từ ảnh
+/// bìa" is on (sc_theme). Falls back to the gradient without artwork.
+class _PlayerBackground extends StatelessWidget {
+  const _PlayerBackground({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    final gradient = DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [c.surfaceSelected, c.background],
+        ),
+      ),
+    );
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        gradient,
+        Obx(() {
+          final uri = PlaybackController.to.currentSong?.uri;
+          if (!SettingsController.to.playerBlurBackground.value ||
+              uri == null) {
+            return const SizedBox.shrink();
+          }
+          final peek = ArtworkCache.peek(uri);
+          return FutureBuilder<Uint8List?>(
+            key: ValueKey(uri),
+            initialData: peek,
+            future: peek == null ? ArtworkCache.load(uri) : null,
+            builder: (context, snap) {
+              final bytes = snap.data;
+              if (bytes == null) return const SizedBox.shrink();
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  ImageFiltered(
+                    imageFilter: ui.ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                    child: Image.memory(
+                      bytes,
+                      fit: BoxFit.cover,
+                      gaplessPlayback: true,
+                      cacheWidth: 200,
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    ),
+                  ),
+                  // Keeps text and controls readable over any cover.
+                  ColoredBox(color: c.background.withValues(alpha: 0.6)),
+                ],
+              );
+            },
+          );
+        }),
+        child,
+      ],
     );
   }
 }

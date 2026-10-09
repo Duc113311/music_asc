@@ -45,6 +45,7 @@ class RawAudioFile {
     required this.relativePath,
     required this.fileName,
     this.dateAddedMs = 0,
+    this.genre,
   });
 
   final String uri;
@@ -62,6 +63,9 @@ class RawAudioFile {
   final String fileName;
   final int dateAddedMs;
 
+  /// Genre tag as stored in the file (may be null or free text).
+  final String? genre;
+
   factory RawAudioFile.fromMap(Map m) => RawAudioFile(
     uri: m['uri'] as String,
     mediaId: (m['mediaId'] as num?)?.toInt(),
@@ -75,6 +79,7 @@ class RawAudioFile {
     relativePath: (m['relativePath'] as String?) ?? '',
     fileName: (m['displayName'] as String?) ?? '',
     dateAddedMs: (m['dateAddedMs'] as num?)?.toInt() ?? 0,
+    genre: m['genre'] as String?,
   );
 }
 

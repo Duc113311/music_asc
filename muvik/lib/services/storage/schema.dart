@@ -4,7 +4,7 @@ class DbSchema {
   DbSchema._();
 
   static const String dbName = 'muvik.db';
-  static const int dbVersion = 1;
+  static const int dbVersion = 2;
 
   static const String tableSongs = 'songs';
   static const String tableSources = 'music_sources';
@@ -139,5 +139,8 @@ class DbSchema {
   /// Ordered migration steps keyed by the version they upgrade *to*.
   /// Example for a future release:
   ///   2: ['ALTER TABLE songs ADD COLUMN bitrate INTEGER'],
-  static const Map<int, List<String>> migrations = {};
+  static const Map<int, List<String>> migrations = {
+    // v2: genre tag for the Explore mood chips (filled by the next scan).
+    2: ['ALTER TABLE $tableSongs ADD COLUMN genre TEXT'],
+  };
 }

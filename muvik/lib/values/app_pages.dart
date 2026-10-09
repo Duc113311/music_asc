@@ -5,6 +5,7 @@ import '../controller/feedback_controller.dart';
 import '../controller/onboarding_controller.dart';
 import '../controller/playlist_detail_controller.dart';
 import '../controller/search_controller.dart';
+import '../controller/settings_controller.dart';
 import '../controller/setup_controller.dart';
 import '../controller/statistics_controller.dart';
 import '../presentation/screen_debug/component_preview_screen.dart';
@@ -37,7 +38,14 @@ import 'route_name.dart';
 class AppPages {
   AppPages._();
 
+  /// Every route gets [_TransitionMiddleware] so "Hiệu ứng chuyển màn" can
+  /// switch animations off app-wide.
   static final List<GetPage<dynamic>> pages = [
+    for (final p in _pages)
+      p.copy(middlewares: [...?p.middlewares, _TransitionMiddleware()]),
+  ];
+
+  static final List<GetPage<dynamic>> _pages = [
     GetPage(name: RouteName.splash, page: () => const SplashScreen()),
     GetPage(
       name: RouteName.onboarding,
@@ -125,4 +133,20 @@ class AppPages {
         page: () => const ComponentPreviewScreen(),
       ),
   ];
+}
+
+/// Replaces the route animation with none while screen transitions are off.
+class _TransitionMiddleware extends GetMiddleware {
+  @override
+  GetPage<dynamic>? onPageCalled(GetPage<dynamic>? page) {
+    if (page == null ||
+        !Get.isRegistered<SettingsController>() ||
+        SettingsController.to.screenTransitions.value) {
+      return page;
+    }
+    return page.copy(
+      transition: Transition.noTransition,
+      transitionDuration: Duration.zero,
+    );
+  }
 }

@@ -6,10 +6,9 @@ import '../../controller/settings_controller.dart';
 import '../../services/application/audio_handler.dart';
 import '../../values/app_assets.dart';
 import '../../values/app_colors.dart';
-import '../../values/app_dimensions.dart';
 import '../../values/app_typography.dart';
 import '../common_components/app_controls.dart';
-import '../common_components/cards.dart';
+import 'settings_detail_widgets.dart';
 
 /// sc_phat_qua_tai_nghe: disconnect pauses by default; reconnect resumes only
 /// if enabled; headset buttons can be turned off (P14-11, P17-09).
@@ -18,88 +17,73 @@ class HeadphonesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = context.colors;
     final s = SettingsController.to;
-    return Scaffold(
-      appBar: DetailAppBar(title: 'settings_headphones'.tr),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.screenH),
-          children: [
-            Image.asset(AppAssets.headphones, height: 150, fit: BoxFit.contain),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              'hp_when_connected'.tr,
-              style: AppTypography.headingS.copyWith(color: c.textPrimary),
+    return DetailScaffold(
+      title: 'settings_headphones'.tr,
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(13.5, 0, 13.5, 24),
+        children: [
+          const _Hero(),
+          DetailSectionLabel('hp_when_connected'.tr),
+          Obx(
+            () => DetailCard(
+              dividerIndent: 18,
+              children: [
+                _Toggle(
+                  title: 'hp_resume'.tr,
+                  desc: 'hp_resume_desc'.tr,
+                  value: s.resumeOnConnect.value,
+                  onChanged: s.setResumeOnConnect,
+                ),
+                _Toggle(
+                  title: 'hp_pause'.tr,
+                  desc: 'hp_pause_desc'.tr,
+                  value: s.pauseOnDisconnect.value,
+                  onChanged: s.setPauseOnDisconnect,
+                ),
+                _Toggle(
+                  title: 'hp_buttons'.tr,
+                  desc: 'hp_buttons_desc'.tr,
+                  value: s.headphoneButtons.value,
+                  onChanged: s.setHeadphoneButtons,
+                ),
+              ],
             ),
-            const SizedBox(height: AppSpacing.xs),
-            Obx(
-              () => SettingsGroupCard(
-                children: [
-                  _Toggle(
-                    title: 'hp_resume'.tr,
-                    desc: 'hp_resume_desc'.tr,
-                    value: s.resumeOnConnect.value,
-                    onChanged: s.setResumeOnConnect,
-                  ),
-                  _Toggle(
-                    title: 'hp_pause'.tr,
-                    desc: 'hp_pause_desc'.tr,
-                    value: s.pauseOnDisconnect.value,
-                    onChanged: s.setPauseOnDisconnect,
-                  ),
-                  _Toggle(
-                    title: 'hp_buttons'.tr,
-                    desc: 'hp_buttons_desc'.tr,
-                    value: s.headphoneButtons.value,
-                    onChanged: s.setHeadphoneButtons,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              'hp_output'.tr,
-              style: AppTypography.headingS.copyWith(color: c.textPrimary),
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            const _OutputDevices(),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'hp_output_note'.tr,
-              style: AppTypography.caption.copyWith(color: c.textMuted),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 27),
+          DetailSectionLabel('hp_output'.tr),
+          const _OutputDevices(),
+        ],
       ),
     );
   }
 }
 
-class SettingsGroupCard extends StatelessWidget {
-  const SettingsGroupCard({super.key, required this.children});
-  final List<Widget> children;
+/// img_tai_nghe placed so the headphones match the mockup (≈130pt wide);
+/// the glow is allowed to bleed past the screen edges.
+class _Hero extends StatelessWidget {
+  const _Hero();
+
+  // Asset 1881×836; the headphones span y 146..704 px.
+  static const _scale = 129 / 558;
 
   @override
   Widget build(BuildContext context) {
-    final c = context.colors;
-    return Container(
-      decoration: BoxDecoration(
-        color: c.surface,
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: c.border),
-      ),
-      child: Column(
+    return SizedBox(
+      height: 164,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.topCenter,
         children: [
-          for (var i = 0; i < children.length; i++) ...[
-            if (i > 0)
-              Divider(
-                color: c.divider,
-                indent: AppSpacing.md,
-                endIndent: AppSpacing.md,
-              ),
-            children[i],
-          ],
+          Positioned(
+            top: 12.5 - 146 * _scale,
+            child: Image.asset(
+              AppAssets.headphones,
+              width: 1881 * _scale,
+              height: 836 * _scale,
+              fit: BoxFit.fill,
+            ),
+          ),
         ],
       ),
     );
@@ -120,14 +104,11 @@ class _Toggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = context.colors;
+    final p = DetailPalette.of(context);
     return InkWell(
       onTap: () => onChanged(!value),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.xs,
-        ),
+        padding: const EdgeInsets.fromLTRB(18, 13, 8, 13),
         child: Row(
           children: [
             Expanded(
@@ -136,11 +117,23 @@ class _Toggle extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: AppTypography.bodyL.copyWith(color: c.textPrimary),
+                    style: AppTypography.bodyL.copyWith(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w500,
+                      color: p.text,
+                    ),
                   ),
-                  Text(
-                    desc,
-                    style: AppTypography.bodyM.copyWith(color: c.textSecondary),
+                  const SizedBox(height: 3),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 255),
+                    child: Text(
+                      desc,
+                      style: AppTypography.bodyM.copyWith(
+                        fontSize: 12,
+                        height: 1.45,
+                        color: p.muted,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -184,31 +177,57 @@ class _OutputDevicesState extends State<_OutputDevices> {
         .where((d) => MuvikAudioHandler.isHeadsetDevice(d.type))
         .toList();
     final usingHeadset = headsets.isNotEmpty;
+    final p = DetailPalette.of(context);
+    // Read-only: Android picks the output; the radio shows the active one.
     Widget row(IconData icon, String title, String sub, bool active) =>
-        ListTile(
-          minTileHeight: 64,
-          leading: Icon(icon, color: active ? c.primary : c.iconDefault),
-          title: Text(
-            title,
-            style: AppTypography.bodyL.copyWith(color: c.textPrimary),
+        Semantics(
+          selected: active,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(22, 15, 18, 15),
+            child: Row(
+              children: [
+                Icon(icon, size: 27, color: active ? c.primary : p.muted),
+                const SizedBox(width: 26),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: AppTypography.bodyL.copyWith(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w500,
+                          color: active ? p.text : p.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        sub,
+                        style: AppTypography.bodyM.copyWith(
+                          fontSize: 12,
+                          color: p.muted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                AppRadio(selected: active, size: 22),
+              ],
+            ),
           ),
-          subtitle: Text(
-            sub,
-            style: AppTypography.bodyM.copyWith(color: c.textSecondary),
-          ),
-          trailing: AppRadio(selected: active),
         );
-    return SettingsGroupCard(
+    return DetailCard(
+      dividerIndent: 18,
       children: [
         row(
-          Icons.volume_up_rounded,
+          Icons.volume_up_outlined,
           'hp_speaker'.tr,
           'hp_speaker_desc'.tr,
           !usingHeadset,
         ),
         if (headsets.isEmpty)
           row(
-            Icons.headphones_rounded,
+            Icons.headphones_outlined,
             'hp_headset'.tr,
             'hp_not_connected'.tr,
             false,
@@ -216,7 +235,7 @@ class _OutputDevicesState extends State<_OutputDevices> {
         else
           for (final d in headsets)
             row(
-              Icons.headphones_rounded,
+              Icons.headphones_outlined,
               d.name.isEmpty ? 'hp_headset'.tr : d.name,
               'hp_connected'.tr,
               true,

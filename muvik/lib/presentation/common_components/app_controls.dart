@@ -6,9 +6,15 @@ import '../../values/app_typography.dart';
 
 /// 24×24 radio, 2 dp ring, 12 dp dot (Design System §7).
 class AppRadio extends StatelessWidget {
-  const AppRadio({super.key, required this.selected, this.enabled = true});
+  const AppRadio({
+    super.key,
+    required this.selected,
+    this.enabled = true,
+    this.size = 24,
+  });
   final bool selected;
   final bool enabled;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +24,8 @@ class AppRadio extends StatelessWidget {
       opacity: enabled ? 1 : 0.4,
       child: AnimatedContainer(
         duration: AppMotion.state,
-        width: 24,
-        height: 24,
+        width: size,
+        height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(color: color, width: 2),
@@ -27,8 +33,8 @@ class AppRadio extends StatelessWidget {
         alignment: Alignment.center,
         child: AnimatedContainer(
           duration: AppMotion.state,
-          width: selected ? 12 : 0,
-          height: selected ? 12 : 0,
+          width: selected ? size / 2 : 0,
+          height: selected ? size / 2 : 0,
           decoration: BoxDecoration(shape: BoxShape.circle, color: c.primary),
         ),
       ),
@@ -101,20 +107,24 @@ class AppSwitch extends StatelessWidget {
               child: AnimatedContainer(
                 duration: AppMotion.state,
                 curve: AppMotion.curve,
-                width: 48,
-                height: 28,
-                padding: const EdgeInsets.all(2),
+                width: 44,
+                height: 25,
+                padding: const EdgeInsets.all(2.5),
                 decoration: BoxDecoration(
                   color: value ? c.primary : c.border,
                   borderRadius: BorderRadius.circular(AppRadius.full),
                 ),
                 alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+                // White thumb in both states, as in every settings mockup.
                 child: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
+                  width: 20,
+                  height: 20,
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: value ? c.onPrimary : c.textSecondary,
+                    color: Color(0xFFF7F6FB),
+                    boxShadow: [
+                      BoxShadow(color: Color(0x33000000), blurRadius: 2),
+                    ],
                   ),
                 ),
               ),

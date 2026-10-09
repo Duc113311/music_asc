@@ -1,10 +1,15 @@
 enum ScanStatus { idle, scanning, success, partial, error, cancelled }
 
+/// Steps shown on sc_quet_thu_vien while scanning: read file metadata, then
+/// rebuild albums/artists, then write availability and source info.
+enum ScanPhase { reading, albums, updating }
+
 /// Progress + result of a library scan. `total` is null when the platform
 /// cannot tell the file count up front (show processed count, not a fake %).
 class ScanState {
   const ScanState({
     this.status = ScanStatus.idle,
+    this.phase = ScanPhase.reading,
     this.processed = 0,
     this.total,
     this.added = 0,
@@ -16,6 +21,7 @@ class ScanState {
   });
 
   final ScanStatus status;
+  final ScanPhase phase;
   final int processed;
   final int? total;
   final int added;
@@ -35,6 +41,7 @@ class ScanState {
 
   ScanState copyWith({
     ScanStatus? status,
+    ScanPhase? phase,
     int? processed,
     int? total,
     int? added,
@@ -45,6 +52,7 @@ class ScanState {
     String? errorCode,
   }) => ScanState(
     status: status ?? this.status,
+    phase: phase ?? this.phase,
     processed: processed ?? this.processed,
     total: total ?? this.total,
     added: added ?? this.added,

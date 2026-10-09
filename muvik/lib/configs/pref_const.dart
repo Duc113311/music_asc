@@ -7,10 +7,14 @@ class PrefConst {
   static const String setupCompleted = 'setup_completed';
   static const String setupStep = 'setup_step';
   static const String permissionDeferred = 'permission_deferred';
+  // One rescan after DB v2 so existing songs get their genre tag.
+  static const String genreBackfillDone = 'genre_backfill_done';
 
   // Appearance (locale: PrefComm.CONFIGURED_LOCALE_BY_USER in dsp_base)
   static const String themeMode = 'theme_mode'; // system | light | dark
   static const String accentColor = 'accent_color'; // accent key
+  static const String playerBackground = 'player_background'; // blur | solid
+  static const String screenTransitions = 'screen_transitions';
 
   // Playback modes
   static const String repeatMode = 'repeat_mode'; // off | all | one

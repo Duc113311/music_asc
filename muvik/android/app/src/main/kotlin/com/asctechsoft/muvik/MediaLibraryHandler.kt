@@ -150,6 +150,19 @@ class MediaLibraryHandler(private val activity: Activity) : MethodChannel.Method
             MediaStore.Audio.Media.DISPLAY_NAME,
             MediaStore.Audio.Media.DATE_ADDED
         )
+        // GENRE is a column from Android 11; older versions use the Genres table.
+        val hasGenreColumn = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+        if (hasGenreColumn) cols.add(MediaStore.Audio.Media.GENRE)
+        val legacyGenres = if (hasGenreColumn) {
+            emptyMap()
+        } else {
+            // Built once per scan (first batch), reused for later batches.
+            val cached = legacyGenreCache
+            if (offset == 0 || cached == null || cached.first != volume) {
+                legacyGenreCache = volume to legacyGenreMap(volume)
+            }
+            legacyGenreCache!!.second
+        }
         val hasRelative = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
         cols.add(if (hasRelative) MediaStore.Audio.Media.RELATIVE_PATH else MediaStore.Audio.Media.DATA)
 
@@ -169,6 +182,7 @@ class MediaLibraryHandler(private val activity: Activity) : MethodChannel.Method
             val iName = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
             val iAdded = c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
             val iPath = c.getColumnIndexOrThrow(cols.last())
+            val iGenre = if (hasGenreColumn) c.getColumnIndex(MediaStore.Audio.Media.GENRE) else -1
             do {
                 val id = c.getLong(iId)
                 val name = c.getString(iName) ?: ""
@@ -187,10 +201,42 @@ class MediaLibraryHandler(private val activity: Activity) : MethodChannel.Method
                         "mime" to c.getString(iMime),
                         "displayName" to name,
                         "relativePath" to relative,
-                        "dateAddedMs" to c.getLong(iAdded) * 1000L
+                        "dateAddedMs" to c.getLong(iAdded) * 1000L,
+                        "genre" to (if (iGenre >= 0) c.getString(iGenre) else legacyGenres[id])
                     )
                 )
             } while (out.size < limit && c.moveToNext())
+        }
+        return out
+    }
+
+    private var legacyGenreCache: Pair<String, Map<Long, String>>? = null
+
+    /** audio id → genre name from MediaStore.Audio.Genres (Android 10 and older). */
+    private fun legacyGenreMap(volume: String): Map<Long, String> {
+        val out = mutableMapOf<Long, String>()
+        try {
+            val genresUri = MediaStore.Audio.Genres.getContentUri(volume)
+            context.contentResolver.query(
+                genresUri,
+                arrayOf(MediaStore.Audio.Genres._ID, MediaStore.Audio.Genres.NAME),
+                null, null, null
+            )?.use { g ->
+                val iId = g.getColumnIndexOrThrow(MediaStore.Audio.Genres._ID)
+                val iName = g.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME)
+                while (g.moveToNext()) {
+                    val name = g.getString(iName) ?: continue
+                    val members = MediaStore.Audio.Genres.Members.getContentUri(volume, g.getLong(iId))
+                    context.contentResolver.query(
+                        members, arrayOf(MediaStore.Audio.Genres.Members.AUDIO_ID), null, null, null
+                    )?.use { m ->
+                        val iAudio = m.getColumnIndexOrThrow(MediaStore.Audio.Genres.Members.AUDIO_ID)
+                        while (m.moveToNext()) out.putIfAbsent(m.getLong(iAudio), name)
+                    }
+                }
+            }
+        } catch (_: Exception) {
+            // Genre is optional; songs simply stay without one.
         }
         return out
     }
@@ -317,6 +363,7 @@ class MediaLibraryHandler(private val activity: Activity) : MethodChannel.Method
                     "title" to r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE),
                     "artist" to r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST),
                     "album" to r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM),
+                    "genre" to r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE),
                     "durationMs" to (r.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L)
                 )
             } catch (_: Exception) {

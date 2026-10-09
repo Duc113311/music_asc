@@ -267,7 +267,11 @@ class LibraryScanService {
         }
       }
 
+      s = s.copyWith(phase: ScanPhase.albums);
+      state.value = s;
       await library.reload();
+      s = s.copyWith(phase: ScanPhase.updating);
+      state.value = s;
       await refreshSources();
       final status = _cancelRequested
           ? ScanStatus.cancelled
@@ -365,6 +369,7 @@ class LibraryScanService {
               title: m['title'] as String?,
               artist: m['artist'] as String?,
               album: m['album'] as String?,
+              genre: m['genre'] as String?,
               durationMs: (m['durationMs'] as num?)?.toInt() ?? 0,
               sizeBytes: f.sizeBytes,
               mimeType: f.mimeType,
@@ -422,6 +427,7 @@ class LibraryScanService {
               folderPath: folder,
               fileName: f.fileName,
               dateAddedMs: f.dateAddedMs,
+              genre: _cleanGenre(f.genre),
               firstSeenAt: now,
               updatedAt: now,
             ),
@@ -444,17 +450,28 @@ class LibraryScanService {
           folderPath: folder,
           fileName: f.fileName,
           dateAddedMs: f.dateAddedMs,
+          genre: _cleanGenre(f.genre),
           available: true,
           updatedAt: now,
         );
         final changed = old.metadataDiffers(fresh);
-        if (changed || !old.available || old.sourceId != src.id) {
+        // A newly read genre is saved but not reported as an "update".
+        final genreChanged = old.genre != fresh.genre;
+        if (changed ||
+            genreChanged ||
+            !old.available ||
+            old.sourceId != src.id) {
           await _songs.update(fresh, exec: txn);
           if (changed) updated++;
         }
       }
     });
     return (added: added, updated: updated);
+  }
+
+  static String? _cleanGenre(String? g) {
+    final t = g?.trim();
+    return t == null || t.isEmpty ? null : t;
   }
 
   String _folderPath(MusicSource src, String relativePath) {

@@ -157,6 +157,8 @@ class SetupController extends GetxController with WidgetsBindingObserver {
 
   Future<void> finish() async {
     await PrefStore.setBool(PrefConst.setupCompleted, true);
+    // Setup scans with the genre-aware schema; no backfill needed later.
+    await PrefStore.setBool(PrefConst.genreBackfillDone, true);
     await PrefStore.setInt(PrefConst.setupStep, 0);
     Get.offAllNamed(RouteName.home);
   }

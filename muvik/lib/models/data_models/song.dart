@@ -27,6 +27,7 @@ class Song {
     this.hidden = false,
     this.favorite = false,
     this.favoriteAt,
+    this.genre,
   });
 
   final int? id;
@@ -50,6 +51,9 @@ class Song {
   final bool hidden;
   final bool favorite;
   final DateTime? favoriteAt;
+
+  /// Genre tag read at scan time; drives the Explore mood chips.
+  final String? genre;
 
   Duration get duration => Duration(milliseconds: durationMs);
 
@@ -90,6 +94,7 @@ class Song {
     'hidden': hidden ? 1 : 0,
     'favorite': favorite ? 1 : 0,
     'favorite_at': favoriteAt?.toUtc().toIso8601String(),
+    'genre': genre,
     'search_key': MetadataFallback.searchKey([
       displayTitle,
       artist ?? '',
@@ -123,6 +128,7 @@ class Song {
     favoriteAt: m['favorite_at'] == null
         ? null
         : DateTime.parse(m['favorite_at'] as String).toLocal(),
+    genre: m['genre'] as String?,
   );
 
   Song copyWith({
@@ -145,6 +151,7 @@ class Song {
     bool? hidden,
     bool? favorite,
     DateTime? favoriteAt,
+    String? genre,
   }) => Song(
     id: id ?? this.id,
     sourceId: sourceId ?? this.sourceId,
@@ -167,6 +174,7 @@ class Song {
     hidden: hidden ?? this.hidden,
     favorite: favorite ?? this.favorite,
     favoriteAt: favoriteAt ?? this.favoriteAt,
+    genre: genre ?? this.genre,
   );
 
   /// True when scanned metadata differs from what is stored (used to count

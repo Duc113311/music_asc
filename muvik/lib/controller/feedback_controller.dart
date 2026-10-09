@@ -16,11 +16,11 @@ enum FeedbackType {
 /// the email app; the app never claims the mail was sent (P14-16..18).
 class FeedbackController extends GetxController {
   static const int minLength = 10;
-  static const int maxLength = 2000;
+  static const int maxLength = 1000;
 
   final TextEditingController content = TextEditingController();
   final TextEditingController email = TextEditingController();
-  final Rx<FeedbackType> type = FeedbackType.idea.obs;
+  final Rx<FeedbackType> type = FeedbackType.bug.obs;
   final RxnString contentError = RxnString();
   final RxnString emailError = RxnString();
   final RxBool noEmailApp = false.obs;

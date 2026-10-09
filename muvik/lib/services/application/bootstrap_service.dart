@@ -5,7 +5,10 @@ import 'package:get/get.dart';
 
 import '../../controller/library_controller.dart';
 import '../../controller/playback_controller.dart';
+import '../../configs/pref_const.dart';
+import '../../configs/pref_defaults.dart';
 import '../storage/database_helper.dart';
+import '../storage/pref_store.dart';
 import 'audio_handler.dart';
 import 'auth_service.dart';
 import 'equalizer_service.dart';
@@ -90,5 +93,29 @@ class BootstrapService {
     _ensure(LibraryController.new);
     _ensure(PlaybackController.new);
     _done = true;
+    _backfillGenres(scan);
+  }
+
+  /// Libraries scanned before DB v2 have no genre; rescan once in the
+  /// background (same as "Quét lại", nothing is deleted).
+  static void _backfillGenres(LibraryScanService scan) {
+    final due =
+        PrefStore.getBool(
+          PrefConst.setupCompleted,
+          PrefDefaults.setupCompleted,
+        ) &&
+        !PrefStore.getBool(
+          PrefConst.genreBackfillDone,
+          PrefDefaults.genreBackfillDone,
+        ) &&
+        scan.permission.value == AudioPermissionStatus.granted;
+    if (!due) return;
+    unawaited(
+      scan.scan().then((s) async {
+        if (s.isFinished) {
+          await PrefStore.setBool(PrefConst.genreBackfillDone, true);
+        }
+      }),
+    );
   }
 }

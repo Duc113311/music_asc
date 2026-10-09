@@ -6,9 +6,12 @@ class PrefDefaults {
   static const bool setupCompleted = false;
   static const int setupStep = 0;
   static const bool permissionDeferred = false;
+  static const bool genreBackfillDone = false;
 
   static const String themeMode = 'system';
   static const String accentColor = 'lavender';
+  static const String playerBackground = 'blur';
+  static const bool screenTransitions = true;
 
   static const String repeatMode = 'off';
   static const String shuffleMode = 'off';
