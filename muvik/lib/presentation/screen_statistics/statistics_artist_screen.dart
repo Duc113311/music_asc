@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../controller/library_controller.dart';
 import '../../controller/playback_controller.dart';
+import '../../models/data_models/song.dart';
 import '../../models/ui_models/period_type.dart';
 import '../../services/application/statistics_service.dart';
 import '../../utils/duration_formatter.dart';
@@ -27,19 +28,23 @@ class StatisticsArtistArgs {
 
 /// Artist statistics for the selected period; Back returns to the same
 /// period (spec §7.3).
-class StatisticsArtistScreen extends StatelessWidget {
+class StatisticsArtistScreen extends StatefulWidget {
   const StatisticsArtistScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final args = Get.arguments as StatisticsArtistArgs;
-    final c = context.colors;
-    final lib = LibraryController.to;
-    final pc = PlaybackController.to;
+  State<StatisticsArtistScreen> createState() => _StatisticsArtistScreenState();
+}
+
+class _StatisticsArtistScreenState extends State<StatisticsArtistScreen> {
+  final args = Get.arguments as StatisticsArtistArgs;
+  late final List<Song> songs = _artistSongs();
+  late Future<PeriodStats> _stats = _load();
+
+  List<Song> _artistSongs() {
     final key = args.artist == null
         ? null
         : MetadataFallback.normalize(args.artist!);
-    final songs = lib.songs
+    return LibraryController.to.songs
         .where(
           (s) => key == null
               ? s.artistOrNull == null
@@ -47,16 +52,29 @@ class StatisticsArtistScreen extends StatelessWidget {
                     MetadataFallback.normalize(s.artistOrNull!) == key),
         )
         .toList();
+  }
+
+  Future<PeriodStats> _load() => Get.find<StatisticsService>().load(
+    args.period,
+    songIds: songs.map((s) => s.id!).toList(),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    final pc = PlaybackController.to;
     final name = args.artist ?? 'unknown_artist'.tr;
     return ScaffoldWithMiniPlayer(
       appBar: DetailAppBar(title: name),
       body: FutureBuilder<PeriodStats>(
-        future: Get.find<StatisticsService>().load(
-          args.period,
-          songIds: songs.map((s) => s.id!).toList(),
-        ),
+        future: _stats,
         builder: (context, snap) {
-          if (snap.hasError) return ErrorState(message: 'stats_load_failed'.tr);
+          if (snap.hasError) {
+            return ErrorState(
+              message: 'stats_load_failed'.tr,
+              onRetry: () async => setState(() => _stats = _load()),
+            );
+          }
           final s = snap.data;
           if (s == null) return const LoadingState();
           return ListView(

@@ -199,6 +199,11 @@ class _CardStyle {
   Color get border => dark ? const Color(0xFF222D7D) : _c.border;
   Color get divider => dark ? const Color(0xFF1D366C) : _c.divider;
 
+  ShapeBorder get shape => RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(12),
+    side: BorderSide(color: border),
+  );
+
   BoxDecoration get decoration => BoxDecoration(
     color: fill,
     borderRadius: BorderRadius.circular(12),
@@ -326,8 +331,10 @@ class _Group extends StatelessWidget {
             ),
           ),
         ),
-        Container(
-          decoration: style.decoration,
+        // Material (not a decorated Container) so the rows' ripples show.
+        Material(
+          color: style.fill,
+          shape: style.shape,
           clipBehavior: Clip.antiAlias,
           child: Column(
             children: [
@@ -374,9 +381,9 @@ class _Row extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 37),
+          constraints: const BoxConstraints(minHeight: 41),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 8, 4),
+            padding: const EdgeInsets.fromLTRB(16, 6, 8, 6),
             child: Row(
               children: [
                 icon,

@@ -21,13 +21,13 @@ VS Code: `.vscode/launch.json` at the repo root has Muvik (dev / alpha / product
 
 | File | Why |
 |---|---|
-| `android/app/google-services.json` | Firebase project `muvik-app` (Crashlytics, Analytics, Google sign-in client ids) |
-| `android/debug_keystore.properties` | Read by dsp_base's Gradle script; keys `appCheckToken`, `appCheckKey` (16 chars), `secretToken`, `secretKey` (16 chars). Any values work while Firebase App Check is off |
+| `android/app/google-services.json` | Firebase project `muvik-app` (Crashlytics, Analytics, Google sign-in client ids). Download it from the Firebase console (Project settings → Android app `com.asctechsoft.muvik`); the build fails without it. Google sign-in only works when the machine's SHA-1 (`keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android`) is registered there |
+| `android/debug_keystore.properties` | Read by dsp_base's Gradle script; keys `appCheckToken`, `appCheckKey` (16 chars), `secretToken`, `secretKey` (16 chars). Any values work while Firebase App Check is off. **Created automatically** from `android/debug_keystore.properties.example` on the first Gradle build if missing |
 
 ## Base package: dsp_base
 
 Muvik builds on the ASC shared base [`dsp_base`](https://github.com/asctechsoft/dsp_base_app)
-(git dependency, commit pinned in `pubspec.lock`; `flutter pub upgrade dsp_base` pulls `main`).
+(git dependency pinned to a commit in `pubspec.yaml` `ref:`; change that ref to update).
 
 | dsp_base piece | Used for |
 |---|---|

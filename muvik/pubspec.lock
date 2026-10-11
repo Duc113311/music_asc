@@ -149,7 +149,7 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: main
+      ref: "2e8d22ebef6061dc9c1290e3659bd99a5a461948"
       resolved-ref: "2e8d22ebef6061dc9c1290e3659bd99a5a461948"
       url: "https://github.com/asctechsoft/dsp_base_app.git"
     source: git

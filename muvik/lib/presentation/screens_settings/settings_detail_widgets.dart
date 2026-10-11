@@ -80,29 +80,32 @@ class DetailCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = DetailPalette.of(context);
-    return Container(
-      padding: padding,
-      decoration: BoxDecoration(
-        color: p.card,
+    // Material (not a decorated Container) so the rows' ripples show.
+    return Material(
+      color: p.card,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: p.border),
+        side: BorderSide(color: p.border),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (var i = 0; i < children.length; i++) ...[
-            if (i > 0)
-              Divider(
-                height: 1,
-                thickness: 1,
-                indent: dividerIndent,
-                endIndent: dividerIndent,
-                color: p.divider,
-              ),
-            children[i],
+      child: Padding(
+        padding: padding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < children.length; i++) ...[
+              if (i > 0)
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  indent: dividerIndent,
+                  endIndent: dividerIndent,
+                  color: p.divider,
+                ),
+              children[i],
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

@@ -136,6 +136,8 @@ class PlaylistDetailScreen extends GetView<PlaylistDetailController> {
       return EmptyState(
         icon: Icons.playlist_remove_rounded,
         title: 'playlist_missing'.tr,
+        actionLabel: 'action_back'.tr,
+        onAction: () async => Get.back<void>(),
       );
     }
     if (controller.editing.value) {

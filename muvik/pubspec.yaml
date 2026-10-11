@@ -38,11 +38,12 @@ dependencies:
     sdk: flutter
   get: ^4.7.3
   # ASC shared base (CommApp, commRunApp, CommLocalize, PrefAssist, App* widgets).
-  # Pinned commit lives in pubspec.lock; `flutter pub upgrade dsp_base` pulls main.
+  # Pinned to a commit so an upstream push cannot break the build; to update,
+  # change `ref` to the new commit and run `flutter pub get`.
   dsp_base:
     git:
       url: https://github.com/asctechsoft/dsp_base_app.git
-      ref: main
+      ref: 2e8d22ebef6061dc9c1290e3659bd99a5a461948
   firebase_core: ^4.0.0
   firebase_crashlytics: ^5.0.1
   sqflite: ^2.4.2+1

@@ -26,6 +26,7 @@ class PrefConst {
   static const String eqCustomGains = 'eq_custom_gains'; // csv of dB per band
   static const String eqBassStrength = 'eq_bass_strength'; // 0..1000
   static const String eqVirtualizerStrength = 'eq_virtualizer_strength';
+  static const String eqLoudnessGainDb = 'eq_loudness_gain_db'; // 0..10
 
   // Headphones
   static const String headphonePauseOnDisconnect =

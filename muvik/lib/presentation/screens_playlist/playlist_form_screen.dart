@@ -129,27 +129,37 @@ class _PlaylistFormScreenState extends State<PlaylistFormScreen> {
             spacing: AppSpacing.sm,
             runSpacing: AppSpacing.sm,
             children: [
-              InkWell(
-                onTap: () => Get.back(result: ''),
-                child: const ArtworkPlaceholder(
-                  size: 88,
-                  icon: Icons.queue_music_rounded,
+              Semantics(
+                button: true,
+                selected: _coverUri == null,
+                label: 'playlist_cover_default'.tr,
+                child: InkWell(
+                  onTap: () => Get.back(result: ''),
+                  child: const ArtworkPlaceholder(
+                    size: 88,
+                    icon: Icons.queue_music_rounded,
+                  ),
                 ),
               ),
               for (final s in _songs.take(30))
-                InkWell(
-                  onTap: () => Get.back(result: s.uri),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: s.uri == _coverUri
-                            ? c.primary
-                            : Colors.transparent,
-                        width: 2,
+                Semantics(
+                  button: true,
+                  selected: s.uri == _coverUri,
+                  label: s.displayTitle,
+                  child: InkWell(
+                    onTap: () => Get.back(result: s.uri),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: s.uri == _coverUri
+                              ? c.primary
+                              : Colors.transparent,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      borderRadius: BorderRadius.circular(10),
+                      child: SongArtwork(song: s, size: 84),
                     ),
-                    child: SongArtwork(song: s, size: 84),
                   ),
                 ),
             ],

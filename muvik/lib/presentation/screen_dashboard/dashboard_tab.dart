@@ -359,6 +359,7 @@ class _ForYouRow extends StatelessWidget {
       if (lib.favorites.isNotEmpty) {
         cards.add(
           CoverCard(
+            width: _cardWidth,
             title: 'favorites'.tr,
             subtitle: 'count_songs_n'.trParams({
               'args1': '${lib.favorites.length}',
@@ -373,6 +374,7 @@ class _ForYouRow extends StatelessWidget {
       for (final p in lib.playlists.take(6)) {
         cards.add(
           CoverCard(
+            width: _cardWidth,
             title: p.name,
             subtitle: 'count_songs_n'.trParams({'args1': '${p.songCount}'}),
             coverSong: p.firstSongId == null
@@ -398,8 +400,9 @@ class _ForYouRow extends StatelessWidget {
           _auto('explore_recently_added'.tr, added, Icons.new_releases_rounded),
         );
       }
+      // Compact cards (bug fix notes: the covers were too large).
       return SizedBox(
-        height: 236,
+        height: _cardHeight,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenH),
@@ -411,9 +414,13 @@ class _ForYouRow extends StatelessWidget {
     });
   }
 
+  static const double _cardWidth = 124;
+  static const double _cardHeight = 196;
+
   Widget _auto(String title, List<Song> songs, IconData icon) {
     final pc = PlaybackController.to;
     return CoverCard(
+      width: _cardWidth,
       title: title,
       subtitle: 'count_songs_n'.trParams({'args1': '${songs.length}'}),
       coverSong: songs.first,

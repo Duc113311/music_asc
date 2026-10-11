@@ -1,12 +1,13 @@
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart' hide RepeatMode;
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../controller/playback_controller.dart';
 import '../../controller/settings_controller.dart';
 import '../../models/ui_models/repeat_mode.dart';
+import '../../utils/toast_utils.dart';
 import '../../values/app_colors.dart';
 import '../../values/app_dimensions.dart';
 import '../../values/app_typography.dart';
@@ -157,13 +158,16 @@ class NowPlayingScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // Tap toggles the play order right away (no sheet).
                         AppIconButton(
-                          icon: Icons.shuffle_rounded,
+                          icon: s.shuffle
+                              ? Icons.shuffle_rounded
+                              : Icons.format_list_numbered_rounded,
                           tooltip: s.shuffle
                               ? 'shuffle_on'.tr
                               : 'shuffle_off'.tr,
                           active: s.shuffle,
-                          onPressed: showShuffleSheet,
+                          onPressed: () => _toggleShuffle(pc),
                         ),
                         AppIconButton(
                           icon: Icons.skip_previous_rounded,
@@ -195,7 +199,8 @@ class NowPlayingScreen extends StatelessWidget {
                             RepeatMode.one => 'repeat_one'.tr,
                           },
                           active: s.repeat != RepeatMode.off,
-                          onPressed: showRepeatSheet,
+                          // Off → All → One → Off, applied right away.
+                          onPressed: () => _cycleRepeat(pc),
                         ),
                       ],
                     ),
@@ -354,4 +359,22 @@ class _PlayerBackground extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Short feedback after a mode change, since there is no sheet any more.
+void _modeChanged(String title, String value) {
+  HapticFeedback.selectionClick();
+  ToastUtils.show('$title: $value', duration: const Duration(seconds: 2));
+}
+
+Future<void> _toggleShuffle(PlaybackController pc) async {
+  final on = !pc.state.value.shuffle;
+  await pc.setShuffle(on);
+  _modeChanged('shuffle_title'.tr, on ? 'shuffle_on'.tr : 'shuffle_off'.tr);
+}
+
+Future<void> _cycleRepeat(PlaybackController pc) async {
+  final next = pc.state.value.repeat.next;
+  await pc.setRepeat(next);
+  _modeChanged('repeat_title'.tr, 'repeat_${next.key}'.tr);
 }

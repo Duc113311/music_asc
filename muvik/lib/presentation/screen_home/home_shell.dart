@@ -150,11 +150,10 @@ class _NavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Container(
-      decoration: BoxDecoration(
-        color: c.background,
-        border: Border(top: BorderSide(color: c.divider)),
-      ),
+    // Material (not a decorated Container) so the tab ripples show.
+    return Material(
+      color: c.background,
+      shape: Border(top: BorderSide(color: c.divider)),
       child: SafeArea(
         top: false,
         child: SizedBox(

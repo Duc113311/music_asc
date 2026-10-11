@@ -125,36 +125,49 @@ class _PrimaryButtonState extends State<PrimaryButton> {
       ],
     );
 
+    final radius = BorderRadius.circular(
+      v == ButtonVariant.primary || v == ButtonVariant.gradient
+          ? AppRadius.full
+          : AppRadius.button,
+    );
     return Semantics(
       button: true,
       enabled: !_disabled,
       label: widget.label,
       excludeSemantics: true,
-      child: GestureDetector(
-        onTapDown: _disabled ? null : (_) => setState(() => _pressed = true),
-        onTapUp: _disabled ? null : (_) => setState(() => _pressed = false),
-        onTapCancel: () => setState(() => _pressed = false),
-        onTap: _tap,
-        child: AnimatedContainer(
-          duration: AppMotion.press,
-          curve: AppMotion.curve,
-          constraints: BoxConstraints(minHeight: height),
-          width: widget.expand ? double.infinity : null,
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.xs,
-          ),
-          decoration: BoxDecoration(
-            color: gradient == null ? bg : null,
-            gradient: gradient,
-            borderRadius: BorderRadius.circular(
-              v == ButtonVariant.primary || v == ButtonVariant.gradient
-                  ? AppRadius.full
-                  : AppRadius.button,
+      child: AnimatedContainer(
+        duration: AppMotion.press,
+        curve: AppMotion.curve,
+        width: widget.expand ? double.infinity : null,
+        decoration: BoxDecoration(
+          color: gradient == null ? bg : null,
+          gradient: gradient,
+          borderRadius: radius,
+          border: border,
+        ),
+        // Ripple drawn above the fill/gradient (shared splash, AppTheme).
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTapDown: _disabled
+                ? null
+                : (_) => setState(() => _pressed = true),
+            onTapUp: _disabled ? null : (_) => setState(() => _pressed = false),
+            onTapCancel: () => setState(() => _pressed = false),
+            onTap: _disabled ? null : _tap,
+            borderRadius: radius,
+            child: Container(
+              constraints: BoxConstraints(minHeight: height),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.xs,
+              ),
+              child: Center(
+                widthFactor: widget.expand ? null : 1,
+                child: content,
+              ),
             ),
-            border: border,
           ),
-          child: Center(widthFactor: widget.expand ? null : 1, child: content),
         ),
       ),
     );

@@ -13,7 +13,10 @@
     <string name="accent_blue">Xanh dương</string>
     <string name="accent_coral">Hồng san hô</string>
     <string name="accent_desc">Chọn màu nhấn sử dụng trong toàn bộ ứng dụng.</string>
+    <string name="accent_green">Xanh lá</string>
     <string name="accent_lavender">Tím lavender</string>
+    <string name="accent_orange">Cam</string>
+    <string name="accent_pink">Hồng phấn</string>
     <string name="accent_preview">Xem trước</string>
     <string name="accent_teal">Xanh ngọc</string>
     <string name="account_desc">Đăng nhập để kết nối tài khoản</string>
@@ -104,6 +107,9 @@
     <string name="eq_enable">Bật bộ chỉnh âm</string>
     <string name="eq_enable_desc">Tùy chỉnh âm thanh theo sở thích của bạn</string>
     <string name="eq_graphic">Bộ chỉnh âm đồ họa</string>
+    <string name="eq_loudness">Tăng âm lượng</string>
+    <string name="eq_loudness_desc">Phát to hơn mức tối đa của hệ thống</string>
+    <string name="eq_loudness_warning">Mức tăng cao có thể gây méo tiếng và hại tai. Hãy giảm xuống khi dùng tai nghe.</string>
     <string name="eq_mode">Chế độ âm thanh</string>
     <string name="eq_needs_playback">Hãy phát một bài để tải các hiệu ứng thiết bị hỗ trợ.</string>
     <string name="eq_preset_bass">Bass</string>
@@ -286,6 +292,7 @@
     <string name="player_title">Đang phát</string>
     <string name="playlist_add_songs">Thêm bài</string>
     <string name="playlist_cover">Ảnh bìa</string>
+    <string name="playlist_cover_default">Ảnh bìa mặc định</string>
     <string name="playlist_cover_hint">Ảnh bìa bài đầu tiên sẽ được dùng cho đến khi bạn chọn bìa.</string>
     <string name="playlist_create">Tạo playlist</string>
     <string name="playlist_create_cta">Tạo playlist</string>

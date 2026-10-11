@@ -12,16 +12,16 @@ import '../../values/app_typography.dart';
 import '../../values/route_name.dart';
 import '../bottom_sheets/song_actions_sheet.dart';
 import '../common_components/app_nav.dart';
+import '../common_components/app_touchable.dart';
 import '../common_components/cards.dart';
-import '../common_components/melo_logo.dart';
 import '../common_components/mini_player.dart';
 import '../common_components/song_artwork.dart';
 import '../common_components/state_views.dart';
 
 /// sc_kham_pha — suggestions from the device library only (P11). Mood chips
 /// filter by the songs' genre tag with explicit keyword rules (P11-04, see
-/// mood_rules.dart). The wave icon at the top right opens "Thống kê"
-/// (P11-06).
+/// mood_rules.dart). The brand header was removed (bug fix notes); the
+/// icon beside the title opens "Thống kê" (P11-06).
 class ExploreTab extends StatelessWidget {
   const ExploreTab({super.key, required this.scrollController});
   final ScrollController scrollController;
@@ -34,7 +34,7 @@ class ExploreTab extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Obx(() {
-          final header = [const _BrandHeader(), const _Title()];
+          final header = [const _Title()];
           if (lib.isEmpty) {
             return ListView(
               controller: scrollController,
@@ -139,119 +139,6 @@ class ExploreTab extends StatelessWidget {
   }
 }
 
-/// "Melo" wordmark with tagline, and the wave button to Statistics.
-class _BrandHeader extends StatelessWidget {
-  const _BrandHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(19, 0, 8, 0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const MeloLogo(
-                  bars: [
-                    MeloBar(2.2, 13, [Color(0xFF8E6BFA), Color(0xFF6D5CF6)]),
-                    MeloBar(2.2, 25, [
-                      Color(0xFFA77CFB),
-                      Color(0xFF6B6CF7),
-                    ], gap: 5.4),
-                    MeloBar(2.2, 18, [
-                      Color(0xFF9C7BFA),
-                      Color(0xFF6C78F6),
-                    ], gap: 4.2),
-                    MeloBar(2.2, 9, [
-                      Color(0xFF7F86F8),
-                      Color(0xFF6E8CF7),
-                    ], gap: 4.4),
-                  ],
-                  fontSize: 31,
-                  textGap: 9,
-                  textColors: [
-                    Color(0xFFB57BFF),
-                    Color(0xFF8C93FF),
-                    Color(0xFF52B8FF),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 35, top: 1),
-                  child: Text(
-                    'splash_tagline'.tr.toUpperCase(),
-                    maxLines: 1,
-                    overflow: TextOverflow.fade,
-                    softWrap: false,
-                    style: AppTypography.caption.copyWith(
-                      fontSize: 7.5,
-                      height: 1.2,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 2.6,
-                      color: const Color(0xFF8A86C0),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Tooltip(
-            message: 'stats_title'.tr,
-            child: Semantics(
-              button: true,
-              label: 'stats_title'.tr,
-              excludeSemantics: true,
-              child: InkResponse(
-                onTap: () => Get.toNamed(RouteName.statistics),
-                radius: 26,
-                child: SizedBox.square(
-                  dimension: 48,
-                  child: Center(child: _WaveIcon(color: c.primary)),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Small multicolor wave (top-right of the mockup).
-class _WaveIcon extends StatelessWidget {
-  const _WaveIcon({required this.color});
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    const heights = <double>[7, 13, 9, 22, 27, 11, 17];
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var i = 0; i < heights.length; i++)
-          Container(
-            width: 2.1,
-            height: heights[i],
-            margin: const EdgeInsets.symmetric(horizontal: 1.3),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(1),
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: i.isEven
-                    ? const [Color(0xFF6FD6F6), Color(0xFF7C6CF8)]
-                    : [color, const Color(0xFF6A5CF6)],
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
 class _Title extends StatelessWidget {
   const _Title();
 
@@ -259,27 +146,39 @@ class _Title extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.colors;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(18.5, 14, 18, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.fromLTRB(18.5, 14, 8, 0),
+      child: Row(
         children: [
-          Semantics(
-            header: true,
-            child: Text(
-              'explore_title'.tr,
-              style: AppTypography.display.copyWith(
-                fontSize: 26.5,
-                height: 1.25,
-                color: c.textPrimary,
-              ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Semantics(
+                  header: true,
+                  child: Text(
+                    'explore_title'.tr,
+                    style: AppTypography.display.copyWith(
+                      fontSize: 26.5,
+                      height: 1.25,
+                      color: c.textPrimary,
+                    ),
+                  ),
+                ),
+                Text(
+                  'explore_subtitle'.tr,
+                  style: AppTypography.bodyL.copyWith(
+                    fontSize: 15.5,
+                    color: c.textSecondary,
+                  ),
+                ),
+              ],
             ),
           ),
-          Text(
-            'explore_subtitle'.tr,
-            style: AppTypography.bodyL.copyWith(
-              fontSize: 15.5,
-              color: c.textSecondary,
-            ),
+          AppIconButton(
+            icon: Icons.insights_rounded,
+            tooltip: 'stats_title'.tr,
+            color: c.primary,
+            onPressed: () => Get.toNamed(RouteName.statistics),
           ),
         ],
       ),

@@ -31,7 +31,8 @@ class EqualizerPanel extends StatelessWidget {
       final waiting =
           caps.bandCentersHz.isEmpty &&
           !caps.bassSupported &&
-          !caps.virtualizerSupported;
+          !caps.virtualizerSupported &&
+          !caps.loudnessSupported;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -155,6 +156,12 @@ class EqualizerPanel extends StatelessWidget {
               ),
             ),
           ],
+          const SizedBox(height: AppSpacing.sm),
+          _LoudnessSlider(
+            value: s.loudnessGainDb,
+            supported: caps.loudnessSupported,
+            onChanged: service.setLoudnessGain,
+          ),
           if (!compact) ...[
             const SizedBox(height: AppSpacing.sm),
             _EffectSlider(
@@ -190,14 +197,17 @@ class _Card extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: c.surface,
+    // Material (not a decorated Container) so chip/switch ripples show.
+    return Material(
+      color: c.surface,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(color: c.border),
+        side: BorderSide(color: c.border),
       ),
-      child: child,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: child,
+      ),
     );
   }
 }
@@ -326,6 +336,121 @@ class _EffectSlider extends StatelessWidget {
               value: value.toDouble(),
               max: 1000,
               onChanged: enabled ? (v) => onChanged(v.round()) : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "Tăng âm lượng": LoudnessEnhancer gain 0..+10 dB, independent of the EQ
+/// switch. High values can distort and hurt hearing, so a warning shows above
+/// [EqualizerState.loudnessWarnDb].
+class _LoudnessSlider extends StatefulWidget {
+  const _LoudnessSlider({
+    required this.value,
+    required this.supported,
+    required this.onChanged,
+  });
+
+  final double value;
+  final bool supported;
+  final ValueChanged<double> onChanged;
+
+  @override
+  State<_LoudnessSlider> createState() => _LoudnessSliderState();
+}
+
+class _LoudnessSliderState extends State<_LoudnessSlider> {
+  double? _drag;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    const max = EqualizerState.maxLoudnessDb;
+    final v = (_drag ?? widget.value).clamp(0, max).toDouble();
+    final loud = v > EqualizerState.loudnessWarnDb;
+    final tint = loud ? c.warning : c.primary;
+    return _Card(
+      child: Opacity(
+        opacity: widget.supported ? 1 : 0.5,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'eq_loudness'.tr,
+                    style: AppTypography.headingS.copyWith(
+                      color: c.textPrimary,
+                    ),
+                  ),
+                ),
+                Text(
+                  v == 0 ? 'value_off'.tr : '+${v.toStringAsFixed(1)} dB',
+                  style: AppTypography.label.copyWith(
+                    color: v == 0 ? c.textSecondary : tint,
+                  ),
+                ),
+              ],
+            ),
+            Text(
+              widget.supported
+                  ? 'eq_loudness_desc'.tr
+                  : 'eq_effect_unsupported'.tr,
+              style: AppTypography.bodyM.copyWith(color: c.textSecondary),
+            ),
+            Semantics(
+              label: 'eq_loudness'.tr,
+              value: '+${v.toStringAsFixed(1)} dB',
+              child: SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  activeTrackColor: tint,
+                  thumbColor: tint,
+                  overlayColor: tint.withValues(alpha: 0.12),
+                ),
+                child: Slider(
+                  value: v,
+                  max: max,
+                  divisions: (max * 2).round(),
+                  onChanged: widget.supported
+                      ? (x) => setState(() => _drag = x)
+                      : null,
+                  onChangeEnd: widget.supported
+                      ? (x) {
+                          widget.onChanged(x);
+                          setState(() => _drag = null);
+                        }
+                      : null,
+                ),
+              ),
+            ),
+            AnimatedSize(
+              duration: AppMotion.state,
+              alignment: Alignment.topCenter,
+              child: loud
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.warning_amber_rounded,
+                          size: AppSizes.iconSm,
+                          color: c.warning,
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        Expanded(
+                          child: Text(
+                            'eq_loudness_warning'.tr,
+                            style: AppTypography.caption.copyWith(
+                              color: c.warning,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : const SizedBox(width: double.infinity),
             ),
           ],
         ),

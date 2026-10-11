@@ -95,36 +95,41 @@ class AppSwitch extends StatelessWidget {
       toggled: value,
       enabled: enabled,
       label: semanticLabel,
-      child: GestureDetector(
-        onTap: enabled ? () => onChanged!(!value) : null,
-        behavior: HitTestBehavior.opaque,
-        child: SizedBox(
-          width: AppSizes.touch + 8,
-          height: AppSizes.touch,
-          child: Center(
-            child: Opacity(
-              opacity: enabled ? 1 : 0.4,
-              child: AnimatedContainer(
-                duration: AppMotion.state,
-                curve: AppMotion.curve,
-                width: 44,
-                height: 25,
-                padding: const EdgeInsets.all(2.5),
-                decoration: BoxDecoration(
-                  color: value ? c.primary : c.border,
-                  borderRadius: BorderRadius.circular(AppRadius.full),
-                ),
-                alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-                // White thumb in both states, as in every settings mockup.
-                child: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color(0xFFF7F6FB),
-                    boxShadow: [
-                      BoxShadow(color: Color(0x33000000), blurRadius: 2),
-                    ],
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkResponse(
+          onTap: enabled ? () => onChanged!(!value) : null,
+          radius: AppSizes.touch / 2,
+          child: SizedBox(
+            width: AppSizes.touch + 8,
+            height: AppSizes.touch,
+            child: Center(
+              child: Opacity(
+                opacity: enabled ? 1 : 0.4,
+                child: AnimatedContainer(
+                  duration: AppMotion.state,
+                  curve: AppMotion.curve,
+                  width: 44,
+                  height: 25,
+                  padding: const EdgeInsets.all(2.5),
+                  decoration: BoxDecoration(
+                    color: value ? c.primary : c.border,
+                    borderRadius: BorderRadius.circular(AppRadius.full),
+                  ),
+                  alignment: value
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  // White thumb in both states, as in every settings mockup.
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFFF7F6FB),
+                      boxShadow: [
+                        BoxShadow(color: Color(0x33000000), blurRadius: 2),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -171,8 +176,6 @@ class AppChip extends StatelessWidget {
             widthFactor: 1,
             child: AnimatedContainer(
               duration: AppMotion.state,
-              constraints: const BoxConstraints(minHeight: AppSizes.chipHeight),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
                 color: selected ? c.surfaceSelected : c.surface,
                 borderRadius: BorderRadius.circular(AppRadius.full),
@@ -182,15 +185,35 @@ class AppChip extends StatelessWidget {
                       : (accent?.withValues(alpha: 0.6) ?? c.border),
                 ),
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (icon != null) ...[
-                    Icon(icon, size: AppSizes.iconSm, color: fg),
-                    const SizedBox(width: 6),
-                  ],
-                  Text(label, style: AppTypography.label.copyWith(color: fg)),
-                ],
+              // Ripple above the chip fill (InkWell on a transparent Material).
+              child: Material(
+                type: MaterialType.transparency,
+                child: InkWell(
+                  onTap: onTap,
+                  customBorder: const StadiumBorder(),
+                  child: Container(
+                    constraints: const BoxConstraints(
+                      minHeight: AppSizes.chipHeight,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (icon != null) ...[
+                          Icon(icon, size: AppSizes.iconSm, color: fg),
+                          const SizedBox(width: 6),
+                        ],
+                        Text(
+                          label,
+                          style: AppTypography.label.copyWith(color: fg),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -231,22 +254,27 @@ class SegmentedTabs extends StatelessWidget {
               child: Semantics(
                 button: true,
                 selected: i == index,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => onChanged(i),
-                  child: AnimatedContainer(
-                    duration: AppMotion.state,
-                    constraints: const BoxConstraints(minHeight: 40),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: i == index ? c.primary : Colors.transparent,
+                child: AnimatedContainer(
+                  duration: AppMotion.state,
+                  decoration: BoxDecoration(
+                    color: i == index ? c.primary : Colors.transparent,
+                    borderRadius: BorderRadius.circular(AppRadius.tabs - 4),
+                  ),
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: InkWell(
+                      onTap: () => onChanged(i),
                       borderRadius: BorderRadius.circular(AppRadius.tabs - 4),
-                    ),
-                    child: Text(
-                      labels[i],
-                      textAlign: TextAlign.center,
-                      style: AppTypography.label.copyWith(
-                        color: i == index ? c.onPrimary : c.textSecondary,
+                      child: Container(
+                        constraints: const BoxConstraints(minHeight: 40),
+                        alignment: Alignment.center,
+                        child: Text(
+                          labels[i],
+                          textAlign: TextAlign.center,
+                          style: AppTypography.label.copyWith(
+                            color: i == index ? c.onPrimary : c.textSecondary,
+                          ),
+                        ),
                       ),
                     ),
                   ),

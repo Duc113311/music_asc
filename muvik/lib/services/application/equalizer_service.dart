@@ -14,6 +14,7 @@ class EqualizerState {
     this.bandGainsDb = const [],
     this.bassStrength = 0,
     this.virtualizerStrength = 0,
+    this.loudnessGainDb = 0,
     this.capabilities = AudioEffectsCapabilities.none,
   });
 
@@ -26,12 +27,21 @@ class EqualizerState {
   /// 0..1000 as in Android audiofx.
   final int bassStrength;
   final int virtualizerStrength;
+
+  /// Loudness boost 0..[maxLoudnessDb]; independent of [enabled].
+  final double loudnessGainDb;
   final AudioEffectsCapabilities capabilities;
+
+  static const double maxLoudnessDb = 10;
+
+  /// Above this the UI warns about distortion and hearing damage.
+  static const double loudnessWarnDb = 6;
 
   bool get supported =>
       capabilities.eqSupported ||
       capabilities.bassSupported ||
-      capabilities.virtualizerSupported;
+      capabilities.virtualizerSupported ||
+      capabilities.loudnessSupported;
 
   EqualizerState copyWith({
     bool? enabled,
@@ -39,6 +49,7 @@ class EqualizerState {
     List<double>? bandGainsDb,
     int? bassStrength,
     int? virtualizerStrength,
+    double? loudnessGainDb,
     AudioEffectsCapabilities? capabilities,
   }) => EqualizerState(
     enabled: enabled ?? this.enabled,
@@ -46,6 +57,7 @@ class EqualizerState {
     bandGainsDb: bandGainsDb ?? this.bandGainsDb,
     bassStrength: bassStrength ?? this.bassStrength,
     virtualizerStrength: virtualizerStrength ?? this.virtualizerStrength,
+    loudnessGainDb: loudnessGainDb ?? this.loudnessGainDb,
     capabilities: capabilities ?? this.capabilities,
   );
 }
@@ -81,6 +93,10 @@ class EqualizerService {
         PrefConst.eqVirtualizerStrength,
         PrefDefaults.eqVirtualizerStrength,
       ),
+      loudnessGainDb: PrefStore.getDouble(
+        PrefConst.eqLoudnessGainDb,
+        PrefDefaults.eqLoudnessGainDb,
+      ).clamp(0, EqualizerState.maxLoudnessDb).toDouble(),
     );
   }
 
@@ -151,6 +167,14 @@ class EqualizerService {
     await _apply();
   }
 
+  /// Loudness boost (sc_bo_chinh_am), saved and re-applied per session.
+  Future<void> setLoudnessGain(double db) async {
+    final v = db.clamp(0, EqualizerState.maxLoudnessDb).toDouble();
+    state.value = state.value.copyWith(loudnessGainDb: v);
+    await PrefStore.setDouble(PrefConst.eqLoudnessGainDb, v);
+    await _apply();
+  }
+
   /// "Đặt lại": defaults defined in PrefDefaults, applied for real (P14-09).
   Future<void> reset() async {
     _customGains = const [];
@@ -168,6 +192,10 @@ class EqualizerService {
       PrefConst.eqVirtualizerStrength,
       PrefDefaults.eqVirtualizerStrength,
     );
+    await PrefStore.setDouble(
+      PrefConst.eqLoudnessGainDb,
+      PrefDefaults.eqLoudnessGainDb,
+    );
     final caps = state.value.capabilities;
     final preset = AudioPreset.fromKey(PrefDefaults.eqPreset);
     state.value = EqualizerState(
@@ -176,6 +204,7 @@ class EqualizerService {
       bandGainsDb: _gainsFor(preset, caps),
       bassStrength: PrefDefaults.eqBassStrength,
       virtualizerStrength: PrefDefaults.eqVirtualizerStrength,
+      loudnessGainDb: PrefDefaults.eqLoudnessGainDb,
       capabilities: caps,
     );
     await _apply();
@@ -189,6 +218,7 @@ class EqualizerService {
       bandGainsDb: s.bandGainsDb,
       bassStrength: s.bassStrength,
       virtualizerStrength: s.virtualizerStrength,
+      loudnessGainDb: s.loudnessGainDb,
     );
   }
 }

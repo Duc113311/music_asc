@@ -41,6 +41,30 @@ enum AccentColor {
     Color(0xFFA16207),
     Color(0xFFF59E0B),
     Color(0xFF854D0E),
+  ),
+  green(
+    'green',
+    'accent_green',
+    Color(0xFF4ADE80),
+    Color(0xFF15803D),
+    Color(0xFF22C55E),
+    Color(0xFF166534),
+  ),
+  pink(
+    'pink',
+    'accent_pink',
+    Color(0xFFF472B6),
+    Color(0xFFBE185D),
+    Color(0xFFEC4899),
+    Color(0xFF9D174D),
+  ),
+  orange(
+    'orange',
+    'accent_orange',
+    Color(0xFFFB923C),
+    Color(0xFFC2410C),
+    Color(0xFFF97316),
+    Color(0xFF9A3412),
   );
 
   const AccentColor(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -26,6 +28,39 @@ class _RateDialog extends StatefulWidget {
 
 class _RateDialogState extends State<_RateDialog> {
   int _stars = 0;
+
+  /// Opening effect: the stars light up one by one, up to 5. A tap on a
+  /// star stops it and keeps the user's choice.
+  Timer? _intro;
+  static const _introDelay = Duration(milliseconds: 250);
+  static const _introStep = Duration(milliseconds: 160);
+
+  @override
+  void initState() {
+    super.initState();
+    _intro = Timer(_introDelay, () {
+      if (!mounted) return;
+      setState(() => _stars = 1);
+      _intro = Timer.periodic(_introStep, (t) {
+        if (!mounted || _stars >= 5) {
+          t.cancel();
+          return;
+        }
+        setState(() => _stars++);
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _intro?.cancel();
+    super.dispose();
+  }
+
+  void _pick(int i) {
+    _intro?.cancel();
+    setState(() => _stars = i);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,16 +97,25 @@ class _RateDialogState extends State<_RateDialog> {
                     label: 'rate_stars_n'.trParams({'args1': '$i'}),
                     excludeSemantics: true,
                     child: InkResponse(
-                      onTap: () => setState(() => _stars = i),
+                      onTap: () => _pick(i),
                       radius: 24,
                       child: SizedBox.square(
                         dimension: AppSizes.touch,
-                        child: Icon(
-                          i <= _stars
-                              ? Icons.star_rounded
-                              : Icons.star_outline_rounded,
-                          size: 36,
-                          color: i <= _stars ? c.primary : c.textMuted,
+                        // Pops in when it lights up.
+                        child: TweenAnimationBuilder<double>(
+                          key: ValueKey(i <= _stars),
+                          tween: Tween(begin: i <= _stars ? 0.6 : 1, end: 1),
+                          duration: const Duration(milliseconds: 260),
+                          curve: Curves.easeOutBack,
+                          builder: (context, scale, child) =>
+                              Transform.scale(scale: scale, child: child),
+                          child: Icon(
+                            i <= _stars
+                                ? Icons.star_rounded
+                                : Icons.star_outline_rounded,
+                            size: 36,
+                            color: i <= _stars ? c.primary : c.textMuted,
+                          ),
                         ),
                       ),
                     ),

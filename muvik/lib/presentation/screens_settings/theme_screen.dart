@@ -74,17 +74,30 @@ class ThemeScreen extends StatelessWidget {
                 bottomPadding: 20,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(6, 16, 6, 0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  // 8 accents on 2 rows of 4.
+                  child: Column(
                     children: [
-                      for (final a in AccentColor.values)
-                        Expanded(
-                          child: _Swatch(
-                            accent: a,
-                            selected: a == accent,
-                            onTap: () => s.setAccent(a),
-                          ),
+                      for (
+                        var row = 0;
+                        row < AccentColor.values.length;
+                        row += 4
+                      ) ...[
+                        if (row > 0) const SizedBox(height: 10),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (final a
+                                in AccentColor.values.skip(row).take(4))
+                              Expanded(
+                                child: _Swatch(
+                                  accent: a,
+                                  selected: a == accent,
+                                  onTap: () => s.setAccent(a),
+                                ),
+                              ),
+                          ],
                         ),
+                      ],
                     ],
                   ),
                 ),
@@ -177,33 +190,37 @@ class _Section extends StatelessWidget {
         ),
       ],
     );
-    return Container(
-      decoration: BoxDecoration(
-        color: c.surface,
+    // Material (not a decorated Container) so the options' ripples show.
+    return Material(
+      color: c.surface,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: c.border.withValues(alpha: 0.6)),
+        side: BorderSide(color: c.border.withValues(alpha: 0.6)),
       ),
-      padding: EdgeInsets.only(top: 17, bottom: bottomPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(
-              left: 17,
-              right: trailing == null ? 17 : 8,
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: EdgeInsets.only(top: 17, bottom: bottomPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(
+                left: 17,
+                right: trailing == null ? 17 : 8,
+              ),
+              child: trailing == null
+                  ? header
+                  : Row(
+                      children: [
+                        Expanded(child: header),
+                        const SizedBox(width: 8),
+                        trailing!,
+                      ],
+                    ),
             ),
-            child: trailing == null
-                ? header
-                : Row(
-                    children: [
-                      Expanded(child: header),
-                      const SizedBox(width: 8),
-                      trailing!,
-                    ],
-                  ),
-          ),
-          ?child,
-        ],
+            ?child,
+          ],
+        ),
       ),
     );
   }

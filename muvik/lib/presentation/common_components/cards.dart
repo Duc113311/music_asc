@@ -429,11 +429,12 @@ class SettingsGroup extends StatelessWidget {
                 ),
               ),
             ),
-          Container(
-            decoration: BoxDecoration(
-              color: c.surface,
+          // Material (not a decorated Container) so the rows' ripples show.
+          Material(
+            color: c.surface,
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppRadius.card),
-              border: Border.all(color: c.border),
+              side: BorderSide(color: c.border),
             ),
             clipBehavior: Clip.antiAlias,
             child: Column(

@@ -21,6 +21,7 @@ class PrefDefaults {
   static const String eqCustomGains = '';
   static const int eqBassStrength = 0;
   static const int eqVirtualizerStrength = 0;
+  static const double eqLoudnessGainDb = 0;
 
   static const bool headphonePauseOnDisconnect = true;
   static const bool headphoneResumeOnConnect = false;

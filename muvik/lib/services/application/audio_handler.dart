@@ -705,6 +705,10 @@ class MuvikAudioHandler extends BaseAudioHandler with SeekHandler {
     }
   }
 
+  /// The only place reading `AudioDeviceType`, which audio_session marks
+  /// @experimental: if its values change, only this list needs updating.
+  /// Unknown types count as "not a headset" (speaker behaviour).
+  // ignore: experimental_member_use
   static bool isHeadsetDevice(AudioDeviceType t) =>
       t == AudioDeviceType.wiredHeadset ||
       t == AudioDeviceType.wiredHeadphones ||

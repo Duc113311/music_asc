@@ -11,6 +11,7 @@ class AudioEffectsCapabilities {
     this.maxLevelDb = 12,
     this.bassSupported = false,
     this.virtualizerSupported = false,
+    this.loudnessSupported = false,
   });
 
   final bool eqSupported;
@@ -19,6 +20,9 @@ class AudioEffectsCapabilities {
   final double maxLevelDb;
   final bool bassSupported;
   final bool virtualizerSupported;
+
+  /// android.media.audiofx.LoudnessEnhancer (API 19+).
+  final bool loudnessSupported;
 
   static const none = AudioEffectsCapabilities();
 
@@ -31,10 +35,11 @@ class AudioEffectsCapabilities {
     maxLevelDb: ((m['maxLevelMb'] as num?) ?? 1200) / 100,
     bassSupported: (m['bassSupported'] as bool?) ?? false,
     virtualizerSupported: (m['virtualizerSupported'] as bool?) ?? false,
+    loudnessSupported: (m['loudnessSupported'] as bool?) ?? false,
   );
 }
 
-/// Android audiofx (Equalizer, BassBoost, Virtualizer) bound to the player's
+/// Android audiofx (Equalizer, BassBoost, Virtualizer, LoudnessEnhancer) bound to the player's
 /// audio session id, so UI changes affect real output (P14-06).
 class AudioEffectsChannel {
   AudioEffectsChannel._();
@@ -65,6 +70,7 @@ class AudioEffectsChannel {
     required List<double> bandGainsDb,
     required int bassStrength,
     required int virtualizerStrength,
+    required double loudnessGainDb,
   }) async {
     if (!isSupported) return;
     try {
@@ -73,6 +79,7 @@ class AudioEffectsChannel {
         'bandLevelsMb': bandGainsDb.map((g) => (g * 100).round()).toList(),
         'bassStrength': bassStrength,
         'virtualizerStrength': virtualizerStrength,
+        'loudnessGainMb': (loudnessGainDb * 100).round(),
       });
     } on PlatformException catch (e) {
       AppLog.info('AudioEffectsChannel.apply: $e');

@@ -2,6 +2,7 @@ package com.asctechsoft.muvik
 
 import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
+import android.media.audiofx.LoudnessEnhancer
 import android.media.audiofx.Virtualizer
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -19,6 +20,7 @@ class AudioEffectsHandler : MethodChannel.MethodCallHandler {
     private var equalizer: Equalizer? = null
     private var bass: BassBoost? = null
     private var virtualizer: Virtualizer? = null
+    private var loudness: LoudnessEnhancer? = null
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         try {
@@ -29,7 +31,8 @@ class AudioEffectsHandler : MethodChannel.MethodCallHandler {
                         call.argument<Boolean>("enabled") ?: false,
                         call.argument<List<Int>>("bandLevelsMb") ?: emptyList(),
                         call.argument<Int>("bassStrength") ?: 0,
-                        call.argument<Int>("virtualizerStrength") ?: 0
+                        call.argument<Int>("virtualizerStrength") ?: 0,
+                        call.argument<Int>("loudnessGainMb") ?: 0
                     )
                     result.success(null)
                 }
@@ -45,12 +48,13 @@ class AudioEffectsHandler : MethodChannel.MethodCallHandler {
     }
 
     private fun attach(id: Int): Map<String, Any?> {
-        if (id != sessionId || equalizer == null && bass == null && virtualizer == null) {
+        if (id != sessionId || equalizer == null && bass == null && virtualizer == null && loudness == null) {
             release()
             sessionId = id
             equalizer = try { Equalizer(0, id) } catch (_: Exception) { null }
             bass = try { BassBoost(0, id).takeIf { it.strengthSupported } } catch (_: Exception) { null }
             virtualizer = try { Virtualizer(0, id).takeIf { it.strengthSupported } } catch (_: Exception) { null }
+            loudness = try { LoudnessEnhancer(id) } catch (_: Exception) { null }
         }
         val eq = equalizer
         val centers = mutableListOf<Double>()
@@ -68,11 +72,18 @@ class AudioEffectsHandler : MethodChannel.MethodCallHandler {
             "minLevelMb" to minMb,
             "maxLevelMb" to maxMb,
             "bassSupported" to (bass != null),
-            "virtualizerSupported" to (virtualizer != null)
+            "virtualizerSupported" to (virtualizer != null),
+            "loudnessSupported" to (loudness != null)
         )
     }
 
-    private fun apply(enabled: Boolean, levelsMb: List<Int>, bassStrength: Int, virtStrength: Int) {
+    private fun apply(
+        enabled: Boolean,
+        levelsMb: List<Int>,
+        bassStrength: Int,
+        virtStrength: Int,
+        loudnessGainMb: Int
+    ) {
         equalizer?.let { eq ->
             val range = eq.bandLevelRange
             for (b in 0 until minOf(eq.numberOfBands.toInt(), levelsMb.size)) {
@@ -89,14 +100,22 @@ class AudioEffectsHandler : MethodChannel.MethodCallHandler {
             it.setStrength(virtStrength.coerceIn(0, 1000).toShort())
             it.enabled = enabled && virtStrength > 0
         }
+        // Loudness boost is independent of the EQ switch: 0 mB means off.
+        loudness?.let {
+            val gain = loudnessGainMb.coerceIn(0, 1000)
+            it.setTargetGain(gain)
+            it.enabled = gain > 0
+        }
     }
 
     private fun release() {
         try { equalizer?.release() } catch (_: Exception) {}
         try { bass?.release() } catch (_: Exception) {}
         try { virtualizer?.release() } catch (_: Exception) {}
+        try { loudness?.release() } catch (_: Exception) {}
         equalizer = null
         bass = null
         virtualizer = null
+        loudness = null
     }
 }

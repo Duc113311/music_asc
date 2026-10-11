@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 import 'app_colors.dart';
 import 'app_dimensions.dart';
+import 'app_ink_ripple.dart';
 import 'app_typography.dart';
 
 /// Light + dark themes built from the same tokens; ThemeMode follows the user
@@ -116,7 +117,8 @@ class AppTheme {
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
         },
       ),
-      splashFactory: InkRipple.splashFactory,
+      // Scan-library ripple, slightly faster, for every touchable.
+      splashFactory: AppInkRipple.splashFactory,
     );
   }
 }

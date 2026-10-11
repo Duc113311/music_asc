@@ -39,52 +39,25 @@ class _AccentSheetState extends State<_AccentSheet> {
       ),
       child: Column(
         children: [
-          Wrap(
-            spacing: AppSpacing.md,
-            runSpacing: AppSpacing.md,
-            alignment: WrapAlignment.center,
-            children: [
-              for (final a in AccentColor.values)
-                Semantics(
-                  button: true,
-                  selected: a == _draft,
-                  label: a.labelKey.tr,
-                  child: InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: () => setState(() => _draft = a),
-                    child: Column(
-                      children: [
-                        AnimatedContainer(
-                          duration: AppMotion.state,
-                          width: 52,
-                          height: 52,
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: a == _draft
-                                  ? base.textPrimary
-                                  : Colors.transparent,
-                              width: 2,
-                            ),
-                          ),
-                          child: CircleAvatar(
-                            backgroundColor: dark ? a.dark : a.light,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          a.labelKey.tr,
-                          style: AppTypography.caption.copyWith(
-                            color: base.textSecondary,
-                          ),
-                        ),
-                      ],
+          // 8 accents on 2 rows of 4.
+          for (var row = 0; row < AccentColor.values.length; row += 4) ...[
+            if (row > 0) const SizedBox(height: AppSpacing.sm),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (final a in AccentColor.values.skip(row).take(4))
+                  Expanded(
+                    child: _Swatch(
+                      accent: a,
+                      selected: a == _draft,
+                      ring: base.textPrimary,
+                      dark: dark,
+                      onTap: () => setState(() => _draft = a),
                     ),
                   ),
-                ),
-            ],
-          ),
+              ],
+            ),
+          ],
           const SizedBox(height: AppSpacing.lg),
           // Live preview of controls in the draft accent.
           Container(
@@ -134,6 +107,70 @@ class _AccentSheetState extends State<_AccentSheet> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _Swatch extends StatelessWidget {
+  const _Swatch({
+    required this.accent,
+    required this.selected,
+    required this.ring,
+    required this.dark,
+    required this.onTap,
+  });
+
+  final AccentColor accent;
+  final bool selected;
+  final Color ring;
+  final bool dark;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final base = context.colors;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: accent.labelKey.tr,
+      excludeSemantics: true,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadius.toast),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Column(
+            children: [
+              AnimatedContainer(
+                duration: AppMotion.state,
+                width: 52,
+                height: 52,
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: selected ? ring : Colors.transparent,
+                    width: 2,
+                  ),
+                ),
+                child: CircleAvatar(
+                  backgroundColor: dark ? accent.dark : accent.light,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                accent.labelKey.tr,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: AppTypography.caption.copyWith(
+                  color: base.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
