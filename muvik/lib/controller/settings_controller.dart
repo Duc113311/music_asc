@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../configs/pref_const.dart';
 import '../configs/pref_defaults.dart';
+import '../services/native/nudge_service.dart';
 import '../services/storage/pref_store.dart';
 import '../values/app_colors.dart';
 
@@ -12,7 +13,7 @@ import '../values/app_colors.dart';
 class SettingsController extends GetxController {
   static SettingsController get to => Get.find();
 
-  final Rx<ThemeMode> themeMode = ThemeMode.system.obs;
+  final Rx<ThemeMode> themeMode = ThemeMode.dark.obs;
   final Rx<AccentColor> accent = AccentColor.lavender.obs;
 
   /// Now Playing background: blurred cover art, or the fixed theme gradient.
@@ -26,6 +27,9 @@ class SettingsController extends GetxController {
   final RxBool resumeOnConnect = PrefDefaults.headphoneResumeOnConnect.obs;
   final RxBool headphoneButtons = PrefDefaults.headphoneButtonsEnabled.obs;
 
+  /// Daily "come back and listen" reminder (NudgeService).
+  final RxBool nudgeEnabled = PrefDefaults.nudgeEnabled.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -35,8 +39,7 @@ class SettingsController extends GetxController {
     accent.value = AccentColor.fromKey(
       PrefStore.getString(PrefConst.accentColor, PrefDefaults.accentColor),
     );
-    playerBlurBackground.value =
-        PrefStore.getString(
+    playerBlurBackground.value = PrefStore.getString(
           PrefConst.playerBackground,
           PrefDefaults.playerBackground,
         ) ==
@@ -57,25 +60,29 @@ class SettingsController extends GetxController {
       PrefConst.headphoneButtonsEnabled,
       PrefDefaults.headphoneButtonsEnabled,
     );
+    nudgeEnabled.value = PrefStore.getBool(
+      PrefConst.nudgeEnabled,
+      PrefDefaults.nudgeEnabled,
+    );
   }
 
   static ThemeMode _parseTheme(String v) => switch (v) {
-    'light' => ThemeMode.light,
-    'dark' => ThemeMode.dark,
-    _ => ThemeMode.system,
-  };
+        'light' => ThemeMode.light,
+        'dark' => ThemeMode.dark,
+        _ => ThemeMode.system,
+      };
 
   static String themeKey(ThemeMode m) => switch (m) {
-    ThemeMode.light => 'light',
-    ThemeMode.dark => 'dark',
-    ThemeMode.system => 'system',
-  };
+        ThemeMode.light => 'light',
+        ThemeMode.dark => 'dark',
+        ThemeMode.system => 'system',
+      };
 
   String get themeLabelKey => switch (themeMode.value) {
-    ThemeMode.light => 'theme_light',
-    ThemeMode.dark => 'theme_dark',
-    ThemeMode.system => 'theme_system',
-  };
+        ThemeMode.light => 'theme_light',
+        ThemeMode.dark => 'theme_dark',
+        ThemeMode.system => 'theme_system',
+      };
 
   Future<void> setThemeMode(ThemeMode m) async {
     themeMode.value = m;
@@ -98,6 +105,12 @@ class SettingsController extends GetxController {
   Future<void> setScreenTransitions(bool v) async {
     screenTransitions.value = v;
     await PrefStore.setBool(PrefConst.screenTransitions, v);
+  }
+
+  Future<void> setNudgeEnabled(bool v) async {
+    nudgeEnabled.value = v;
+    await PrefStore.setBool(PrefConst.nudgeEnabled, v);
+    await NudgeService.refresh();
   }
 
   Future<void> setPauseOnDisconnect(bool v) async {

@@ -41,23 +41,22 @@ class _StatisticsArtistScreenState extends State<StatisticsArtistScreen> {
   late Future<PeriodStats> _stats = _load();
 
   List<Song> _artistSongs() {
-    final key = args.artist == null
-        ? null
-        : MetadataFallback.normalize(args.artist!);
+    final key =
+        args.artist == null ? null : MetadataFallback.normalize(args.artist!);
     return LibraryController.to.songs
         .where(
           (s) => key == null
               ? s.artistOrNull == null
               : (s.artistOrNull != null &&
-                    MetadataFallback.normalize(s.artistOrNull!) == key),
+                  MetadataFallback.normalize(s.artistOrNull!) == key),
         )
         .toList();
   }
 
   Future<PeriodStats> _load() => Get.find<StatisticsService>().load(
-    args.period,
-    songIds: songs.map((s) => s.id!).toList(),
-  );
+        args.period,
+        songIds: songs.map((s) => s.id!).toList(),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +115,10 @@ class _StatisticsArtistScreenState extends State<StatisticsArtistScreen> {
                       : null,
                 ),
               ),
-              SectionHeader(title: 'stats_top_songs'.tr),
+              SectionHeader(
+                title: 'stats_top_songs'.tr,
+                titleStyle: AppTypography.headingS,
+              ),
               if (s.topSongs.isEmpty)
                 EmptyState(
                   compact: true,

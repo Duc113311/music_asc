@@ -78,7 +78,7 @@ class MiniPlayer extends StatelessWidget {
                             value: progress,
                             minHeight: 3,
                             backgroundColor: c.border,
-                            color: c.primary,
+                            color: c.primaryLight,
                           ),
                         ),
                       ],
@@ -124,8 +124,8 @@ class MiniPlayerSpacer extends StatelessWidget {
       () => SizedBox(
         height:
             (PlaybackController.to.hasSong ? AppSizes.miniPlayer + 24 : 16) +
-            extra +
-            MediaQuery.paddingOf(context).bottom,
+                extra +
+                MediaQuery.paddingOf(context).bottom,
       ),
     );
   }

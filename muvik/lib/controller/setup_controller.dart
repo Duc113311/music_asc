@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../configs/pref_const.dart';
 import '../configs/pref_defaults.dart';
@@ -98,6 +99,7 @@ class SetupController extends GetxController with WidgetsBindingObserver {
       }
       final s = await _scan.requestPermission();
       if (s == AudioPermissionStatus.granted) {
+        await _askNotifications();
         await _scan.refreshSources();
         goTo(1);
       } else {
@@ -108,9 +110,18 @@ class SetupController extends GetxController with WidgetsBindingObserver {
     }
   }
 
+  /// Android 13+ hides the playback notification (lock screen and shade
+  /// controls) until this is granted; refusal is harmless.
+  Future<void> _askNotifications() async {
+    try {
+      await Permission.notification.request();
+    } catch (_) {}
+  }
+
   /// "Để sau": continue with current access; folders can still be picked.
   Future<void> later() async {
     await PrefStore.setBool(PrefConst.permissionDeferred, true);
+    await _askNotifications();
     goTo(1);
   }
 

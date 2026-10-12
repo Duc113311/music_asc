@@ -33,6 +33,7 @@ class PrefConst {
       'headphone_pause_on_disconnect';
   static const String headphoneResumeOnConnect = 'headphone_resume_on_connect';
   static const String headphoneButtonsEnabled = 'headphone_buttons_enabled';
+  static const String nudgeEnabled = 'nudge_enabled';
 
   // Library
   static const String songSort = 'song_sort';

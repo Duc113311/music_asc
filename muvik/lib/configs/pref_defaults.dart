@@ -8,7 +8,7 @@ class PrefDefaults {
   static const bool permissionDeferred = false;
   static const bool genreBackfillDone = false;
 
-  static const String themeMode = 'system';
+  static const String themeMode = 'dark';
   static const String accentColor = 'lavender';
   static const String playerBackground = 'blur';
   static const bool screenTransitions = true;
@@ -26,6 +26,7 @@ class PrefDefaults {
   static const bool headphonePauseOnDisconnect = true;
   static const bool headphoneResumeOnConnect = false;
   static const bool headphoneButtonsEnabled = true;
+  static const bool nudgeEnabled = true;
 
   static const String songSort = 'title_asc';
 

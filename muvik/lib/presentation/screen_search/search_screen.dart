@@ -257,28 +257,95 @@ class _History extends StatelessWidget {
                 TextButton(
                   onPressed: controller.clearHistory,
                   child: Text(
-                    'search_clear_history'.tr,
+                    'search_clear_all'.tr,
                     style: AppTypography.label.copyWith(color: c.primary),
                   ),
                 ),
               ],
             ),
           ),
-          for (final h in controller.history)
-            ListTile(
-              minTileHeight: 52,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenH,
-              ),
-              leading: Icon(Icons.history_rounded, color: c.iconDefault),
-              title: Text(
-                h,
-                style: AppTypography.bodyL.copyWith(color: c.textPrimary),
-              ),
-              onTap: () => controller.useHistory(h),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenH,
+              AppSpacing.xs,
+              AppSpacing.screenH,
+              0,
             ),
+            child: Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: [
+                for (final h in controller.history)
+                  _HistoryChip(
+                    label: h,
+                    onTap: () => controller.useHistory(h),
+                    onRemove: () => controller.removeHistory(h),
+                  ),
+              ],
+            ),
+          ),
         ],
       );
     });
+  }
+}
+
+/// Recent query as a pill: tap to search again, x to forget it.
+class _HistoryChip extends StatelessWidget {
+  const _HistoryChip({
+    required this.label,
+    required this.onTap,
+    required this.onRemove,
+  });
+  final String label;
+  final VoidCallback onTap;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    final radius = BorderRadius.circular(AppRadius.full);
+    return Material(
+      color: c.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: radius,
+        side: BorderSide(color: c.border),
+      ),
+      child: InkWell(
+        borderRadius: radius,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.history_rounded, size: 18, color: c.iconDefault),
+              const SizedBox(width: 6),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 200),
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.bodyM.copyWith(color: c.textPrimary),
+                ),
+              ),
+              InkResponse(
+                onTap: onRemove,
+                radius: 20,
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Icon(
+                    Icons.close_rounded,
+                    size: 16,
+                    color: c.iconDefault,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

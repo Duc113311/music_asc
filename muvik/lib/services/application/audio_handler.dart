@@ -483,7 +483,9 @@ class MuvikAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> onTaskRemoved() async {
-    if (!_player.playing) await stop();
+    // Keep the (dismissible) notification once a song is loaded, so the
+    // controls survive swiping the app away; only an empty player stops.
+    if (!_player.playing && _loadedEntryId == null) await stop();
   }
 
   // ------------------------------------------------------------ loading

@@ -73,9 +73,9 @@ void main() {
     });
   });
 
-  test('8 accent colors with unique keys', () {
-    expect(AccentColor.values.length, 8);
-    expect(AccentColor.values.map((a) => a.key).toSet().length, 8);
+  test('12 accent colors with unique keys', () {
+    expect(AccentColor.values.length, 12);
+    expect(AccentColor.values.map((a) => a.key).toSet().length, 12);
   });
 
   for (final scale in [1.0, 1.3]) {

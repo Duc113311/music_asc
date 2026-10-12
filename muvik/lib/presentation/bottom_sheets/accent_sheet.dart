@@ -39,7 +39,7 @@ class _AccentSheetState extends State<_AccentSheet> {
       ),
       child: Column(
         children: [
-          // 8 accents on 2 rows of 4.
+          // 12 accents on 3 rows of 4.
           for (var row = 0; row < AccentColor.values.length; row += 4) ...[
             if (row > 0) const SizedBox(height: AppSpacing.sm),
             Row(

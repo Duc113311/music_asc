@@ -47,10 +47,10 @@ class SettingsTab extends StatelessWidget {
           bottom: false,
           child: ListView(
             controller: scrollController,
-            padding: const EdgeInsets.symmetric(horizontal: 13),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
             children: [
               const _Header(),
-              const SizedBox(height: 10),
+              const SizedBox(height: 16),
               const _AccountCard(),
               _Group(
                 title: 'settings_group_utilities'.tr,
@@ -58,6 +58,7 @@ class SettingsTab extends StatelessWidget {
                   _Row(
                     icon: const _FolderSyncIcon(),
                     title: 'settings_scan'.tr,
+                    subtitle: 'settings_scan_desc'.tr,
                     onTap: () => Get.toNamed(RouteName.scanLibrary),
                   ),
                   Obx(() {
@@ -65,13 +66,14 @@ class SettingsTab extends StatelessWidget {
                     return _Row(
                       icon: const _GradientIcon(Icons.schedule_rounded),
                       title: 'settings_sleep_timer'.tr,
+                      subtitle: 'settings_sleep_timer_desc'.tr,
                       value: st.waitingForTrackEnd
                           ? 'sleep_waiting_track_short'.tr
                           : (st.deadline == null
-                                ? 'value_off'.tr
-                                : DurationFormatter.clock(
-                                    st.remaining(DateTime.now()),
-                                  )),
+                              ? 'value_off'.tr
+                              : DurationFormatter.clock(
+                                  st.remaining(DateTime.now()),
+                                )),
                       onTap: () => Get.toNamed(RouteName.sleepTimer),
                     );
                   }),
@@ -92,21 +94,23 @@ class SettingsTab extends StatelessWidget {
                         ),
                       ),
                       title: 'settings_equalizer'.tr,
-                      value: eq.enabled
-                          ? eq.preset.labelKey.tr
-                          : 'value_off'.tr,
+                      subtitle: 'settings_equalizer_desc'.tr,
+                      value:
+                          eq.enabled ? eq.preset.labelKey.tr : 'value_off'.tr,
                       onTap: () => Get.toNamed(RouteName.equalizer),
                     );
                   }),
                   _Row(
                     icon: const _GradientIcon(Icons.graphic_eq_rounded),
                     title: 'settings_quality'.tr,
+                    subtitle: 'settings_quality_desc'.tr,
                     value: 'quality_original'.tr,
                     onTap: () => Get.toNamed(RouteName.playbackQuality),
                   ),
                   _Row(
                     icon: const _GradientIcon(Icons.headphones_outlined),
                     title: 'settings_headphones'.tr,
+                    subtitle: 'settings_headphones_desc'.tr,
                     onTap: () => Get.toNamed(RouteName.headphones),
                   ),
                 ],
@@ -118,6 +122,7 @@ class SettingsTab extends StatelessWidget {
                     () => _Row(
                       icon: const _GradientIcon(Icons.dark_mode_outlined),
                       title: 'settings_theme'.tr,
+                      subtitle: 'settings_theme_desc'.tr,
                       value: settings.themeLabelKey.tr,
                       onTap: () => Get.toNamed(RouteName.theme),
                     ),
@@ -126,6 +131,7 @@ class SettingsTab extends StatelessWidget {
                     () => _Row(
                       icon: const _GradientIcon(Icons.palette_outlined),
                       title: 'settings_accent'.tr,
+                      subtitle: 'settings_accent_desc'.tr,
                       // sc_cat_dat shows only the swatch; the name stays
                       // for screen readers.
                       trailing: Semantics(
@@ -147,14 +153,31 @@ class SettingsTab extends StatelessWidget {
               _Group(
                 title: 'settings_group_app'.tr,
                 children: [
+                  Obx(
+                    () => _Row(
+                      icon: const _GradientIcon(Icons.notifications_outlined),
+                      title: 'settings_nudge'.tr,
+                      subtitle: 'settings_nudge_desc'.tr,
+                      chevron: false,
+                      trailing: Switch(
+                        value: settings.nudgeEnabled.value,
+                        onChanged: settings.setNudgeEnabled,
+                      ),
+                      onTap: () => settings.setNudgeEnabled(
+                        !settings.nudgeEnabled.value,
+                      ),
+                    ),
+                  ),
                   _Row(
                     icon: const _GradientIcon(Icons.shield_outlined),
                     title: 'settings_permissions'.tr,
+                    subtitle: 'settings_permissions_desc'.tr,
                     onTap: () => Get.toNamed(RouteName.permissions),
                   ),
                   _Row(
                     icon: const _GradientIcon(Icons.star_outline_rounded),
                     title: 'settings_rate'.tr,
+                    subtitle: 'settings_rate_desc'.tr,
                     onTap: showRateAppDialog,
                   ),
                   FutureBuilder<PackageInfo>(
@@ -162,9 +185,9 @@ class SettingsTab extends StatelessWidget {
                     builder: (context, snap) => _Row(
                       icon: const _GradientIcon(Icons.info_outline_rounded),
                       title: 'settings_about'.tr,
-                      value: snap.data == null
-                          ? null
-                          : 'v${snap.data!.version}',
+                      subtitle: 'settings_about_desc'.tr,
+                      value:
+                          snap.data == null ? null : 'v${snap.data!.version}',
                       onTap: () => Get.toNamed(RouteName.about),
                     ),
                   ),
@@ -189,8 +212,8 @@ class SettingsTab extends StatelessWidget {
 /// theme keeps the regular surface tokens.
 class _CardStyle {
   _CardStyle(BuildContext context)
-    : dark = Theme.of(context).brightness == Brightness.dark,
-      _c = context.colors;
+      : dark = Theme.of(context).brightness == Brightness.dark,
+        _c = context.colors;
 
   final bool dark;
   final AppColors _c;
@@ -200,15 +223,15 @@ class _CardStyle {
   Color get divider => dark ? const Color(0xFF1D366C) : _c.divider;
 
   ShapeBorder get shape => RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(12),
-    side: BorderSide(color: border),
-  );
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: border),
+      );
 
   BoxDecoration get decoration => BoxDecoration(
-    color: fill,
-    borderRadius: BorderRadius.circular(12),
-    border: Border.all(color: border),
-  );
+        color: fill,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: border),
+      );
 }
 
 /// Icon tinted top-to-bottom from the accent to sky blue.
@@ -294,7 +317,7 @@ class _Header extends StatelessWidget {
             style: AppTypography.bodyL.copyWith(
               fontSize: 14.5,
               height: 1.4,
-              color: c.primary,
+              color: c.primaryLight,
             ),
           ),
         ],
@@ -316,8 +339,9 @@ class _Group extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        const SizedBox(height: 24),
         Padding(
-          padding: const EdgeInsets.fromLTRB(4, 8, 4, 3),
+          padding: const EdgeInsets.fromLTRB(4, 0, 4, 10),
           child: Semantics(
             header: true,
             child: Text(
@@ -326,7 +350,7 @@ class _Group extends StatelessWidget {
                 fontSize: 12.5,
                 height: 1.25,
                 letterSpacing: 0.5,
-                color: c.primary,
+                color: c.primaryLight,
               ),
             ),
           ),
@@ -342,9 +366,9 @@ class _Group extends StatelessWidget {
                 if (i > 0)
                   Divider(
                     height: 1,
-                    thickness: 1,
-                    indent: 12,
-                    endIndent: 12,
+                    thickness: 0.5,
+                    indent: 68,
+                    endIndent: 0,
                     color: style.divider,
                   ),
                 children[i],
@@ -362,13 +386,17 @@ class _Row extends StatelessWidget {
   const _Row({
     required this.icon,
     required this.title,
+    this.subtitle,
     this.value,
     this.trailing,
     this.onTap,
+    this.chevron = true,
   });
 
+  final bool chevron;
   final Widget icon;
   final String title;
+  final String? subtitle;
   final String? value;
   final Widget? trailing;
   final VoidCallback? onTap;
@@ -381,36 +409,75 @@ class _Row extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 41),
+          constraints: const BoxConstraints(minHeight: 66),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 6, 8, 6),
+            padding: const EdgeInsets.fromLTRB(12, 12, 6, 12),
             child: Row(
               children: [
-                icon,
-                const SizedBox(width: 22),
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: c.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                    border:
+                        Border.all(color: c.primary.withValues(alpha: 0.25)),
+                  ),
+                  child: Center(child: icon),
+                ),
+                const SizedBox(width: 14),
                 Expanded(
-                  child: Text(
-                    title,
-                    style: AppTypography.bodyL.copyWith(
-                      fontSize: 13.5,
-                      height: 1.35,
-                      color: c.textPrimary,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: AppTypography.bodyL.copyWith(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: c.textPrimary,
+                        ),
+                      ),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle!,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.caption.copyWith(
+                            fontSize: 12.5,
+                            color: c.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 if (value != null)
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 140),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8),
+                    child: Container(
+                      margin: const EdgeInsets.only(left: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: c.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: c.primary.withValues(alpha: 0.4),
+                        ),
+                      ),
                       child: Text(
                         value!,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.end,
                         style: AppTypography.bodyM.copyWith(
-                          fontSize: 12,
-                          color: c.primary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: c.primaryLight,
                         ),
                       ),
                     ),
@@ -421,7 +488,8 @@ class _Row extends StatelessWidget {
                     child: trailing,
                   ),
                 const SizedBox(width: 2),
-                Icon(Icons.chevron_right_rounded, size: 24, color: c.primary),
+                if (chevron)
+                  Icon(Icons.chevron_right_rounded, size: 24, color: c.primary),
               ],
             ),
           ),
@@ -440,7 +508,7 @@ class _AccountCard extends StatelessWidget {
     final auth = AuthController.to;
     return Container(
       decoration: _CardStyle(context).decoration,
-      padding: const EdgeInsets.fromLTRB(12, 7, 12, 8),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
       child: Obx(() {
         final u = auth.user.value;
         return Column(
@@ -475,7 +543,7 @@ class _AccountCard extends StatelessWidget {
                         style: AppTypography.bodyM.copyWith(
                           fontSize: 12,
                           height: 1.4,
-                          color: c.primary,
+                          color: c.primaryLight,
                         ),
                       ),
                     ],
@@ -483,7 +551,7 @@ class _AccountCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 16),
             if (u == null) ...[
               _PillButton(
                 label: 'account_google_sign_in'.tr,
@@ -491,13 +559,13 @@ class _AccountCard extends StatelessWidget {
                 loading: auth.busy.value,
                 onTap: auth.signIn,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(
                 'account_optional'.tr,
                 textAlign: TextAlign.center,
                 style: AppTypography.caption.copyWith(
                   fontSize: 10.5,
-                  color: c.primary,
+                  color: c.primaryLight,
                 ),
               ),
             ] else
@@ -553,7 +621,7 @@ class _PillButton extends StatelessWidget {
           onTap: loading ? null : onTap,
           borderRadius: BorderRadius.circular(12),
           child: SizedBox(
-            height: 32,
+            height: 40,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -595,9 +663,9 @@ class _GoogleLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox.square(
-    dimension: size,
-    child: const CustomPaint(painter: _GooglePainter()),
-  );
+        dimension: size,
+        child: const CustomPaint(painter: _GooglePainter()),
+      );
 }
 
 class _GooglePainter extends CustomPainter {

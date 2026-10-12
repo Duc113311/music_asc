@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../controller/library_controller.dart';
 import '../../controller/playback_controller.dart';
+import '../../services/native/nudge_service.dart';
 import '../../services/application/listening_stats_service.dart';
 import '../../utils/toast_utils.dart';
 import '../../values/app_colors.dart';
@@ -37,6 +38,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) => NudgeService.refresh());
     // Cold start from the media notification: show Now Playing (P17-06).
     if (AudioService.notificationClicked.value) {
       WidgetsBinding.instance.addPostFrameCallback(
@@ -59,10 +61,12 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       LibraryController.to.scanService.refreshOnResume();
+      NudgeService.refresh();
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
       // Persist pending listening time before the OS may kill the UI process.
       Get.find<ListeningStatsService>().flush();
+      NudgeService.refresh();
     }
   }
 
@@ -81,14 +85,14 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   }
 
   Widget _tab(int i) => switch (i) {
-    0 => DashboardTab(
-      scrollController: _scrolls[0],
-      onOpenLibrary: () => _select(1),
-    ),
-    1 => LibraryTab(scrollController: _scrolls[1]),
-    2 => ExploreTab(scrollController: _scrolls[2]),
-    _ => SettingsTab(scrollController: _scrolls[3]),
-  };
+        0 => DashboardTab(
+            scrollController: _scrolls[0],
+            onOpenLibrary: () => _select(1),
+          ),
+        1 => LibraryTab(scrollController: _scrolls[1]),
+        2 => ExploreTab(scrollController: _scrolls[2]),
+        _ => SettingsTab(scrollController: _scrolls[3]),
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -176,14 +180,6 @@ class _NavBar extends StatelessWidget {
                             horizontal: 14,
                             vertical: 6,
                           ),
-                          decoration: BoxDecoration(
-                            color: i == index
-                                ? c.surfaceSelected
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(
-                              AppRadius.input,
-                            ),
-                          ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -197,9 +193,8 @@ class _NavBar extends StatelessWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: AppTypography.navigation.copyWith(
-                                  color: i == index
-                                      ? c.primary
-                                      : c.textSecondary,
+                                  color:
+                                      i == index ? c.primary : c.textSecondary,
                                 ),
                               ),
                             ],

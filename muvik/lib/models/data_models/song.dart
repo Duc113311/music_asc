@@ -55,6 +55,16 @@ class Song {
   /// Genre tag read at scan time; drives the Explore mood chips.
   final String? genre;
 
+  /// Voice/call recordings: kept out of the music tabs, still reachable via
+  /// their folder.
+  bool get isRecording {
+    final f = folderPath.toLowerCase();
+    final n = fileName.toLowerCase();
+    return RegExp(r'record|ghi.?âm|voice|call').hasMatch(f) ||
+        RegExp(r'^(call.?record|voice|ghi.?âm|record|rec[_ -]?\d|ptt-)')
+            .hasMatch(n);
+  }
+
   Duration get duration => Duration(milliseconds: durationMs);
 
   /// Title with file-name fallback (P05-08).

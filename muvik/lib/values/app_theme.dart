@@ -96,14 +96,14 @@ class AppTheme {
       ),
       sliderTheme: SliderThemeData(
         trackHeight: 4,
-        activeTrackColor: c.primary,
+        activeTrackColor: c.primaryLight,
         inactiveTrackColor: c.border,
-        thumbColor: c.primary,
+        thumbColor: c.primaryLight,
         overlayColor: c.primary.withValues(alpha: 0.12),
         thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: c.primary,
+        color: c.primaryLight,
         linearTrackColor: c.border,
       ),
       textSelectionTheme: TextSelectionThemeData(

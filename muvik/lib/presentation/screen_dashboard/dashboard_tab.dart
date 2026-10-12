@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import '../../controller/library_controller.dart';
 import '../../controller/playback_controller.dart';
 import '../../models/data_models/song.dart';
+import '../../values/app_assets.dart';
 import '../../values/app_colors.dart';
 import '../../values/app_dimensions.dart';
 import '../../values/app_typography.dart';
@@ -140,14 +141,9 @@ class _DashboardTabState extends State<DashboardTab>
                 ),
               ),
               SliverToBoxAdapter(
-                child: SectionHeader(
-                  title: 'home_your_music'.tr,
-                  onMore: pc.hasSong ? pc.openNowPlaying : null,
-                  moreLabel: '',
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: _YourMusicCard(onOpenLibrary: widget.onOpenLibrary),
+                child: lib.isEmpty
+                    ? _YourMusicCard(onOpenLibrary: widget.onOpenLibrary)
+                    : const _HomeBanners(),
               ),
               SliverToBoxAdapter(
                 child: Padding(
@@ -183,21 +179,30 @@ class _DashboardTabState extends State<DashboardTab>
               ),
               if (!lib.isEmpty) ...[
                 SliverToBoxAdapter(
-                  child: SectionHeader(title: 'home_for_you'.tr),
+                  child: SectionHeader(
+                    title: 'home_for_you'.tr,
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.screenH,
+                      AppSpacing.sm,
+                      AppSpacing.xs,
+                      14,
+                    ),
+                  ),
                 ),
                 SliverToBoxAdapter(child: _ForYouRow()),
               ],
               SliverToBoxAdapter(
                 child: SectionHeader(
+                  padding: _headerPad,
                   title: 'home_recent_title'.tr,
                   onMore: recent.isEmpty
                       ? null
                       : () => AppNav.openSongs(
-                          SongListArgs(
-                            title: 'home_recent_title'.tr,
-                            songs: () => lib.recent,
+                            SongListArgs(
+                              title: 'home_recent_title'.tr,
+                              songs: () => lib.recent,
+                            ),
                           ),
-                        ),
                 ),
               ),
               if (recent.isEmpty)
@@ -228,6 +233,250 @@ class _DashboardTabState extends State<DashboardTab>
             ],
           );
         }),
+      ),
+    );
+  }
+}
+
+const _headerPad = EdgeInsets.fromLTRB(
+  AppSpacing.screenH,
+  AppSpacing.sm,
+  AppSpacing.xs,
+  0,
+);
+
+class _BannerData {
+  const _BannerData({
+    required this.image,
+    required this.title,
+    required this.subtitle,
+    required this.onPlay,
+    this.badge,
+  });
+  final String image;
+  final String title;
+  final String subtitle;
+  final String? badge;
+  final VoidCallback onPlay;
+}
+
+/// Swipeable hero slides on Home (replaces the old "Nhạc của bạn" card).
+class _HomeBanners extends StatefulWidget {
+  const _HomeBanners();
+
+  @override
+  State<_HomeBanners> createState() => _HomeBannersState();
+}
+
+class _HomeBannersState extends State<_HomeBanners> {
+  final _controller = PageController();
+  int _page = 0;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  List<_BannerData> _slides() {
+    final lib = LibraryController.to;
+    final pc = PlaybackController.to;
+    final song = pc.state.value.currentSong;
+    final most = lib.mostPlayed(limit: 50);
+    final least = lib.leastPlayed(limit: 50);
+    return [
+      if (song != null)
+        _BannerData(
+          image: AppAssets.sleepSunset,
+          badge: 'home_continue'.tr,
+          title: song.displayTitle,
+          subtitle: song.artistOrNull ?? 'unknown_artist'.tr,
+          onPlay: () {
+            if (!pc.state.value.playing) pc.togglePlay();
+            pc.openNowPlaying();
+          },
+        ),
+      _BannerData(
+        image: AppAssets.exploreRandom,
+        badge: 'home_banner_badge'.tr,
+        title: 'explore_random'.tr,
+        subtitle: 'explore_random_desc'.tr,
+        onPlay: () => pc.playAll(lib.songs.toList(), shuffle: true),
+      ),
+      if (most.isNotEmpty)
+        _BannerData(
+          image: AppAssets.exploreReplay,
+          badge: 'home_banner_badge'.tr,
+          title: 'explore_replay'.tr,
+          subtitle: 'explore_replay_desc'.tr,
+          onPlay: () => pc.playAll(most),
+        ),
+      if (least.isNotEmpty)
+        _BannerData(
+          image: AppAssets.exploreLeast,
+          badge: 'home_banner_badge'.tr,
+          title: 'explore_least'.tr,
+          subtitle: 'explore_least_desc'.tr,
+          onPlay: () => pc.playAll(least),
+        ),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      PlaybackController.to.state.value; // rebuild on playback changes
+      final slides = _slides();
+      final page = _page.clamp(0, slides.length - 1);
+      return Padding(
+        padding: const EdgeInsets.only(top: AppSpacing.md),
+        child: SizedBox(
+          height: 190,
+          child: PageView.builder(
+            controller: _controller,
+            itemCount: slides.length,
+            onPageChanged: (i) => setState(() => _page = i),
+            itemBuilder: (_, i) => Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenH,
+              ),
+              child: _BannerCard(
+                data: slides[i],
+                count: slides.length,
+                index: page,
+              ),
+            ),
+          ),
+        ),
+      );
+    });
+  }
+}
+
+class _BannerCard extends StatelessWidget {
+  const _BannerCard({
+    required this.data,
+    required this.count,
+    required this.index,
+  });
+  final _BannerData data;
+  final int count;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppRadius.card),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(data.image, fit: BoxFit.cover),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Colors.black.withValues(alpha: 0.75),
+                  Colors.black.withValues(alpha: 0.15),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (data.badge != null)
+                  Text(
+                    data.badge!.toUpperCase(),
+                    style: AppTypography.caption.copyWith(
+                      color: c.primaryLight,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                const SizedBox(height: 4),
+                SizedBox(
+                  width: 220,
+                  child: Text(
+                    data.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.headingS.copyWith(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                SizedBox(
+                  width: 220,
+                  child: Text(
+                    data.subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.bodyM.copyWith(
+                      color: Colors.white.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: data.onPlay,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.xs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: c.primary,
+                      borderRadius: BorderRadius.circular(AppRadius.full),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.play_arrow_rounded,
+                          size: 20,
+                          color: c.onPrimary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'home_listen_now'.tr,
+                          style: AppTypography.label.copyWith(
+                            color: c.onPrimary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            top: AppSpacing.sm,
+            right: AppSpacing.md,
+            child: Row(
+              children: [
+                for (var i = 0; i < count; i++)
+                  Container(
+                    width: 8,
+                    height: 8,
+                    margin: const EdgeInsets.only(left: 4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(
+                        alpha: i == index ? 0.95 : 0.4,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -289,7 +538,7 @@ class _YourMusicCard extends StatelessWidget {
                           ? 'home_now_playing'.tr.toUpperCase()
                           : 'home_continue'.tr.toUpperCase(),
                       style: AppTypography.caption.copyWith(
-                        color: c.primary,
+                        color: c.primaryLight,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -377,9 +626,8 @@ class _ForYouRow extends StatelessWidget {
             width: _cardWidth,
             title: p.name,
             subtitle: 'count_songs_n'.trParams({'args1': '${p.songCount}'}),
-            coverSong: p.firstSongId == null
-                ? null
-                : lib.songById(p.firstSongId!),
+            coverSong:
+                p.firstSongId == null ? null : lib.songById(p.firstSongId!),
             onTap: () => AppNav.openPlaylist(p.id!),
             onPlay: p.songCount == 0
                 ? null
@@ -414,8 +662,8 @@ class _ForYouRow extends StatelessWidget {
     });
   }
 
-  static const double _cardWidth = 124;
-  static const double _cardHeight = 196;
+  static const double _cardWidth = 170;
+  static const double _cardHeight = 172;
 
   Widget _auto(String title, List<Song> songs, IconData icon) {
     final pc = PlaybackController.to;

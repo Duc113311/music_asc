@@ -13,6 +13,10 @@
     <string name="accent_blue">Xanh dương</string>
     <string name="accent_coral">Hồng san hô</string>
     <string name="accent_desc">Chọn màu nhấn sử dụng trong toàn bộ ứng dụng.</string>
+    <string name="accent_fuchsia">Hồng tím neon</string>
+    <string name="accent_lime">Xanh chanh</string>
+    <string name="accent_indigo">Chàm</string>
+    <string name="accent_ruby">Đỏ ruby</string>
     <string name="accent_green">Xanh lá</string>
     <string name="accent_lavender">Tím lavender</string>
     <string name="accent_orange">Cam</string>
@@ -182,6 +186,8 @@
     <string name="greeting_evening">Chào buổi tối</string>
     <string name="greeting_morning">Chào buổi sáng</string>
     <string name="greeting_noon">Chào buổi trưa</string>
+    <string name="home_banner_badge">Dành riêng cho bạn</string>
+    <string name="home_listen_now">Nghe ngay</string>
     <string name="home_continue">Tiếp tục nghe</string>
     <string name="home_for_you">Playlist dành cho bạn</string>
     <string name="home_now_playing">Đang phát</string>
@@ -242,6 +248,9 @@
     <string name="month_short_8">T8</string>
     <string name="month_short_9">T9</string>
     <string name="mood_calm">Êm dịu</string>
+    <string name="mood_romantic">Lãng mạn</string>
+    <string name="mood_workout">Tập luyện</string>
+    <string name="mood_party">Tiệc tùng</string>
     <string name="mood_empty">Chưa có bài nào có thể loại phù hợp. Danh sách tâm trạng dựa trên thể loại (genre) lưu trong file nhạc.</string>
     <string name="mood_energetic">Sôi động</string>
     <string name="mood_focus">Tập trung</string>
@@ -520,4 +529,23 @@
     <string name="weekday_short_5">T6</string>
     <string name="weekday_short_6">T7</string>
     <string name="weekday_short_7">CN</string>
+    <string name="settings_scan_desc">Tìm nhạc trong thư mục trên máy</string>
+    <string name="settings_sleep_timer_desc">Tự dừng phát sau một khoảng thời gian</string>
+    <string name="settings_equalizer_desc">Tinh chỉnh âm bass, treble</string>
+    <string name="settings_quality_desc">Chất lượng âm thanh khi phát</string>
+    <string name="settings_headphones_desc">Thiết bị và hành vi tai nghe</string>
+    <string name="settings_theme_desc">Sáng, tối hoặc theo hệ thống</string>
+    <string name="settings_accent_desc">Màu chủ đạo của ứng dụng</string>
+    <string name="settings_permissions_desc">Quyền truy cập nhạc và thông báo</string>
+    <string name="settings_rate_desc">Chia sẻ cảm nhận của bạn</string>
+    <string name="settings_about_desc">Phiên bản và thông tin ứng dụng</string>
+    <string name="search_clear_all">Xóa tất cả</string>
+    <string name="nudge_title_1">Đến giờ nghe nhạc rồi</string>
+    <string name="nudge_body_1">Mở Muvik và nghe vài bài bạn thích nhé.</string>
+    <string name="nudge_title_2">Thư giãn một chút nào</string>
+    <string name="nudge_body_2">Playlist của bạn đang chờ, bật nhạc thôi.</string>
+    <string name="nudge_title_3">Hôm nay bạn chưa nghe nhạc</string>
+    <string name="nudge_body_3">Quay lại Muvik để nghe lại bài yêu thích.</string>
+    <string name="settings_nudge">Nhắc nghe nhạc</string>
+    <string name="settings_nudge_desc">Một thông báo mỗi tối nếu bạn chưa nghe</string>
 </resources>

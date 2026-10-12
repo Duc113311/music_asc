@@ -133,6 +133,11 @@ class MusicSearchController extends GetxController {
     await PrefStore.setStringList(PrefConst.searchHistory, history.toList());
   }
 
+  Future<void> removeHistory(String q) async {
+    history.remove(q);
+    await PrefStore.setStringList(PrefConst.searchHistory, history.toList());
+  }
+
   /// Clears search history only — never music (spec §4.5).
   Future<void> clearHistory() async {
     history.clear();

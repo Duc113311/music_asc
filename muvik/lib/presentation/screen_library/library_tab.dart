@@ -119,20 +119,20 @@ class LibraryTab extends StatelessWidget {
             Obx(
               () =>
                   !lib.hasPermission && lib.sources.every((s) => !s.accessible)
-                  ? Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.screenH,
-                        AppSpacing.sm,
-                        AppSpacing.screenH,
-                        0,
-                      ),
-                      child: InfoBanner(
-                        message: 'no_audio_permission'.tr,
-                        actionLabel: 'action_grant'.tr,
-                        onAction: () => Get.toNamed(RouteName.permissions),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
+                      ? Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.screenH,
+                            AppSpacing.sm,
+                            AppSpacing.screenH,
+                            0,
+                          ),
+                          child: InfoBanner(
+                            message: 'no_audio_permission'.tr,
+                            actionLabel: 'action_grant'.tr,
+                            onAction: () => Get.toNamed(RouteName.permissions),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
             ),
             Expanded(
               child: TabBarView(
@@ -185,7 +185,6 @@ class _SongsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = context.colors;
     final lib = LibraryController.to;
     final pc = PlaybackController.to;
     return Obx(() {
@@ -194,28 +193,10 @@ class _SongsTab extends StatelessWidget {
       final currentId = pc.currentSong?.id;
       return ListView.builder(
         controller: scrollController,
-        itemCount: songs.length + 2,
+        itemCount: songs.length + 1,
         itemBuilder: (context, i) {
-          if (i == 0) {
-            return ListTile(
-              minTileHeight: 56,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenH,
-              ),
-              leading: Icon(Icons.shuffle_rounded, color: c.primary),
-              title: Text(
-                'action_shuffle_all'.tr,
-                style: AppTypography.label.copyWith(color: c.textPrimary),
-              ),
-              trailing: Text(
-                'sort_label'.trParams({'args1': lib.sort.value.labelKey.tr}),
-                style: AppTypography.caption.copyWith(color: c.textMuted),
-              ),
-              onTap: () => pc.playAll(songs, shuffle: true),
-            );
-          }
-          if (i == songs.length + 1) return const MiniPlayerSpacer();
-          final s = songs[i - 1];
+          if (i == songs.length) return const MiniPlayerSpacer();
+          final s = songs[i];
           return SongTile(
             song: s,
             isCurrent: s.id == currentId,
@@ -264,7 +245,9 @@ class _GroupsTab extends StatelessWidget {
                 width: box.maxWidth,
                 title: groupTitle(g),
                 subtitle:
-                    '${g.subtitle ?? 'various_artists'.tr} • ${'count_songs_n'.trParams({'args1': '${g.songs.length}'})}',
+                    '${g.subtitle ?? 'various_artists'.tr} • ${'count_songs_n'.trParams({
+                      'args1': '${g.songs.length}'
+                    })}',
                 coverSong: g.coverSong,
                 placeholderIcon: Icons.album_rounded,
                 onTap: () => openGroup(g),
@@ -336,10 +319,12 @@ class _GroupRow extends StatelessWidget {
                       g.allUnavailable
                           ? 'source_unavailable'.tr
                           : (isFolder
-                                ? '${g.subtitle} • ${'count_songs_n'.trParams({'args1': '${g.songs.length}'})}'
-                                : 'count_songs_n'.trParams({
-                                    'args1': '${g.songs.length}',
-                                  })),
+                              ? '${g.subtitle} • ${'count_songs_n'.trParams({
+                                      'args1': '${g.songs.length}'
+                                    })}'
+                              : 'count_songs_n'.trParams({
+                                  'args1': '${g.songs.length}',
+                                })),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.bodyM.copyWith(
@@ -433,9 +418,8 @@ class _PlaylistsTab extends StatelessWidget {
                 width: box.maxWidth,
                 title: p.name,
                 subtitle: 'count_songs_n'.trParams({'args1': '${p.songCount}'}),
-                coverSong: p.firstSongId == null
-                    ? null
-                    : lib.songById(p.firstSongId!),
+                coverSong:
+                    p.firstSongId == null ? null : lib.songById(p.firstSongId!),
                 onTap: () => AppNav.openPlaylist(p.id!),
                 onMore: () => showPlaylistActions(
                   p,

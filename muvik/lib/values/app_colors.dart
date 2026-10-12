@@ -5,9 +5,9 @@ enum AccentColor {
   lavender(
     'lavender',
     'accent_lavender',
-    Color(0xFFA78BFA),
+    Color(0xFF7C5CF4),
     Color(0xFF7C3AED),
-    Color(0xFF8B5CF6),
+    Color(0xFF6A49E8),
     Color(0xFF6D28D9),
   ),
   teal(
@@ -65,6 +65,38 @@ enum AccentColor {
     Color(0xFFC2410C),
     Color(0xFFF97316),
     Color(0xFF9A3412),
+  ),
+  fuchsia(
+    'fuchsia',
+    'accent_fuchsia',
+    Color(0xFFD946EF),
+    Color(0xFFA21CAF),
+    Color(0xFFC026D3),
+    Color(0xFF86198F),
+  ),
+  lime(
+    'lime',
+    'accent_lime',
+    Color(0xFFA3E635),
+    Color(0xFF4D7C0F),
+    Color(0xFF84CC16),
+    Color(0xFF3F6212),
+  ),
+  indigo(
+    'indigo',
+    'accent_indigo',
+    Color(0xFF6366F1),
+    Color(0xFF4338CA),
+    Color(0xFF4F46E5),
+    Color(0xFF3730A3),
+  ),
+  ruby(
+    'ruby',
+    'accent_ruby',
+    Color(0xFFFF3B5C),
+    Color(0xFFC8102E),
+    Color(0xFFE11D48),
+    Color(0xFF9F1239),
   );
 
   const AccentColor(
@@ -131,6 +163,10 @@ class AppColors extends ThemeExtension<AppColors> {
   final Color scrim;
   final Color primary;
   final Color primaryPressed;
+
+  /// Lighter tone for highlighted text and progress bars (lavender: #9D85FF).
+  Color get primaryLight =>
+      primary == AccentColor.lavender.dark ? const Color(0xFF9D85FF) : primary;
   final Color onPrimary;
   final Color secondary;
   final Color textPrimary;
@@ -167,9 +203,7 @@ class AppColors extends ThemeExtension<AppColors> {
     scrim: const Color(0x99000000),
     primary: accent.dark,
     primaryPressed: accent.darkPressed,
-    onPrimary: accent == AccentColor.lavender
-        ? const Color(0xFF140D26)
-        : onColor(accent.dark),
+    onPrimary: onColor(accent.dark),
     secondary: const Color(0xFF46D9E5),
     textPrimary: const Color(0xFFF5F6FC),
     textSecondary: const Color(0xFFB2B8CD),

@@ -16,6 +16,7 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : AudioServiceActivity() {
     companion object {
         const val SYSTEM_UI_CHANNEL = "com.asctechsoft.muvik/system_ui"
+        const val NUDGE_CHANNEL = "com.asctechsoft.muvik/nudge"
     }
 
     private var mediaLibrary: MediaLibraryHandler? = null
@@ -32,6 +33,25 @@ class MainActivity : AudioServiceActivity() {
         val effects = AudioEffectsHandler()
         MethodChannel(messenger, AudioEffectsHandler.CHANNEL).setMethodCallHandler(effects)
         audioEffects = effects
+
+        MethodChannel(messenger, NUDGE_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "schedule" -> {
+                    NudgeScheduler.schedule(
+                        this,
+                        call.argument<Int>("hour") ?: 19,
+                        call.argument<String>("title") ?: "",
+                        call.argument<String>("body") ?: "",
+                    )
+                    result.success(null)
+                }
+                "cancel" -> {
+                    NudgeScheduler.cancel(this)
+                    result.success(null)
+                }
+                else -> result.notImplemented()
+            }
+        }
 
         // Dart re-hides after changing the system UI mode at startup.
         MethodChannel(messenger, SYSTEM_UI_CHANNEL).setMethodCallHandler { call, result ->

@@ -117,7 +117,7 @@ class StepPermission extends GetView<SetupController> {
           const SizedBox(height: AppSpacing.sm),
           PrimaryButton(
             label: 'action_later'.tr,
-            variant: ButtonVariant.secondary,
+            variant: ButtonVariant.tertiary,
             onPressed: controller.later,
           ),
         ],

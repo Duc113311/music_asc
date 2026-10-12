@@ -96,9 +96,10 @@ class LibraryController extends GetxController {
 
   void _rebuild() {
     final all = _library.visibleSongs..sort(sort.value.compare);
-    songs.assignAll(all);
-    albums.assignAll(LibraryGrouping.albums(all));
-    artists.assignAll(LibraryGrouping.artists(all));
+    final music = all.where((s) => !s.isRecording).toList();
+    songs.assignAll(music);
+    albums.assignAll(LibraryGrouping.albums(music));
+    artists.assignAll(LibraryGrouping.artists(music));
     folders.assignAll(LibraryGrouping.folders(all));
     favorites.assignAll(
       all.where((s) => s.favorite).toList()..sort(

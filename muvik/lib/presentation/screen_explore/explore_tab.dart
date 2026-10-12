@@ -64,46 +64,50 @@ class ExploreTab extends StatelessWidget {
                     ...header,
                     const SizedBox(height: 14),
                     const _SearchBox(),
-                    const SizedBox(height: 13),
+                    const SizedBox(height: 20),
                     const _MoodChips(),
-                    const SizedBox(height: 13),
+                    const SizedBox(height: 20),
                     SizedBox(
-                      height: 190,
-                      child: Row(
+                      height: 170,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 18),
                         children: [
-                          const SizedBox(width: 11),
-                          Expanded(
-                            flex: 125,
-                            child: _SuggestionCard(
-                              art: AppAssets.exploreReplay,
-                              title: 'explore_replay'.tr,
-                              desc: 'explore_replay_desc'.tr,
-                              songs: most.isNotEmpty ? most : random,
-                              titleMaxWidth: 72,
-                            ),
+                          _SuggestionCard(
+                            art: AppAssets.exploreReplay,
+                            title: 'explore_replay'.tr,
+                            desc: 'explore_replay_desc'.tr,
+                            songs: most.isNotEmpty ? most : random,
                           ),
-                          const SizedBox(width: 7),
-                          Expanded(
-                            flex: 118,
-                            child: _SuggestionCard(
-                              art: AppAssets.exploreLeast,
-                              title: 'explore_least'.tr,
-                              desc: 'explore_least_desc'.tr,
-                              songs: least,
-                            ),
+                          const SizedBox(width: 10),
+                          _SuggestionCard(
+                            art: AppAssets.exploreLeast,
+                            title: 'explore_least'.tr,
+                            desc: 'explore_least_desc'.tr,
+                            songs: least,
                           ),
-                          const SizedBox(width: 7),
-                          Expanded(
-                            flex: 114,
-                            child: _SuggestionCard(
-                              art: AppAssets.exploreRandom,
-                              title: 'explore_random'.tr,
-                              desc: 'explore_random_desc'.tr,
-                              songs: random,
-                              shuffle: true,
-                            ),
+                          const SizedBox(width: 10),
+                          _SuggestionCard(
+                            art: AppAssets.exploreRandom,
+                            title: 'explore_random'.tr,
+                            desc: 'explore_random_desc'.tr,
+                            songs: random,
+                            shuffle: true,
                           ),
-                          const SizedBox(width: 9),
+                          const SizedBox(width: 10),
+                          _SuggestionCard(
+                            art: AppAssets.exploreReplay,
+                            title: 'home_recent_title'.tr,
+                            desc: 'home_recent'.tr,
+                            songs: lib.recent.toList(),
+                          ),
+                          const SizedBox(width: 10),
+                          _SuggestionCard(
+                            art: AppAssets.exploreLeast,
+                            title: 'explore_recently_added'.tr,
+                            desc: 'home_for_you'.tr,
+                            songs: added,
+                          ),
                         ],
                       ),
                     ),
@@ -158,7 +162,7 @@ class _Title extends StatelessWidget {
                   child: Text(
                     'explore_title'.tr,
                     style: AppTypography.display.copyWith(
-                      fontSize: 26.5,
+                      fontSize: 28,
                       height: 1.25,
                       color: c.textPrimary,
                     ),
@@ -167,7 +171,7 @@ class _Title extends StatelessWidget {
                 Text(
                   'explore_subtitle'.tr,
                   style: AppTypography.bodyL.copyWith(
-                    fontSize: 15.5,
+                    fontSize: 16,
                     color: c.textSecondary,
                   ),
                 ),
@@ -260,33 +264,50 @@ class _MoodChips extends StatelessWidget {
       Color(0xFF2E1A2A),
       Color(0xFFB65A58),
     ),
+    Mood.romantic: (
+      Icons.favorite_border_rounded,
+      Color(0xFFF58AB8),
+      Color(0xFF2E1A33),
+      Color(0xFFA9558A),
+    ),
+    Mood.workout: (
+      Icons.fitness_center_rounded,
+      Color(0xFF7BD88F),
+      Color(0xFF14301F),
+      Color(0xFF3E8F57),
+    ),
+    Mood.party: (
+      Icons.celebration_outlined,
+      Color(0xFFF6C85F),
+      Color(0xFF30260F),
+      Color(0xFF9A7A2A),
+    ),
   };
 
   @override
   Widget build(BuildContext context) {
     final lib = LibraryController.to;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(19, 0, 15.6, 0),
-      child: Row(
-        children: [
-          for (final (i, m) in Mood.values.indexed) ...[
-            if (i > 0) const SizedBox(width: 7.2),
-            Expanded(
-              flex: const [114, 117, 109][i],
-              child: _MoodChip(
-                label: m.labelKey.tr,
-                style: _style[m]!,
-                onTap: () => AppNav.openSongs(
-                  SongListArgs(
-                    title: m.labelKey.tr,
-                    songs: () => lib.songsByMood(m),
-                    emptyMessage: 'mood_empty'.tr,
-                  ),
-                ),
+    return SizedBox(
+      height: 40,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        itemCount: Mood.values.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        itemBuilder: (context, i) {
+          final m = Mood.values[i];
+          return _MoodChip(
+            label: m.labelKey.tr,
+            style: _style[m]!,
+            onTap: () => AppNav.openSongs(
+              SongListArgs(
+                title: m.labelKey.tr,
+                songs: () => lib.songsByMood(m),
+                emptyMessage: 'mood_empty'.tr,
               ),
             ),
-          ],
-        ],
+          );
+        },
       ),
     );
   }
@@ -322,25 +343,24 @@ class _MoodChip extends StatelessWidget {
           onTap: onTap,
           borderRadius: radius,
           child: SizedBox(
-            height: 35,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: 19, color: fg),
-                const SizedBox(width: 10),
-                Flexible(
-                  child: Text(
+            height: 38,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(icon, size: 19, color: fg),
+                  const SizedBox(width: 10),
+                  Text(
                     label,
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                     style: AppTypography.label.copyWith(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
                       color: fg,
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -356,11 +376,8 @@ class _SuggestionCard extends StatelessWidget {
     required this.desc,
     required this.songs,
     this.shuffle = false,
-    this.titleMaxWidth = double.infinity,
   });
 
-  /// Narrows the title so it breaks like the mockup ("Nghe lại / hôm nay").
-  final double titleMaxWidth;
   final String art;
   final String title;
   final String desc;
@@ -374,83 +391,86 @@ class _SuggestionCard extends StatelessWidget {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final fill = dark ? const Color(0xFF0C152A) : c.surface;
     final radius = BorderRadius.circular(14);
-    return Material(
-      color: fill,
-      shape: RoundedRectangleBorder(
-        borderRadius: radius,
-        side: BorderSide(color: dark ? const Color(0xFF1B2161) : c.border),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => AppNav.openSongs(
-          SongListArgs(title: title, subtitle: desc, songs: () => songs),
+    return SizedBox(
+      width: 168,
+      child: Material(
+        color: fill,
+        shape: RoundedRectangleBorder(
+          borderRadius: radius,
+          side: BorderSide(color: dark ? const Color(0xFF1B2161) : c.border),
         ),
-        child: Stack(
-          children: [
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 0,
-              height: 116,
-              child: ShaderMask(
-                blendMode: BlendMode.dstIn,
-                shaderCallback: (r) => const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF000000), Color(0x00000000)],
-                  stops: [0.6, 1],
-                ).createShader(r),
-                child: Image.asset(
-                  art,
-                  fit: BoxFit.cover,
-                  alignment: Alignment.topCenter,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => AppNav.openSongs(
+            SongListArgs(title: title, subtitle: desc, songs: () => songs),
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                left: 0,
+                right: 0,
+                top: 0,
+                height: 100,
+                child: ShaderMask(
+                  blendMode: BlendMode.dstIn,
+                  shaderCallback: (r) => const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFF000000), Color(0x00000000)],
+                    stops: [0.6, 1],
+                  ).createShader(r),
+                  child: Image.asset(
+                    art,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topCenter,
+                  ),
                 ),
               ),
-            ),
-            Positioned(
-              right: 6.5,
-              top: 85.5,
-              child: _PlayButton(
-                onTap: songs.isEmpty
-                    ? null
-                    : () => pc.playAll(songs, shuffle: shuffle),
+              Positioned(
+                right: 6.5,
+                top: 70,
+                child: _PlayButton(
+                  onTap: songs.isEmpty
+                      ? null
+                      : () => pc.playAll(songs, shuffle: shuffle),
+                ),
               ),
-            ),
-            Positioned(
-              left: 11,
-              right: 8,
-              top: 113,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: titleMaxWidth),
-                    child: Text(
-                      title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTypography.headingS.copyWith(
-                        fontSize: 12.3,
-                        height: 1.3,
-                        color: c.textPrimary,
+              Positioned(
+                left: 11,
+                right: 8,
+                top: 106,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(),
+                      child: Text(
+                        title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.headingS.copyWith(
+                          fontSize: 15,
+                          height: 1.3,
+                          color: c.textPrimary,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    desc,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.caption.copyWith(
-                      fontSize: 10.5,
-                      height: 1.45,
-                      color: c.textSecondary,
+                    const SizedBox(height: 3),
+                    Text(
+                      desc,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.caption.copyWith(
+                        fontSize: 12,
+                        height: 1.4,
+                        color: c.textSecondary,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -580,11 +600,11 @@ class _SongRow extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: SizedBox(
-          height: 54,
+          height: 68,
           child: Row(
             children: [
               const SizedBox(width: 18.6),
-              SongArtwork(song: song, size: 47, radius: 6),
+              SongArtwork(song: song, size: 52, radius: 8),
               const SizedBox(width: 14.7),
               Expanded(
                 child: Column(
@@ -596,8 +616,6 @@ class _SongRow extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.songTitle.copyWith(
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w400,
                         color: current ? c.primary : c.textPrimary,
                       ),
                     ),
@@ -607,7 +625,7 @@ class _SongRow extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.bodyM.copyWith(
-                        fontSize: 12,
+                        fontSize: 14,
                         color: c.textMuted,
                       ),
                     ),

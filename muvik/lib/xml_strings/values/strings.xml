@@ -13,6 +13,10 @@
     <string name="accent_blue">Blue</string>
     <string name="accent_coral">Coral</string>
     <string name="accent_desc">Choose the accent color used across the whole app.</string>
+    <string name="accent_fuchsia">Neon fuchsia</string>
+    <string name="accent_lime">Lime</string>
+    <string name="accent_indigo">Indigo</string>
+    <string name="accent_ruby">Ruby</string>
     <string name="accent_green">Green</string>
     <string name="accent_lavender">Lavender</string>
     <string name="accent_orange">Orange</string>
@@ -182,6 +186,8 @@
     <string name="greeting_evening">Good evening</string>
     <string name="greeting_morning">Good morning</string>
     <string name="greeting_noon">Good afternoon</string>
+    <string name="home_banner_badge">Just for you</string>
+    <string name="home_listen_now">Listen now</string>
     <string name="home_continue">Continue listening</string>
     <string name="home_for_you">Playlists for you</string>
     <string name="home_now_playing">Now playing</string>
@@ -244,6 +250,9 @@
     <string name="mood_calm">Calm</string>
     <string name="mood_empty">No songs with a matching genre yet. Mood lists use the genre stored in your music files.</string>
     <string name="mood_energetic">Energetic</string>
+    <string name="mood_romantic">Romantic</string>
+    <string name="mood_workout">Workout</string>
+    <string name="mood_party">Party</string>
     <string name="mood_focus">Focus</string>
     <string name="more_options">More options</string>
     <string name="no_audio_permission">No access to audio files</string>
@@ -520,4 +529,23 @@
     <string name="weekday_short_5">Fri</string>
     <string name="weekday_short_6">Sat</string>
     <string name="weekday_short_7">Sun</string>
+    <string name="settings_scan_desc">Find music in folders on your device</string>
+    <string name="settings_sleep_timer_desc">Stop playback after a set time</string>
+    <string name="settings_equalizer_desc">Fine-tune bass and treble</string>
+    <string name="settings_quality_desc">Audio quality used for playback</string>
+    <string name="settings_headphones_desc">Headphone devices and behavior</string>
+    <string name="settings_theme_desc">Light, dark or follow system</string>
+    <string name="settings_accent_desc">The main color of the app</string>
+    <string name="settings_permissions_desc">Music and notification access</string>
+    <string name="settings_rate_desc">Share what you think</string>
+    <string name="settings_about_desc">Version and app information</string>
+    <string name="search_clear_all">Clear all</string>
+    <string name="nudge_title_1">Time for some music</string>
+    <string name="nudge_body_1">Open Muvik and play a few songs you like.</string>
+    <string name="nudge_title_2">Take a little break</string>
+    <string name="nudge_body_2">Your playlists are waiting. Press play.</string>
+    <string name="nudge_title_3">No music yet today</string>
+    <string name="nudge_body_3">Come back to Muvik for your favorite songs.</string>
+    <string name="settings_nudge">Listening reminder</string>
+    <string name="settings_nudge_desc">One evening notification if you have not listened</string>
 </resources>

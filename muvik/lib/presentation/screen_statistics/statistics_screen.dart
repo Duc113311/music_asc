@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -90,6 +92,7 @@ class StatisticsScreen extends GetView<StatisticsController> {
               onRefresh: controller.load,
               child: ListView(
                 children: [
+                  const SizedBox(height: AppSpacing.md),
                   Row(
                     children: [
                       IconButton(
@@ -183,9 +186,8 @@ class StatisticsScreen extends GetView<StatisticsController> {
                           icon: Icons.chevron_right_rounded,
                           tooltip: 'stats_next_period'.tr,
                           color: c.textPrimary,
-                          onPressed: controller.canGoNext
-                              ? controller.next
-                              : null,
+                          onPressed:
+                              controller.canGoNext ? controller.next : null,
                         ),
                       ],
                     ),
@@ -340,6 +342,17 @@ class _Summary extends StatelessWidget {
   }
 }
 
+/// Rounds [rawMax] up so [divisions] equal steps land on round numbers.
+double _niceMax(double rawMax, int divisions) {
+  final rough = rawMax / divisions;
+  final exp = (math.log(rough) / math.ln10).floor();
+  final mag = math.pow(10, exp).toDouble();
+  for (final m in const [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) {
+    if (mag * m >= rough) return mag * m * divisions;
+  }
+  return mag * 10 * divisions;
+}
+
 class _ChartCard extends GetView<StatisticsController> {
   const _ChartCard({required this.stats});
   final PeriodStats stats;
@@ -353,10 +366,11 @@ class _ChartCard extends GetView<StatisticsController> {
     final maxH = hours.fold<double>(0, (a, b) => b > a ? b : a);
     // Minutes when the period is small, hours otherwise.
     final useMinutes = maxH < 1;
-    final values = useMinutes
-        ? buckets.map((b) => b.listenedMs / 60000).toList()
-        : hours;
+    final values =
+        useMinutes ? buckets.map((b) => b.listenedMs / 60000).toList() : hours;
     final maxV = values.fold<double>(0, (a, b) => b > a ? b : a);
+    final maxY = _niceMax(maxV <= 0 ? 1 : maxV * 1.05, 5);
+    final interval = maxY / 5;
     final peak = stats.peakBucket;
     final title = switch (p.type) {
       PeriodType.week => 'stats_rhythm_week'.tr,
@@ -386,15 +400,28 @@ class _ChartCard extends GetView<StatisticsController> {
                       ),
                     ),
                   ),
-                  Text(
-                    useMinutes ? 'unit_minutes'.tr : 'unit_hours'.tr,
-                    style: AppTypography.caption.copyWith(color: c.textMuted),
-                  ),
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
               SizedBox(
-                height: 180,
+                width: 34,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: Text(
+                    useMinutes ? 'unit_minutes'.tr : 'unit_hours'.tr,
+                    textAlign: TextAlign.right,
+                    maxLines: 1,
+                    softWrap: false,
+                    style: AppTypography.caption.copyWith(
+                      fontSize: 11,
+                      color: c.textSecondary,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 190,
                 child: stats.totalMs == 0
                     ? Center(
                         child: Text(
@@ -408,15 +435,23 @@ class _ChartCard extends GetView<StatisticsController> {
                         label: title,
                         child: BarChart(
                           BarChartData(
-                            maxY: maxV == 0 ? 1 : maxV * 1.15,
+                            maxY: maxY,
+                            minY: 0,
                             alignment: BarChartAlignment.spaceAround,
-                            borderData: FlBorderData(show: false),
+                            borderData: FlBorderData(
+                              show: true,
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: c.textPrimary.withValues(alpha: 0.2),
+                                ),
+                              ),
+                            ),
                             gridData: FlGridData(
                               drawVerticalLine: false,
+                              horizontalInterval: interval,
                               getDrawingHorizontalLine: (_) => FlLine(
-                                color: c.divider,
-                                strokeWidth: 1,
-                                dashArray: [4, 4],
+                                color: c.textPrimary.withValues(alpha: 0.12),
+                                strokeWidth: 0.6,
                               ),
                             ),
                             titlesData: FlTitlesData(
@@ -425,17 +460,27 @@ class _ChartCard extends GetView<StatisticsController> {
                               leftTitles: AxisTitles(
                                 sideTitles: SideTitles(
                                   showTitles: true,
-                                  reservedSize: 32,
-                                  getTitlesWidget: (v, meta) => SideTitleWidget(
-                                    meta: meta,
-                                    child: Text(
-                                      v.toStringAsFixed(
-                                        v < 10 && v != v.roundToDouble()
-                                            ? 1
-                                            : 0,
-                                      ),
-                                      style: AppTypography.caption.copyWith(
-                                        color: c.textMuted,
+                                  reservedSize: 34,
+                                  interval: interval,
+                                  getTitlesWidget: (v, meta) => SizedBox(
+                                    width: 34,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 4),
+                                      child: Text(
+                                        v <= 0
+                                            ? '0'
+                                            : v.toStringAsFixed(
+                                                v < 10 && v != v.roundToDouble()
+                                                    ? 1
+                                                    : 0,
+                                              ),
+                                        textAlign: TextAlign.right,
+                                        maxLines: 1,
+                                        softWrap: false,
+                                        style: AppTypography.caption.copyWith(
+                                          fontSize: 11,
+                                          color: c.textSecondary,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -444,19 +489,23 @@ class _ChartCard extends GetView<StatisticsController> {
                               bottomTitles: AxisTitles(
                                 sideTitles: SideTitles(
                                   showTitles: true,
-                                  reservedSize: 24,
+                                  reservedSize: 28,
+                                  interval: 1,
                                   getTitlesWidget: (v, meta) {
                                     final i = v.toInt();
-                                    final show =
-                                        p.type != PeriodType.month ||
+                                    final show = p.type != PeriodType.month ||
                                         i == 0 ||
-                                        (i + 1) % 5 == 0;
-                                    return SideTitleWidget(
-                                      meta: meta,
+                                        ((i + 1) % 5 == 0 &&
+                                            (values.length - i - 1 >= 2 ||
+                                                i == values.length - 1)) ||
+                                        i == values.length - 1;
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 5),
                                       child: Text(
                                         show ? bucketLabel(p, i) : '',
                                         style: AppTypography.caption.copyWith(
-                                          color: c.textMuted,
+                                          fontSize: 11,
+                                          color: c.textSecondary,
                                         ),
                                       ),
                                     );
@@ -473,14 +522,18 @@ class _ChartCard extends GetView<StatisticsController> {
                                 }
                               },
                               touchTooltipData: BarTouchTooltipData(
-                                getTooltipColor: (_) => c.surfaceElevated,
+                                tooltipBorderRadius: BorderRadius.circular(6),
+                                getTooltipColor: (_) =>
+                                    Colors.black.withValues(alpha: 0.75),
                                 getTooltipItem: (group, gi, rod, ri) =>
                                     BarTooltipItem(
-                                      '${bucketLongLabel(p, gi)}\n${DurationFormatter.listening(buckets[gi].listenedMs)} • ${'stats_plays_n'.trParams({'args1': '${buckets[gi].plays}'})}',
-                                      AppTypography.caption.copyWith(
-                                        color: c.textPrimary,
-                                      ),
-                                    ),
+                                  '${bucketLongLabel(p, gi)}\n${DurationFormatter.listening(buckets[gi].listenedMs)} • ${'stats_plays_n'.trParams({
+                                        'args1': '${buckets[gi].plays}'
+                                      })}',
+                                  AppTypography.caption.copyWith(
+                                    color: c.textPrimary,
+                                  ),
+                                ),
                               ),
                             ),
                             barGroups: [
@@ -490,23 +543,26 @@ class _ChartCard extends GetView<StatisticsController> {
                                   barRods: [
                                     BarChartRodData(
                                       toY: values[i],
-                                      width: p.type == PeriodType.month
-                                          ? 6
-                                          : 18,
-                                      borderRadius: const BorderRadius.vertical(
-                                        top: Radius.circular(6),
+                                      width: switch (p.type) {
+                                        PeriodType.week => 24,
+                                        PeriodType.month => 8,
+                                        PeriodType.year => 16,
+                                      },
+                                      borderRadius: BorderRadius.zero,
+                                      backDrawRodData:
+                                          BackgroundBarChartRodData(
+                                        show: true,
+                                        toY: maxY,
+                                        color: c.textPrimary.withValues(
+                                          alpha: 0.08,
+                                        ),
                                       ),
                                       gradient: LinearGradient(
-                                        begin: Alignment.bottomCenter,
-                                        end: Alignment.topCenter,
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
                                         colors: i == (sel ?? peak)
-                                            ? [c.primary, c.secondary]
-                                            : [
-                                                c.primary.withValues(
-                                                  alpha: 0.7,
-                                                ),
-                                                c.primary,
-                                              ],
+                                            ? [c.secondary, c.primary]
+                                            : [c.primaryLight, c.primary],
                                       ),
                                     ),
                                   ],
@@ -615,6 +671,7 @@ class _TopSongs extends StatelessWidget {
           children: [
             SectionHeader(
               title: 'stats_top_songs'.tr,
+              titleStyle: AppTypography.headingS,
               padding: const EdgeInsets.fromLTRB(AppSpacing.md, 0, 0, 0),
               onMore: () => Get.toNamed(
                 RouteName.statisticsSongs,
@@ -708,17 +765,16 @@ class RankedSongRow extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: AppSpacing.xs),
-                Flexible(
-                  child: Text(
-                    showTime
-                        ? DurationFormatter.listening(item.listenedMs)
-                        : 'stats_plays_n'.trParams({'args1': '${item.plays}'}),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.bodyM.copyWith(color: c.textPrimary),
-                  ),
+                const SizedBox(width: AppSpacing.md),
+                Text(
+                  showTime
+                      ? DurationFormatter.listening(item.listenedMs)
+                      : 'stats_plays_n'.trParams({'args1': '${item.plays}'}),
+                  maxLines: 1,
+                  softWrap: false,
+                  style: AppTypography.bodyM.copyWith(color: c.textPrimary),
                 ),
+                const SizedBox(width: AppSpacing.xxs),
                 IconButton(
                   tooltip: 'song_menu'.tr,
                   onPressed: onMore,
@@ -755,6 +811,7 @@ class _TopArtists extends StatelessWidget {
           children: [
             SectionHeader(
               title: 'stats_top_artists'.tr,
+              titleStyle: AppTypography.headingS,
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.md,
                 AppSpacing.xs,

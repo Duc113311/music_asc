@@ -168,6 +168,7 @@ class SectionHeader extends StatelessWidget {
     required this.title,
     this.onMore,
     this.moreLabel,
+    this.titleStyle,
     this.padding = const EdgeInsets.fromLTRB(
       AppSpacing.screenH,
       AppSpacing.groupGap,
@@ -181,6 +182,9 @@ class SectionHeader extends StatelessWidget {
   final String? moreLabel;
   final EdgeInsets padding;
 
+  /// Overrides the default heading size.
+  final TextStyle? titleStyle;
+
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
@@ -193,7 +197,9 @@ class SectionHeader extends StatelessWidget {
               header: true,
               child: Text(
                 title,
-                style: AppTypography.headingM.copyWith(color: c.textPrimary),
+                style: (titleStyle ?? AppTypography.headingM).copyWith(
+                  color: c.textPrimary,
+                ),
               ),
             ),
           ),
@@ -205,7 +211,7 @@ class SectionHeader extends StatelessWidget {
               icon: Icon(Icons.chevron_right_rounded, color: c.primary),
               label: Text(
                 moreLabel ?? 'see_all'.tr,
-                style: AppTypography.label.copyWith(color: c.primary),
+                style: AppTypography.label.copyWith(color: c.primaryLight),
               ),
             ),
         ],
@@ -380,7 +386,7 @@ class SettingsTile extends StatelessWidget {
                         textAlign: TextAlign.end,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: AppTypography.bodyM.copyWith(color: c.primary),
+                        style: AppTypography.bodyM.copyWith(color: c.primaryLight),
                       ),
                     ),
                   ),
@@ -423,7 +429,7 @@ class SettingsGroup extends StatelessWidget {
                 child: Text(
                   title!.toUpperCase(),
                   style: AppTypography.label.copyWith(
-                    color: c.primary,
+                    color: c.primaryLight,
                     letterSpacing: 0.6,
                   ),
                 ),

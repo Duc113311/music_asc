@@ -1,3 +1,4 @@
+import '../../values/app_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -24,7 +25,12 @@ class AboutScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(15, 26, 15, 24),
         children: [
-          const Center(child: _WaveMark()),
+          Center(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: Image.asset(AppAssets.logo, width: 96, height: 96),
+            ),
+          ),
           const SizedBox(height: 4),
           Text(
             AppConfig.appName,
@@ -119,38 +125,6 @@ class AboutScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Five rounded accent bars, the app's wave mark (sc_gioi_thieu).
-class _WaveMark extends StatelessWidget {
-  const _WaveMark();
-
-  @override
-  Widget build(BuildContext context) {
-    final color = Color.lerp(context.colors.primary, Colors.white, 0.15)!;
-    const heights = [15.6, 36.8, 72.7, 36.8, 15.6];
-    return ExcludeSemantics(
-      child: SizedBox(
-        height: 72.7,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (var i = 0; i < heights.length; i++) ...[
-              if (i > 0) const SizedBox(width: 9.1),
-              Container(
-                width: 10,
-                height: heights[i],
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              ),
-            ],
-          ],
-        ),
       ),
     );
   }
