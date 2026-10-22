@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:dsp_base/convenience_imports.dart' show PrefAssist;
+import 'package:muvik/services/storage/pref_store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:muvik/models/data_models/song.dart';
@@ -50,10 +50,10 @@ void main() {
     expect(greetingKey(4), 'greeting_evening');
   });
 
-  test('XML strings load through dsp_base CommLocalize', () async {
+  test('XML strings load through asc_common AscLocale', () async {
     TestWidgetsFlutterBinding.ensureInitialized();
     SharedPreferences.setMockInitialValues({});
-    await PrefAssist.init();
+    await PrefStore.init();
     final locale = await AppLocalize.ensureConfigured();
     expect(AppLocalize.translatedLocales, contains(locale));
     await AppLocalize.loadTranslations();

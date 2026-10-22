@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../controller/library_controller.dart';
 import '../../controller/playback_controller.dart';
+import '../../services/application/app_lifecycle_service.dart';
 import '../../services/native/nudge_service.dart';
 import '../../services/application/listening_stats_service.dart';
 import '../../utils/toast_utils.dart';
@@ -26,7 +27,7 @@ class HomeShell extends StatefulWidget {
   State<HomeShell> createState() => _HomeShellState();
 }
 
-class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
+class _HomeShellState extends State<HomeShell> {
   int _index = 0;
   final Set<int> _built = {0};
   final List<ScrollController> _scrolls = List.generate(
@@ -37,7 +38,9 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    AppLifecycleService.to
+      ..addResumedListener(_onResumed)
+      ..addBackgroundListener(_onBackground);
     WidgetsBinding.instance.addPostFrameCallback((_) => NudgeService.refresh());
     // Cold start from the media notification: show Now Playing (P17-06).
     if (AudioService.notificationClicked.value) {
@@ -49,7 +52,9 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    AppLifecycleService.to
+      ..removeResumedListener(_onResumed)
+      ..removeBackgroundListener(_onBackground);
     for (final s in _scrolls) {
       s.dispose();
     }
@@ -57,17 +62,16 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      LibraryController.to.scanService.refreshOnResume();
-      NudgeService.refresh();
-    } else if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.detached) {
-      // Persist pending listening time before the OS may kill the UI process.
-      Get.find<ListeningStatsService>().flush();
-      NudgeService.refresh();
-    }
+  // Driven by AppLifecycleService (the app's single lifecycle observer).
+  void _onResumed() {
+    LibraryController.to.scanService.refreshOnResume();
+    NudgeService.refresh();
+  }
+
+  void _onBackground() {
+    // Persist pending listening time before the OS may kill the UI process.
+    Get.find<ListeningStatsService>().flush();
+    NudgeService.refresh();
   }
 
   void _select(int i) {

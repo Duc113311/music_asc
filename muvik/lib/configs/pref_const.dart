@@ -10,7 +10,9 @@ class PrefConst {
   // One rescan after DB v2 so existing songs get their genre tag.
   static const String genreBackfillDone = 'genre_backfill_done';
 
-  // Appearance (locale: PrefComm.CONFIGURED_LOCALE_BY_USER in dsp_base)
+  // Appearance
+  static const String language = 'language'; // AscLocale: en_US | vi_VN
+  static const String followSystemLanguage = 'follow_system_language';
   static const String themeMode = 'theme_mode'; // system | light | dark
   static const String accentColor = 'accent_color'; // accent key
   static const String playerBackground = 'player_background'; // blur | solid

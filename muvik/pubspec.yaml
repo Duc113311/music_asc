@@ -37,13 +37,19 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   get: ^4.7.3
-  # ASC shared base (CommApp, commRunApp, CommLocalize, PrefAssist, App* widgets).
-  # Pinned to a commit so an upstream push cannot break the build; to update,
-  # change `ref` to the new commit and run `flutter pub get`.
+  # ASC shared base: the same two packages smart_drink uses, so both apps share
+  # one base. asc_common = UI primitives, XML localization, typed prefs, logging,
+  # build flavor. dsp_base = Firebase + AdMob + consent bootstrap.
+  # Pinned to commits so an upstream push cannot break the build; to update,
+  # change `ref` and run `flutter pub get` (see docs/base_packages.md).
+  asc_common:
+    git:
+      url: https://github.com/asctechsoft/asc_common.git
+      ref: 96a4c3b
   dsp_base:
     git:
       url: https://github.com/asctechsoft/dsp_base_app.git
-      ref: 2e8d22ebef6061dc9c1290e3659bd99a5a461948
+      ref: 2692ce3
   firebase_core: ^4.0.0
   firebase_crashlytics: ^5.0.1
   sqflite: ^2.4.2+1
@@ -64,12 +70,6 @@ dependencies:
   path_provider: ^2.1.6
   rxdart: ^0.28.0
 
-# permission_handler 13 (required by dsp_base) pulls permission_handler_android
-# 14.x, whose Gradle script needs AGP 9 / compileSdk 37 that Flutter 3.38
-# does not ship. 13.0.1 implements the same platform interface (^4.2).
-# Remove once Flutter moves to AGP 9.
-dependency_overrides:
-  permission_handler_android: 13.0.1
 
 dev_dependencies:
   flutter_test:

@@ -27,11 +27,3 @@ plugins {
 }
 
 include(":app")
-
-// dsp_base reads android/debug_keystore.properties (git-ignored). On a fresh
-// clone or CI, create it from the committed example so the build works.
-val debugKeystoreProperties = file("debug_keystore.properties")
-if (!debugKeystoreProperties.exists()) {
-    file("debug_keystore.properties.example").copyTo(debugKeystoreProperties)
-    println("Created android/debug_keystore.properties from the example (App Check off).")
-}

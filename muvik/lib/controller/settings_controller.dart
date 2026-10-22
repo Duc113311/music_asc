@@ -7,7 +7,7 @@ import '../services/native/nudge_service.dart';
 import '../services/storage/pref_store.dart';
 import '../values/app_colors.dart';
 
-/// Appearance and headphone preferences (the language lives in dsp_base
+/// Appearance and headphone preferences (the language lives in asc_common
 /// CommLocalize, see AppLocalize). Theme changes rebuild the
 /// app theme only — the player and queue are untouched (P14-12).
 class SettingsController extends GetxController {
