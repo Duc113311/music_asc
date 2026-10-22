@@ -79,7 +79,7 @@ class PlayerEvent {
 /// notification, lock screen and headset buttons all call into this handler.
 class MuvikAudioHandler extends BaseAudioHandler with SeekHandler {
   MuvikAudioHandler({required this.library, PlaybackRepository? repository})
-    : _repo = repository ?? PlaybackRepository();
+      : _repo = repository ?? PlaybackRepository();
 
   final LibraryDataService library;
   final PlaybackRepository _repo;
@@ -284,9 +284,8 @@ class MuvikAudioHandler extends BaseAudioHandler with SeekHandler {
   /// mini player, paused (P07-15).
   @override
   Future<void> stop() async {
-    _pendingPosition = _loadedEntryId != null
-        ? _player.position
-        : _pendingPosition;
+    _pendingPosition =
+        _loadedEntryId != null ? _player.position : _pendingPosition;
     _events.add(const PlayerEvent(PlayerEventType.stopped));
     _stopSnapshotTimer();
     await _player.stop();
@@ -720,13 +719,13 @@ class MuvikAudioHandler extends BaseAudioHandler with SeekHandler {
       t == AudioDeviceType.usbAudio;
 
   MediaItem _mediaItem(Song s, QueueEntry e) => MediaItem(
-    id: s.uri,
-    title: s.displayTitle,
-    artist: s.artistOrNull,
-    album: s.albumOrNull,
-    duration: s.durationMs > 0 ? s.duration : null,
-    extras: {'songId': s.id, 'entryId': e.entryId},
-  );
+        id: s.uri,
+        title: s.displayTitle,
+        artist: s.artistOrNull,
+        album: s.albumOrNull,
+        duration: s.durationMs > 0 ? s.duration : null,
+        extras: {'songId': s.id, 'entryId': e.entryId},
+      );
 
   Future<void> _updateArtwork(Song s, QueueEntry e) async {
     try {
@@ -749,8 +748,7 @@ class MuvikAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   void _updateAudible() {
-    audible.value =
-        _player.playing &&
+    audible.value = _player.playing &&
         _player.processingState == ProcessingState.ready &&
         _loadedEntryId != null;
   }
@@ -761,15 +759,13 @@ class MuvikAudioHandler extends BaseAudioHandler with SeekHandler {
       index: _queue.index,
       currentSong: _currentSong,
       playing: _player.playing && _loadedEntryId != null,
-      loading:
-          _loading ||
+      loading: _loading ||
           (_loadedEntryId != null &&
               (_player.processingState == ProcessingState.loading ||
                   _player.processingState == ProcessingState.buffering)),
       repeat: _queue.repeat,
       shuffle: _queue.shuffle,
-      duration:
-          _player.duration ??
+      duration: _player.duration ??
           ((_currentSong?.durationMs ?? 0) > 0 ? _currentSong!.duration : null),
       sourceLoaded: _loadedEntryId != null,
     );

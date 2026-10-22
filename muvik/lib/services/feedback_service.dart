@@ -92,9 +92,9 @@ class FeedbackService {
   }
 
   static Future<void> markRatePrompted() => PrefStore.setInt(
-    PrefConst.rateLastPromptAt,
-    DateTime.now().millisecondsSinceEpoch,
-  );
+        PrefConst.rateLastPromptAt,
+        DateTime.now().millisecondsSinceEpoch,
+      );
 
   static Future<bool> openUrl(String url) async {
     if (url.isEmpty) return false;

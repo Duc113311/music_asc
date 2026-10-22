@@ -71,7 +71,7 @@ class PeriodStats {
 /// Read-side statistics built only from recorded sessions/segments.
 class StatisticsService {
   StatisticsService({required this.library, ListeningRepository? repository})
-    : _repo = repository ?? ListeningRepository();
+      : _repo = repository ?? ListeningRepository();
 
   final LibraryDataService library;
   final ListeningRepository _repo;
@@ -143,8 +143,8 @@ class StatisticsService {
       final d = b.listenedMs.compareTo(a.listenedMs);
       if (d != 0) return d;
       return a.song.displayTitle.toLowerCase().compareTo(
-        b.song.displayTitle.toLowerCase(),
-      );
+            b.song.displayTitle.toLowerCase(),
+          );
     });
     return list;
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../common_components/app_touchable.dart';
 import 'package:get/get.dart';
 
 import '../../controller/library_controller.dart';
@@ -75,9 +76,8 @@ class PlaylistDetailScreen extends GetView<PlaylistDetailController> {
                         switch (v) {
                           case 'add':
                             final ids = await showSongPicker(
-                              exclude: controller.songs
-                                  .map((s) => s.id!)
-                                  .toSet(),
+                              exclude:
+                                  controller.songs.map((s) => s.id!).toSet(),
                             );
                             if (ids != null && ids.isNotEmpty) {
                               await controller.addSongs(ids);
@@ -155,11 +155,12 @@ class PlaylistDetailScreen extends GetView<PlaylistDetailController> {
             key: ValueKey('edit-${s.id}'),
             song: s,
             dense: true,
-            trailing: IconButton(
+            trailing: AppIconButton(
+              icon: Icons.remove_circle_outline_rounded,
               tooltip: controller.isFavorites
                   ? 'action_unfavorite'.tr
                   : 'action_remove_from_playlist'.tr,
-              icon: Icon(Icons.remove_circle_outline_rounded, color: c.error),
+              color: c.error,
               onPressed: () => controller.removeFromDraft(s),
             ),
           );
@@ -170,7 +171,7 @@ class PlaylistDetailScreen extends GetView<PlaylistDetailController> {
     final p = controller.playlist.value;
     final cover = p?.coverUri != null
         ? songs.firstWhereOrNull((s) => s.uri == p!.coverUri) ??
-              songs.firstOrNull
+            songs.firstOrNull
         : songs.firstOrNull;
     final currentId = pc.currentSong?.id;
     return ListView.builder(
@@ -217,7 +218,9 @@ class PlaylistDetailScreen extends GetView<PlaylistDetailController> {
                             ),
                           ),
                           Text(
-                            '${'count_songs_n'.trParams({'args1': '${songs.length}'})} • ${DurationFormatter.total(controller.totalMs)}',
+                            '${'count_songs_n'.trParams({
+                                  'args1': '${songs.length}'
+                                })} • ${DurationFormatter.total(controller.totalMs)}',
                             style: AppTypography.bodyM.copyWith(
                               color: c.textSecondary,
                             ),
@@ -244,9 +247,8 @@ class PlaylistDetailScreen extends GetView<PlaylistDetailController> {
                         label: 'action_play_all'.tr,
                         icon: Icons.play_arrow_rounded,
                         height: AppSizes.buttonSecondary,
-                        onPressed: songs.isEmpty
-                            ? null
-                            : () => pc.playAll(songs),
+                        onPressed:
+                            songs.isEmpty ? null : () => pc.playAll(songs),
                       ),
                     ),
                     const SizedBox(width: AppSpacing.sm),

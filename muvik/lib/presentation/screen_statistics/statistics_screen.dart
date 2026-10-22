@@ -95,12 +95,10 @@ class StatisticsScreen extends GetView<StatisticsController> {
                   const SizedBox(height: AppSpacing.md),
                   Row(
                     children: [
-                      IconButton(
+                      AppIconButton(
+                        icon: Icons.arrow_back_rounded,
                         tooltip: 'action_back'.tr,
-                        icon: Icon(
-                          Icons.arrow_back_rounded,
-                          color: c.textPrimary,
-                        ),
+                        color: c.textPrimary,
                         onPressed: () => Get.back<void>(),
                       ),
                       Expanded(
@@ -775,10 +773,10 @@ class RankedSongRow extends StatelessWidget {
                   style: AppTypography.bodyM.copyWith(color: c.textPrimary),
                 ),
                 const SizedBox(width: AppSpacing.xxs),
-                IconButton(
+                AppIconButton(
+                  icon: Icons.more_vert_rounded,
                   tooltip: 'song_menu'.tr,
                   onPressed: onMore,
-                  icon: Icon(Icons.more_vert_rounded, color: c.iconDefault),
                 ),
               ],
             ),

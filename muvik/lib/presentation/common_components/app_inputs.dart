@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_touchable.dart';
 import 'package:get/get.dart';
 
 import '../../values/app_colors.dart';
@@ -14,9 +15,9 @@ InputDecoration _decoration(
 }) {
   final c = context.colors;
   OutlineInputBorder border(Color color, double width) => OutlineInputBorder(
-    borderRadius: BorderRadius.circular(AppRadius.input),
-    borderSide: BorderSide(color: color, width: width),
-  );
+        borderRadius: BorderRadius.circular(AppRadius.input),
+        borderSide: BorderSide(color: color, width: width),
+      );
   return InputDecoration(
     hintText: hint,
     hintStyle: AppTypography.bodyL.copyWith(color: c.textMuted),
@@ -104,9 +105,9 @@ class AppTextField extends StatelessWidget {
                 valueListenable: controller,
                 builder: (context, v, _) => v.text.isEmpty || !enabled
                     ? const SizedBox.shrink()
-                    : IconButton(
+                    : AppIconButton(
+                        icon: Icons.close_rounded,
                         tooltip: 'action_clear'.tr,
-                        icon: Icon(Icons.close_rounded, color: c.iconDefault),
                         onPressed: () {
                           controller.clear();
                           onChanged?.call('');
@@ -214,9 +215,9 @@ class AppSearchField extends StatelessWidget {
                   valueListenable: ctrl,
                   builder: (context, v, _) => v.text.isEmpty
                       ? const SizedBox.shrink()
-                      : IconButton(
+                      : AppIconButton(
+                          icon: Icons.close_rounded,
                           tooltip: 'action_clear'.tr,
-                          icon: Icon(Icons.close_rounded, color: c.iconDefault),
                           onPressed: () {
                             ctrl.clear();
                             onChanged?.call('');

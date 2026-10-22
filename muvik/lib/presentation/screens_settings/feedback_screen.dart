@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import '../common_components/app_touchable.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -28,9 +29,11 @@ class FeedbackScreen extends GetView<FeedbackController> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
-        leading: IconButton(
+        leading: AppIconButton(
+          icon: Icons.chevron_left_rounded,
           tooltip: 'action_back'.tr,
-          icon: Icon(Icons.chevron_left_rounded, size: 34, color: c.primary),
+          size: 34,
+          color: c.primary,
           onPressed: () => Get.back<void>(),
         ),
         title: Text(
@@ -163,9 +166,9 @@ class FeedbackScreen extends GetView<FeedbackController> {
 class _FeedbackPalette {
   _FeedbackPalette._(this.dark, this._c);
   factory _FeedbackPalette.of(BuildContext context) => _FeedbackPalette._(
-    Theme.of(context).brightness == Brightness.dark,
-    context.colors,
-  );
+        Theme.of(context).brightness == Brightness.dark,
+        context.colors,
+      );
 
   final bool dark;
   final AppColors _c;
@@ -259,12 +262,12 @@ class _ErrorText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 6, left: 4),
-    child: Text(
-      text,
-      style: AppTypography.caption.copyWith(color: context.colors.error),
-    ),
-  );
+        padding: const EdgeInsets.only(top: 6, left: 4),
+        child: Text(
+          text,
+          style: AppTypography.caption.copyWith(color: context.colors.error),
+        ),
+      );
 }
 
 class _TypeChip extends StatelessWidget {

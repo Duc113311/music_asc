@@ -44,8 +44,7 @@ class DatabaseHelper {
 
   Future<Database> _open() async {
     final factory = factoryOverride ?? databaseFactory;
-    final path =
-        pathOverride ??
+    final path = pathOverride ??
         p.join(await factory.getDatabasesPath(), DbSchema.dbName);
     return factory.openDatabase(
       path,

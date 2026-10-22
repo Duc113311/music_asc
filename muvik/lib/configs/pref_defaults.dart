@@ -23,10 +23,14 @@ class PrefDefaults {
   static const int eqVirtualizerStrength = 0;
   static const double eqLoudnessGainDb = 0;
 
+  /// Compressor + limiter for a loud, dense sound (on by default).
+  static const bool eqLoudMode = true;
+
   static const bool headphonePauseOnDisconnect = true;
   static const bool headphoneResumeOnConnect = false;
   static const bool headphoneButtonsEnabled = true;
   static const bool nudgeEnabled = true;
+  static const bool ongoingNotification = true;
 
   static const String songSort = 'title_asc';
 

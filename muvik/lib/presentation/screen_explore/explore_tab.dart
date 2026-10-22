@@ -4,7 +4,10 @@ import 'package:get/get.dart';
 import '../../controller/library_controller.dart';
 import '../../controller/playback_controller.dart';
 import '../../models/data_models/song.dart';
+import '../../models/ui_models/period_type.dart';
+import '../../services/application/statistics_service.dart';
 import '../../utils/duration_formatter.dart';
+import '../../utils/explore_collections.dart';
 import '../../utils/mood_rules.dart';
 import '../../values/app_assets.dart';
 import '../../values/app_colors.dart';
@@ -54,6 +57,7 @@ class ExploreTab extends StatelessWidget {
           final least = lib.leastPlayed();
           final random = lib.randomMix();
           final added = lib.recentlyAdded(limit: 50);
+          final collections = ExploreCollections.build(lib.songs.toList());
           return CustomScrollView(
             controller: scrollController,
             slivers: [
@@ -108,6 +112,20 @@ class ExploreTab extends StatelessWidget {
                             desc: 'home_for_you'.tr,
                             songs: added,
                           ),
+                          const _MonthTop(),
+                          if (lib.favorites.length >= 3) ...[
+                            const SizedBox(width: 10),
+                            _SuggestionCard(
+                              art: AppAssets.exploreReplay,
+                              title: 'explore_favorites'.tr,
+                              desc: 'explore_favorites_desc'.tr,
+                              songs: lib.favorites.toList(),
+                            ),
+                          ],
+                          for (var i = 0; i < collections.length; i++) ...[
+                            const SizedBox(width: 10),
+                            _collectionCard(collections[i], i),
+                          ],
                         ],
                       ),
                     ),
@@ -632,16 +650,98 @@ class _SongRow extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
+              AppIconButton(
+                icon: Icons.more_horiz_rounded,
                 tooltip: 'song_menu'.tr,
+                color: c.textSecondary,
                 onPressed: onMore,
-                icon: Icon(Icons.more_horiz_rounded, color: c.textSecondary),
               ),
               const SizedBox(width: 4),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Title/description of an extra Explore collection (all from device songs).
+(String, String) _collectionText(ExploreCollection c) => switch (c.kind) {
+  ExploreKind.tiktok => ('explore_tiktok'.tr, 'explore_tiktok_desc'.tr),
+  ExploreKind.morning => ('explore_morning'.tr, 'explore_morning_desc'.tr),
+  ExploreKind.evening => ('explore_evening'.tr, 'explore_evening_desc'.tr),
+  ExploreKind.quick => ('explore_quick'.tr, 'explore_quick_desc'.tr),
+  ExploreKind.long => ('explore_long'.tr, 'explore_long_desc'.tr),
+  ExploreKind.genre => (
+    'explore_genre_n'.trParams({'args1': c.param ?? ''}),
+    'explore_genre_desc'.tr,
+  ),
+  ExploreKind.artist => (
+    'explore_artist_n'.trParams({'args1': c.param ?? ''}),
+    'explore_artist_desc'.tr,
+  ),
+};
+
+Widget _collectionCard(ExploreCollection c, int index) {
+  final (title, desc) = _collectionText(c);
+  const arts = [
+    AppAssets.exploreLeast,
+    AppAssets.exploreRandom,
+    AppAssets.exploreReplay,
+  ];
+  return _SuggestionCard(
+    art: arts[index % arts.length],
+    title: title,
+    desc: desc,
+    songs: c.songs,
+  );
+}
+
+/// "Nghe nhiều tháng này": most played songs of the current month, from the
+/// listening statistics. Hidden until there is something to show.
+class _MonthTop extends StatefulWidget {
+  const _MonthTop();
+
+  @override
+  State<_MonthTop> createState() => _MonthTopState();
+}
+
+class _MonthTopState extends State<_MonthTop> {
+  late final Future<List<Song>> _future = _load();
+
+  Future<List<Song>> _load() async {
+    try {
+      final ranked = await Get.find<StatisticsService>().topSongs(
+        StatsPeriod.containing(PeriodType.month, DateTime.now()),
+      );
+      return [
+        for (final r in ranked.take(50))
+          if (r.song.available) r.song,
+      ];
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Song>>(
+      future: _future,
+      builder: (context, snap) {
+        final songs = snap.data;
+        if (songs == null || songs.length < 3) return const SizedBox.shrink();
+        return Row(
+          children: [
+            const SizedBox(width: 10),
+            _SuggestionCard(
+              art: AppAssets.exploreReplay,
+              title: 'explore_month'.tr,
+              desc: 'explore_month_desc'.tr,
+              songs: songs,
+            ),
+          ],
+        );
+      },
     );
   }
 }

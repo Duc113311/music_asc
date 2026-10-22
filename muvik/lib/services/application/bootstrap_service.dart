@@ -7,10 +7,10 @@ import '../../controller/library_controller.dart';
 import '../../controller/playback_controller.dart';
 import '../../configs/pref_const.dart';
 import '../../configs/pref_defaults.dart';
+import '../native/ongoing_notification_service.dart';
 import '../storage/database_helper.dart';
 import '../storage/pref_store.dart';
 import 'audio_handler.dart';
-import 'auth_service.dart';
 import 'equalizer_service.dart';
 import 'library_data_service.dart';
 import 'library_scan_service.dart';
@@ -18,7 +18,6 @@ import 'listening_stats_service.dart';
 import 'playlist_service.dart';
 import 'sleep_timer_service.dart';
 import 'statistics_service.dart';
-import '../../utils/app_log.dart';
 
 /// Initializes data and audio in a fixed order (P06-01):
 /// prefs/theme/locale (main) → DB → library → audio handler → stats/timer/EQ
@@ -59,6 +58,11 @@ class BootstrapService {
       Get.put(handler, permanent: true);
       await handler.init();
 
+      handler.view.addListener(
+        () => OngoingNotificationService.sync(handler.view.value),
+      );
+      unawaited(OngoingNotificationService.sync(handler.view.value));
+
       final eq = _ensure(EqualizerService.new)..loadPrefs();
       handler.audioSessionId.addListener(
         () => eq.attach(handler.audioSessionId.value),
@@ -83,13 +87,6 @@ class BootstrapService {
     await scan.checkPermission();
     await scan.refreshSources();
 
-    final auth = _ensure(AuthService.new);
-    unawaited(
-      auth.init().catchError((Object e) {
-        AppLog.info('Auth init ignored: ${e.runtimeType}');
-      }),
-    );
-
     _ensure(LibraryController.new);
     _ensure(PlaybackController.new);
     _done = true;
@@ -99,8 +96,7 @@ class BootstrapService {
   /// Libraries scanned before DB v2 have no genre; rescan once in the
   /// background (same as "Quét lại", nothing is deleted).
   static void _backfillGenres(LibraryScanService scan) {
-    final due =
-        PrefStore.getBool(
+    final due = PrefStore.getBool(
           PrefConst.setupCompleted,
           PrefDefaults.setupCompleted,
         ) &&

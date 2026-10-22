@@ -12,6 +12,7 @@ class AudioEffectsCapabilities {
     this.bassSupported = false,
     this.virtualizerSupported = false,
     this.loudnessSupported = false,
+    this.dynamicsSupported = false,
   });
 
   final bool eqSupported;
@@ -24,19 +25,23 @@ class AudioEffectsCapabilities {
   /// android.media.audiofx.LoudnessEnhancer (API 19+).
   final bool loudnessSupported;
 
+  /// android.media.audiofx.DynamicsProcessing (API 28+): compressor + limiter.
+  final bool dynamicsSupported;
+
   static const none = AudioEffectsCapabilities();
 
   factory AudioEffectsCapabilities.fromMap(Map m) => AudioEffectsCapabilities(
-    eqSupported: (m['eqSupported'] as bool?) ?? false,
-    bandCentersHz: ((m['bandCentersHz'] as List?) ?? const [])
-        .map((e) => (e as num).toDouble())
-        .toList(),
-    minLevelDb: ((m['minLevelMb'] as num?) ?? -1200) / 100,
-    maxLevelDb: ((m['maxLevelMb'] as num?) ?? 1200) / 100,
-    bassSupported: (m['bassSupported'] as bool?) ?? false,
-    virtualizerSupported: (m['virtualizerSupported'] as bool?) ?? false,
-    loudnessSupported: (m['loudnessSupported'] as bool?) ?? false,
-  );
+        eqSupported: (m['eqSupported'] as bool?) ?? false,
+        bandCentersHz: ((m['bandCentersHz'] as List?) ?? const [])
+            .map((e) => (e as num).toDouble())
+            .toList(),
+        minLevelDb: ((m['minLevelMb'] as num?) ?? -1200) / 100,
+        maxLevelDb: ((m['maxLevelMb'] as num?) ?? 1200) / 100,
+        bassSupported: (m['bassSupported'] as bool?) ?? false,
+        virtualizerSupported: (m['virtualizerSupported'] as bool?) ?? false,
+        loudnessSupported: (m['loudnessSupported'] as bool?) ?? false,
+        dynamicsSupported: (m['dynamicsSupported'] as bool?) ?? false,
+      );
 }
 
 /// Android audiofx (Equalizer, BassBoost, Virtualizer, LoudnessEnhancer) bound to the player's
@@ -71,6 +76,7 @@ class AudioEffectsChannel {
     required int bassStrength,
     required int virtualizerStrength,
     required double loudnessGainDb,
+    bool loudMode = false,
   }) async {
     if (!isSupported) return;
     try {
@@ -80,6 +86,7 @@ class AudioEffectsChannel {
         'bassStrength': bassStrength,
         'virtualizerStrength': virtualizerStrength,
         'loudnessGainMb': (loudnessGainDb * 100).round(),
+        'loudMode': loudMode,
       });
     } on PlatformException catch (e) {
       AppLog.info('AudioEffectsChannel.apply: $e');

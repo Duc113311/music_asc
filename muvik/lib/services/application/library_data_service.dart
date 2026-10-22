@@ -11,8 +11,8 @@ import '../storage/database_helper.dart';
 /// the player and Home update together (P10-08, P18-01).
 class LibraryDataService {
   LibraryDataService({SongRepository? songs, ExclusionRepository? exclusions})
-    : _songs = songs ?? SongRepository(),
-      _exclusions = exclusions ?? ExclusionRepository();
+      : _songs = songs ?? SongRepository(),
+        _exclusions = exclusions ?? ExclusionRepository();
 
   final SongRepository _songs;
   final ExclusionRepository _exclusions;

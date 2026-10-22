@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'app_touchable.dart';
 import 'package:get/get.dart';
 
 import '../../models/data_models/song.dart';
+import '../../values/app_assets.dart';
 import '../../values/app_colors.dart';
 import '../../values/app_dimensions.dart';
 import '../../values/app_typography.dart';
@@ -101,20 +103,18 @@ class CoverCard extends StatelessWidget {
           ),
         ),
         if (onPlay != null)
-          IconButton(
+          AppIconButton(
+            icon: Icons.play_circle_fill_rounded,
             tooltip: 'action_play'.tr,
+            size: 32,
+            color: c.primary,
             onPressed: onPlay,
-            icon: Icon(
-              Icons.play_circle_fill_rounded,
-              color: c.primary,
-              size: 32,
-            ),
           ),
         if (onMore != null)
-          IconButton(
+          AppIconButton(
+            icon: Icons.more_vert_rounded,
             tooltip: 'more_options'.tr,
             onPressed: onMore,
-            icon: Icon(Icons.more_vert_rounded, color: c.iconDefault),
           ),
       ],
     ),
@@ -298,9 +298,10 @@ class DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: backgroundColor,
       surfaceTintColor: backgroundColor == null ? null : Colors.transparent,
-      leading: IconButton(
+      leading: AppIconButton(
+        icon: Icons.arrow_back_rounded,
         tooltip: 'action_back'.tr,
-        icon: Icon(Icons.arrow_back_rounded, color: c.textPrimary),
+        color: c.textPrimary,
         onPressed: onBack ?? () => Get.back<void>(),
       ),
       title: Text(
@@ -463,18 +464,38 @@ class GradientBackground extends StatelessWidget {
   const GradientBackground({super.key, required this.child});
   final Widget child;
 
+  /// The shared wave background is painted once per route (AppBackground),
+  /// so this stays transparent.
+  @override
+  Widget build(BuildContext context) => child;
+}
+
+/// The app-wide background of the Settings screen: theme color plus the wave
+/// artwork (dimmed on dark). Wrapped around every route in AppPages.
+class AppBackground extends StatelessWidget {
+  const AppBackground({super.key, required this.child});
+  final Widget child;
+
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: c.gradientBg,
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: ColoredBox(
+            color: c.background,
+            child: Image.asset(
+              dark ? AppAssets.bgDark : AppAssets.bgLight,
+              fit: BoxFit.cover,
+              alignment: Alignment.topCenter,
+              color: dark ? const Color(0x73040B22) : null,
+              colorBlendMode: dark ? BlendMode.srcATop : null,
+            ),
+          ),
         ),
-      ),
-      child: child,
+        Positioned.fill(child: child),
+      ],
     );
   }
 }

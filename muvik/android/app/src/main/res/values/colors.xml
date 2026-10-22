@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ongoing notification: custom RemoteViews follow the OS dark mode, so
+         every colour needs a values-night twin. -->
+    <color name="noti_accent">#7C5CF4</color>
+    <color name="noti_text_primary">#1A1A2E</color>
+    <color name="noti_text_secondary">#45464F</color>
+    <color name="noti_btn_icon">#FFFFFF</color>
+    <color name="noti_white">#FFFFFF</color>
+</resources>

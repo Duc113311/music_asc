@@ -79,6 +79,7 @@ class MediaLibraryHandler(private val activity: Activity) : MethodChannel.Method
         "readMetadata" -> readMetadata(call.argument<List<String>>("uris") ?: emptyList())
         "getArtwork" -> getArtwork(call.argument<String>("uri")!!, call.argument<Int>("size") ?: 256)
         "getAudioFormat" -> getAudioFormat(call.argument<String>("uri")!!)
+        "getLyrics" -> LyricsReader.read(context, Uri.parse(call.argument<String>("uri")!!))
         "existing" -> existing(call.argument<List<String>>("uris") ?: emptyList())
         else -> throw NotImplementedError()
     }

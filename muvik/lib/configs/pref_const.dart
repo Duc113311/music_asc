@@ -27,6 +27,7 @@ class PrefConst {
   static const String eqBassStrength = 'eq_bass_strength'; // 0..1000
   static const String eqVirtualizerStrength = 'eq_virtualizer_strength';
   static const String eqLoudnessGainDb = 'eq_loudness_gain_db'; // 0..10
+  static const String eqLoudMode = 'eq_loud_mode';
 
   // Headphones
   static const String headphonePauseOnDisconnect =
@@ -34,6 +35,7 @@ class PrefConst {
   static const String headphoneResumeOnConnect = 'headphone_resume_on_connect';
   static const String headphoneButtonsEnabled = 'headphone_buttons_enabled';
   static const String nudgeEnabled = 'nudge_enabled';
+  static const String ongoingNotification = 'ongoing_notification';
 
   // Library
   static const String songSort = 'song_sort';

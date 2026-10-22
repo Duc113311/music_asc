@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_touchable.dart';
 import 'package:get/get.dart';
 
 import '../../models/data_models/song.dart';
@@ -136,10 +137,10 @@ class SongTile extends StatelessWidget {
                 ),
                 ?trailing,
                 if (onMore != null)
-                  IconButton(
+                  AppIconButton(
+                    icon: Icons.more_vert_rounded,
                     tooltip: 'song_menu'.tr,
                     onPressed: onMore,
-                    icon: Icon(Icons.more_vert_rounded, color: c.iconDefault),
                   ),
               ],
             ),

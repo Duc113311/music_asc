@@ -27,9 +27,9 @@ class LibraryScanService {
     SongRepository? songs,
     SourceRepository? sources,
     ExclusionRepository? exclusions,
-  }) : _songs = songs ?? SongRepository(),
-       _sources = sources ?? SourceRepository(),
-       _exclusions = exclusions ?? ExclusionRepository();
+  })  : _songs = songs ?? SongRepository(),
+        _sources = sources ?? SourceRepository(),
+        _exclusions = exclusions ?? ExclusionRepository();
 
   final LibraryDataService library;
   final SongRepository _songs;
@@ -124,8 +124,7 @@ class LibraryScanService {
       for (final s in (await _sources.getAll()).where(
         (s) => s.type == SourceType.tree,
       )) {
-        final ok =
-            MediaLibraryChannel.isSupported &&
+        final ok = MediaLibraryChannel.isSupported &&
             await MediaLibraryChannel.hasTreePermission(s.uri);
         if (ok != s.accessible) {
           if (ok) {
@@ -276,8 +275,8 @@ class LibraryScanService {
       final status = _cancelRequested
           ? ScanStatus.cancelled
           : (anyFailed
-                ? (s.processed > 0 ? ScanStatus.partial : ScanStatus.error)
-                : (s.skipped > 0 ? ScanStatus.partial : ScanStatus.success));
+              ? (s.processed > 0 ? ScanStatus.partial : ScanStatus.error)
+              : (s.skipped > 0 ? ScanStatus.partial : ScanStatus.success));
       s = s.copyWith(status: status);
     } catch (e, st) {
       AppLog.error('LibraryScanService.scan', e, st);
@@ -386,9 +385,9 @@ class LibraryScanService {
     final completed = !_cancelRequested;
     final missing = completed
         ? previouslyAvailable.entries
-              .where((e) => !seen.contains(e.key))
-              .map((e) => e.value)
-              .toList()
+            .where((e) => !seen.contains(e.key))
+            .map((e) => e.value)
+            .toList()
         : <int>[];
     return _SourceResult(s, completed, missing, seen.length);
   }
@@ -475,9 +474,8 @@ class LibraryScanService {
   }
 
   String _folderPath(MusicSource src, String relativePath) {
-    final root = src.type == SourceType.volume
-        ? src.displayName
-        : src.displayName;
+    final root =
+        src.type == SourceType.volume ? src.displayName : src.displayName;
     final rel = relativePath.endsWith('/')
         ? relativePath.substring(0, relativePath.length - 1)
         : relativePath;

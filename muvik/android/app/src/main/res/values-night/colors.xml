@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="noti_accent">#9B82FF</color>
+    <color name="noti_text_primary">#F1F0FA</color>
+    <color name="noti_text_secondary">#C2C0D4</color>
+    <color name="noti_btn_icon">#FFFFFF</color>
+    <color name="noti_white">#FFFFFF</color>
+</resources>

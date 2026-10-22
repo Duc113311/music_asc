@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../common_components/app_touchable.dart';
 import 'package:get/get.dart';
 
 import '../../controller/playback_controller.dart';
@@ -269,13 +270,10 @@ class _QueueRow extends StatelessWidget {
                 ),
               ),
               if (onRemove != null)
-                IconButton(
+                AppIconButton(
+                  icon: Icons.remove_circle_outline_rounded,
                   tooltip: 'queue_remove'.tr,
                   onPressed: onRemove,
-                  icon: Icon(
-                    Icons.remove_circle_outline_rounded,
-                    color: c.iconDefault,
-                  ),
                 ),
               if (index != null)
                 ReorderableDragStartListener(

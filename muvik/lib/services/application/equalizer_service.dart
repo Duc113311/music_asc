@@ -15,6 +15,7 @@ class EqualizerState {
     this.bassStrength = 0,
     this.virtualizerStrength = 0,
     this.loudnessGainDb = 0,
+    this.loudMode = PrefDefaults.eqLoudMode,
     this.capabilities = AudioEffectsCapabilities.none,
   });
 
@@ -30,6 +31,9 @@ class EqualizerState {
 
   /// Loudness boost 0..[maxLoudnessDb]; independent of [enabled].
   final double loudnessGainDb;
+
+  /// Compressor + limiter ("Âm thanh lớn"); independent of [enabled].
+  final bool loudMode;
   final AudioEffectsCapabilities capabilities;
 
   static const double maxLoudnessDb = 10;
@@ -41,7 +45,8 @@ class EqualizerState {
       capabilities.eqSupported ||
       capabilities.bassSupported ||
       capabilities.virtualizerSupported ||
-      capabilities.loudnessSupported;
+      capabilities.loudnessSupported ||
+      capabilities.dynamicsSupported;
 
   EqualizerState copyWith({
     bool? enabled,
@@ -50,16 +55,19 @@ class EqualizerState {
     int? bassStrength,
     int? virtualizerStrength,
     double? loudnessGainDb,
+    bool? loudMode,
     AudioEffectsCapabilities? capabilities,
-  }) => EqualizerState(
-    enabled: enabled ?? this.enabled,
-    preset: preset ?? this.preset,
-    bandGainsDb: bandGainsDb ?? this.bandGainsDb,
-    bassStrength: bassStrength ?? this.bassStrength,
-    virtualizerStrength: virtualizerStrength ?? this.virtualizerStrength,
-    loudnessGainDb: loudnessGainDb ?? this.loudnessGainDb,
-    capabilities: capabilities ?? this.capabilities,
-  );
+  }) =>
+      EqualizerState(
+        enabled: enabled ?? this.enabled,
+        preset: preset ?? this.preset,
+        bandGainsDb: bandGainsDb ?? this.bandGainsDb,
+        bassStrength: bassStrength ?? this.bassStrength,
+        virtualizerStrength: virtualizerStrength ?? this.virtualizerStrength,
+        loudnessGainDb: loudnessGainDb ?? this.loudnessGainDb,
+        loudMode: loudMode ?? this.loudMode,
+        capabilities: capabilities ?? this.capabilities,
+      );
 }
 
 /// Single source of EQ truth shared by the player sheet and the full screen.
@@ -97,6 +105,8 @@ class EqualizerService {
         PrefConst.eqLoudnessGainDb,
         PrefDefaults.eqLoudnessGainDb,
       ).clamp(0, EqualizerState.maxLoudnessDb).toDouble(),
+      loudMode:
+          PrefStore.getBool(PrefConst.eqLoudMode, PrefDefaults.eqLoudMode),
     );
   }
 
@@ -105,8 +115,7 @@ class EqualizerService {
     if (sessionId == null || sessionId == 0) return;
     final caps = await AudioEffectsChannel.attach(sessionId);
     final s = state.value;
-    final gains =
-        s.preset == AudioPreset.custom &&
+    final gains = s.preset == AudioPreset.custom &&
             _customGains.length == caps.bandCentersHz.length
         ? _customGains
         : _gainsFor(s.preset, caps);
@@ -115,9 +124,9 @@ class EqualizerService {
   }
 
   List<double> _gainsFor(AudioPreset p, AudioEffectsCapabilities caps) => [
-    for (final hz in caps.bandCentersHz)
-      p.gainAt(hz).clamp(caps.minLevelDb, caps.maxLevelDb).toDouble(),
-  ];
+        for (final hz in caps.bandCentersHz)
+          p.gainAt(hz).clamp(caps.minLevelDb, caps.maxLevelDb).toDouble(),
+      ];
 
   Future<void> setEnabled(bool enabled) async {
     state.value = state.value.copyWith(enabled: enabled);
@@ -127,8 +136,7 @@ class EqualizerService {
 
   Future<void> selectPreset(AudioPreset preset) async {
     final s = state.value;
-    final gains =
-        preset == AudioPreset.custom &&
+    final gains = preset == AudioPreset.custom &&
             _customGains.length == s.capabilities.bandCentersHz.length
         ? _customGains
         : _gainsFor(preset, s.capabilities);
@@ -175,6 +183,12 @@ class EqualizerService {
     await _apply();
   }
 
+  Future<void> setLoudMode(bool on) async {
+    state.value = state.value.copyWith(loudMode: on);
+    await PrefStore.setBool(PrefConst.eqLoudMode, on);
+    await _apply();
+  }
+
   /// "Đặt lại": defaults defined in PrefDefaults, applied for real (P14-09).
   Future<void> reset() async {
     _customGains = const [];
@@ -196,6 +210,7 @@ class EqualizerService {
       PrefConst.eqLoudnessGainDb,
       PrefDefaults.eqLoudnessGainDb,
     );
+    await PrefStore.setBool(PrefConst.eqLoudMode, PrefDefaults.eqLoudMode);
     final caps = state.value.capabilities;
     final preset = AudioPreset.fromKey(PrefDefaults.eqPreset);
     state.value = EqualizerState(
@@ -205,6 +220,7 @@ class EqualizerService {
       bassStrength: PrefDefaults.eqBassStrength,
       virtualizerStrength: PrefDefaults.eqVirtualizerStrength,
       loudnessGainDb: PrefDefaults.eqLoudnessGainDb,
+      loudMode: PrefDefaults.eqLoudMode,
       capabilities: caps,
     );
     await _apply();
@@ -219,6 +235,7 @@ class EqualizerService {
       bassStrength: s.bassStrength,
       virtualizerStrength: s.virtualizerStrength,
       loudnessGainDb: s.loudnessGainDb,
+      loudMode: s.loudMode,
     );
   }
 }

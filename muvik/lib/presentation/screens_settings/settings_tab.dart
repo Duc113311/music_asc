@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-import '../../controller/auth_controller.dart';
+import '../../configs/app_config.dart';
 import '../../controller/playback_controller.dart';
 import '../../controller/settings_controller.dart';
+import '../../services/feedback_service.dart';
 import '../../utils/duration_formatter.dart';
-import '../../values/app_assets.dart';
+import '../../utils/toast_utils.dart';
 import '../../values/app_colors.dart';
 import '../../values/app_typography.dart';
 import '../../values/route_name.dart';
 import '../bottom_sheets/accent_sheet.dart';
 import '../common_components/mini_player.dart';
-import '../dialogs/app_dialogs.dart';
 import '../dialogs/rate_app_dialog.dart';
 
 /// sc_cat_dat: account + Tiện ích / Âm thanh / Giao diện / Ứng dụng only
@@ -27,22 +27,8 @@ class SettingsTab extends StatelessWidget {
     final settings = SettingsController.to;
     final pc = PlaybackController.to;
     final c = context.colors;
-    final dark = Theme.of(context).brightness == Brightness.dark;
     return Stack(
       children: [
-        Positioned.fill(
-          child: ColoredBox(
-            color: c.background,
-            child: Image.asset(
-              dark ? AppAssets.bgDark : AppAssets.bgLight,
-              fit: BoxFit.cover,
-              alignment: Alignment.topCenter,
-              // The mockup shows the waves dimmed behind the content.
-              color: dark ? const Color(0x73040B22) : null,
-              colorBlendMode: dark ? BlendMode.srcATop : null,
-            ),
-          ),
-        ),
         SafeArea(
           bottom: false,
           child: ListView(
@@ -50,8 +36,6 @@ class SettingsTab extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
             children: [
               const _Header(),
-              const SizedBox(height: 16),
-              const _AccountCard(),
               _Group(
                 title: 'settings_group_utilities'.tr,
                 children: [
@@ -168,6 +152,21 @@ class SettingsTab extends StatelessWidget {
                       ),
                     ),
                   ),
+                  Obx(
+                    () => _Row(
+                      icon: const _GradientIcon(Icons.music_note_rounded),
+                      title: 'settings_ongoing'.tr,
+                      subtitle: 'settings_ongoing_desc'.tr,
+                      chevron: false,
+                      trailing: Switch(
+                        value: settings.ongoingNotification.value,
+                        onChanged: settings.setOngoingNotification,
+                      ),
+                      onTap: () => settings.setOngoingNotification(
+                        !settings.ongoingNotification.value,
+                      ),
+                    ),
+                  ),
                   _Row(
                     icon: const _GradientIcon(Icons.shield_outlined),
                     title: 'settings_permissions'.tr,
@@ -180,16 +179,21 @@ class SettingsTab extends StatelessWidget {
                     subtitle: 'settings_rate_desc'.tr,
                     onTap: showRateAppDialog,
                   ),
-                  FutureBuilder<PackageInfo>(
-                    future: PackageInfo.fromPlatform(),
-                    builder: (context, snap) => _Row(
-                      icon: const _GradientIcon(Icons.info_outline_rounded),
-                      title: 'settings_about'.tr,
-                      subtitle: 'settings_about_desc'.tr,
-                      value:
-                          snap.data == null ? null : 'v${snap.data!.version}',
-                      onTap: () => Get.toNamed(RouteName.about),
-                    ),
+                  _Row(
+                    icon: const _GradientIcon(Icons.privacy_tip_outlined),
+                    title: 'about_privacy'.tr,
+                    subtitle: 'settings_privacy_desc'.tr,
+                    onTap: () async {
+                      final ok = await FeedbackService.openUrl(
+                        AppConfig.privacyPolicyUrl,
+                      );
+                      if (!ok) {
+                        ToastUtils.show(
+                          'about_privacy_unavailable'.tr,
+                          type: ToastType.warning,
+                        );
+                      }
+                    },
                   ),
                   if (kDebugMode)
                     _Row(
@@ -199,6 +203,23 @@ class SettingsTab extends StatelessWidget {
                     ),
                 ],
               ),
+              const SizedBox(height: 24),
+              Center(
+                child: FutureBuilder<PackageInfo>(
+                  future: PackageInfo.fromPlatform(),
+                  builder: (context, snap) => snap.data == null
+                      ? const SizedBox.shrink()
+                      : Text(
+                          'about_version'
+                              .trParams({'args1': snap.data!.version}),
+                          style: AppTypography.caption.copyWith(
+                            fontSize: 12.5,
+                            color: c.textMuted,
+                          ),
+                        ),
+                ),
+              ),
+              const SizedBox(height: 8),
               const MiniPlayerSpacer(extra: 8),
             ],
           ),
@@ -499,272 +520,3 @@ class _Row extends StatelessWidget {
   }
 }
 
-class _AccountCard extends StatelessWidget {
-  const _AccountCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    final auth = AuthController.to;
-    return Container(
-      decoration: _CardStyle(context).decoration,
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-      child: Obx(() {
-        final u = auth.user.value;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                const SizedBox(width: 4),
-                _Avatar(url: u?.photoUrl),
-                const SizedBox(width: 18),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        u?.displayName ??
-                            (u == null ? 'account_title'.tr : u.email),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTypography.bodyL.copyWith(
-                          fontSize: 14,
-                          height: 1.4,
-                          fontWeight: FontWeight.w500,
-                          color: c.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        u?.email ?? 'account_desc'.tr,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTypography.bodyM.copyWith(
-                          fontSize: 12,
-                          height: 1.4,
-                          color: c.primaryLight,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (u == null) ...[
-              _PillButton(
-                label: 'account_google_sign_in'.tr,
-                leading: const _GoogleLogo(size: 17),
-                loading: auth.busy.value,
-                onTap: auth.signIn,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'account_optional'.tr,
-                textAlign: TextAlign.center,
-                style: AppTypography.caption.copyWith(
-                  fontSize: 10.5,
-                  color: c.primaryLight,
-                ),
-              ),
-            ] else
-              _PillButton(
-                label: 'account_sign_out'.tr,
-                leading: const Icon(
-                  Icons.logout_rounded,
-                  size: 17,
-                  color: Color(0xFF141455),
-                ),
-                onTap: () => confirmLogout(auth.signOut),
-              ),
-          ],
-        );
-      }),
-    );
-  }
-}
-
-/// White rounded button of the account card (Google sign-in / sign-out).
-class _PillButton extends StatelessWidget {
-  const _PillButton({
-    required this.label,
-    required this.leading,
-    required this.onTap,
-    this.loading = false,
-  });
-
-  final String label;
-  final Widget leading;
-  final Future<void> Function() onTap;
-  final bool loading;
-
-  static const _fg = Color(0xFF141455);
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: label,
-      excludeSemantics: true,
-      child: Material(
-        color: const Color(0xFFF3F6FD),
-        // Outlined on the light theme, where the card is white too.
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: Theme.of(context).brightness == Brightness.dark
-              ? BorderSide.none
-              : BorderSide(color: context.colors.border),
-        ),
-        child: InkWell(
-          // Ignore taps while signing in (double-submit guard, P15-03).
-          onTap: loading ? null : onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: SizedBox(
-            height: 40,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (loading)
-                  const SizedBox.square(
-                    dimension: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: _fg,
-                    ),
-                  )
-                else
-                  leading,
-                const SizedBox(width: 18),
-                Flexible(
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.label.copyWith(
-                      fontSize: 12.5,
-                      color: _fg,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Four-color Google "G" mark drawn with arcs (no bitmap asset needed).
-class _GoogleLogo extends StatelessWidget {
-  const _GoogleLogo({required this.size});
-  final double size;
-
-  @override
-  Widget build(BuildContext context) => SizedBox.square(
-        dimension: size,
-        child: const CustomPaint(painter: _GooglePainter()),
-      );
-}
-
-class _GooglePainter extends CustomPainter {
-  const _GooglePainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final s = size.width;
-    final stroke = s * 0.2;
-    final rect = Rect.fromLTWH(stroke / 2, stroke / 2, s - stroke, s - stroke);
-    Paint p(Color color) => Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke;
-    const deg = 3.1415926535 / 180;
-    // Angles clockwise from 3 o'clock.
-    canvas.drawArc(
-      rect,
-      -45 * deg,
-      -100 * deg,
-      false,
-      p(const Color(0xFFEA4335)),
-    );
-    canvas.drawArc(
-      rect,
-      -145 * deg,
-      -80 * deg,
-      false,
-      p(const Color(0xFFFBBC05)),
-    );
-    canvas.drawArc(
-      rect,
-      135 * deg,
-      -90 * deg,
-      false,
-      p(const Color(0xFF34A853)),
-    );
-    canvas.drawArc(
-      rect,
-      45 * deg,
-      -45 * deg,
-      false,
-      p(const Color(0xFF4285F4)),
-    );
-    // Blue crossbar.
-    canvas.drawRect(
-      Rect.fromLTWH(s * 0.5, s * 0.5 - stroke / 2, s * 0.5, stroke),
-      Paint()..color = const Color(0xFF4285F4),
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-/// Gradient ring with a person outline, or the network photo (P15-04).
-class _Avatar extends StatelessWidget {
-  const _Avatar({this.url});
-  final String? url;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    final gradient = LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [c.primary, const Color(0xFF52C7FD)],
-    );
-    final fallback = ShaderMask(
-      blendMode: BlendMode.srcIn,
-      shaderCallback: gradient.createShader,
-      child: const Icon(
-        Icons.person_outline_rounded,
-        size: 38,
-        color: Colors.white,
-      ),
-    );
-    return Container(
-      width: 46,
-      height: 46,
-      padding: const EdgeInsets.all(2.5),
-      decoration: BoxDecoration(shape: BoxShape.circle, gradient: gradient),
-      child: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: _CardStyle(context).fill.withValues(alpha: 1),
-        ),
-        clipBehavior: Clip.antiAlias,
-        alignment: Alignment.center,
-        child: url == null
-            ? fallback
-            : Image.network(
-                url!,
-                width: 41,
-                height: 41,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => fallback,
-              ),
-      ),
-    );
-  }
-}

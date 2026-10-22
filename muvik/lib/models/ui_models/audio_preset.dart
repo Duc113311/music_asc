@@ -9,6 +9,7 @@ enum AudioPreset {
   pop('pop', 'eq_preset_pop', [-1, 2, 4, 4, 2, 0, -1]),
   rock('rock', 'eq_preset_rock', [5, 3, -1, -2, 1, 3, 5]),
   vocal('vocal', 'eq_preset_vocal', [-2, -1, 1, 4, 4, 2, 0]),
+  tiktok('tiktok', 'eq_preset_tiktok', [7, 5, 0, -1, 2, 5, 6]),
   custom('custom', 'eq_preset_custom', [0, 0, 0, 0, 0, 0, 0]);
 
   const AudioPreset(this.key, this.labelKey, this.curveDb);
@@ -32,9 +33,9 @@ enum AudioPreset {
       AudioPreset.values.where((p) => p != AudioPreset.custom).toList();
 
   static AudioPreset fromKey(String? key) => AudioPreset.values.firstWhere(
-    (p) => p.key == key,
-    orElse: () => AudioPreset.normal,
-  );
+        (p) => p.key == key,
+        orElse: () => AudioPreset.normal,
+      );
 
   /// Gain (dB) for a band centred at [hz], log-interpolated along the curve.
   double gainAt(double hz) {
@@ -43,8 +44,7 @@ enum AudioPreset {
     if (hz >= f.last) return curveDb.last;
     for (var i = 0; i < f.length - 1; i++) {
       if (hz >= f[i] && hz <= f[i + 1]) {
-        final t =
-            (math.log(hz) - math.log(f[i])) /
+        final t = (math.log(hz) - math.log(f[i])) /
             (math.log(f[i + 1]) - math.log(f[i]));
         return curveDb[i] + (curveDb[i + 1] - curveDb[i]) * t;
       }

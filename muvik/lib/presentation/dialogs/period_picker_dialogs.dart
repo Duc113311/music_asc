@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../common_components/app_touchable.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -41,10 +42,10 @@ class _PeriodDialogState extends State<_PeriodDialog> {
   PeriodType get _type => widget.initial.type;
 
   void _goCurrent() => setState(() {
-    _draft = StatsPeriod.containing(_type, _now);
-    _cursor = _draft.start;
-    _yearPageStart = _now.year - (_now.year % 12);
-  });
+        _draft = StatsPeriod.containing(_type, _now);
+        _cursor = _draft.start;
+        _yearPageStart = _now.year - (_now.year % 12);
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -90,11 +91,13 @@ class _PeriodDialogState extends State<_PeriodDialog> {
               ),
               TextButton(
                 onPressed: _goCurrent,
-                child: Text(switch (_type) {
-                  PeriodType.week => 'pick_current_week'.tr,
-                  PeriodType.month => 'pick_current_month'.tr,
-                  PeriodType.year => 'pick_current_year'.tr,
-                }, style: AppTypography.label.copyWith(color: c.primary)),
+                child: Text(
+                    switch (_type) {
+                      PeriodType.week => 'pick_current_week'.tr,
+                      PeriodType.month => 'pick_current_month'.tr,
+                      PeriodType.year => 'pick_current_year'.tr,
+                    },
+                    style: AppTypography.label.copyWith(color: c.primary)),
               ),
             ],
           ),
@@ -128,36 +131,33 @@ class _PeriodDialogState extends State<_PeriodDialog> {
     String label,
     VoidCallback? prev,
     VoidCallback? next,
-  ) => Row(
-    children: [
-      IconButton(
-        tooltip: 'stats_prev_period'.tr,
-        onPressed: prev,
-        icon: Icon(
-          Icons.chevron_left_rounded,
-          color: prev == null ? c.textDisabled : c.textPrimary,
-        ),
-      ),
-      Expanded(
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: AppTypography.label.copyWith(
+  ) =>
+      Row(
+        children: [
+          AppIconButton(
+            icon: Icons.chevron_left_rounded,
+            tooltip: 'stats_prev_period'.tr,
             color: c.textPrimary,
-            fontSize: 16,
+            onPressed: prev,
           ),
-        ),
-      ),
-      IconButton(
-        tooltip: 'stats_next_period'.tr,
-        onPressed: next,
-        icon: Icon(
-          Icons.chevron_right_rounded,
-          color: next == null ? c.textDisabled : c.textPrimary,
-        ),
-      ),
-    ],
-  );
+          Expanded(
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: AppTypography.label.copyWith(
+                color: c.textPrimary,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          AppIconButton(
+            icon: Icons.chevron_right_rounded,
+            tooltip: 'stats_next_period'.tr,
+            color: c.textPrimary,
+            onPressed: next,
+          ),
+        ],
+      );
 
   Widget _weekCalendar(AppColors c) {
     final locale = Get.locale?.toLanguageTag();
@@ -214,8 +214,7 @@ class _PeriodDialogState extends State<_PeriodDialog> {
                   Expanded(
                     child: _Cell(
                       label: '${day.day}',
-                      selected:
-                          _draft.contains(day) &&
+                      selected: _draft.contains(day) &&
                           AppDateUtils.dateOnly(day) ==
                               AppDateUtils.dateOnly(_now),
                       inRange: _draft.contains(day),

@@ -39,7 +39,7 @@ class AppTheme {
       brightness: b,
       colorScheme: scheme,
       fontFamily: AppTypography.fontFamily,
-      scaffoldBackgroundColor: c.background,
+      scaffoldBackgroundColor: Colors.transparent,
       canvasColor: c.background,
       dividerColor: c.divider,
       extensions: [c],

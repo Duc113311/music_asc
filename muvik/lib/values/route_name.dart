@@ -26,7 +26,6 @@ class RouteName {
       '/settings/headphones'; // sc_phat_qua_tai_nghe
   static const String theme = '/settings/theme'; // sc_theme
   static const String permissions = '/settings/permissions';
-  static const String about = '/settings/about'; // sc_gioi_thieu
   static const String feedback = '/settings/feedback'; // sc_feedback
   static const String componentPreview = '/debug/components';
 }

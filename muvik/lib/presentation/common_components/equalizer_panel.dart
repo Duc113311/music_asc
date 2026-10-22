@@ -28,14 +28,47 @@ class EqualizerPanel extends StatelessWidget {
     return Obx(() {
       final EqualizerState s = pc.eq.value;
       final caps = s.capabilities;
-      final waiting =
-          caps.bandCentersHz.isEmpty &&
+      final waiting = caps.bandCentersHz.isEmpty &&
           !caps.bassSupported &&
           !caps.virtualizerSupported &&
           !caps.loudnessSupported;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          _Card(
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'eq_loud_mode'.tr,
+                        style: AppTypography.headingS.copyWith(
+                          color: c.textPrimary,
+                        ),
+                      ),
+                      Text(
+                        caps.dynamicsSupported
+                            ? 'eq_loud_mode_desc'.tr
+                            : 'eq_effect_unsupported'.tr,
+                        style: AppTypography.bodyM.copyWith(
+                          color: c.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                AppSwitch(
+                  value: s.loudMode,
+                  semanticLabel: 'eq_loud_mode'.tr,
+                  onChanged:
+                      caps.dynamicsSupported ? service.setLoudMode : null,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
           _Card(
             child: Row(
               children: [
@@ -261,9 +294,8 @@ class _BandSliderState extends State<_BandSlider> {
                   value: v,
                   min: widget.min,
                   max: widget.max,
-                  onChanged: widget.enabled
-                      ? (x) => setState(() => _drag = x)
-                      : null,
+                  onChanged:
+                      widget.enabled ? (x) => setState(() => _drag = x) : null,
                   onChangeEnd: widget.enabled
                       ? (x) {
                           widget.onChanged(x.roundToDouble());

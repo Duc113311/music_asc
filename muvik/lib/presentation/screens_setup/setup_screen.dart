@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../common_components/app_touchable.dart';
 import 'package:get/get.dart';
 
 import '../../controller/setup_controller.dart';
@@ -74,10 +75,11 @@ class SetupHeader extends StatelessWidget {
           Row(
             children: [
               if (onBack != null)
-                IconButton(
+                AppIconButton(
+                  icon: Icons.chevron_left_rounded,
                   tooltip: 'action_back'.tr,
+                  color: c.textPrimary,
                   onPressed: onBack,
-                  icon: Icon(Icons.chevron_left_rounded, color: c.textPrimary),
                 )
               else
                 const SizedBox(width: AppSpacing.md),

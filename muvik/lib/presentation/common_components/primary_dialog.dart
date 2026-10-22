@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_touchable.dart';
 import 'package:get/get.dart';
 
 import '../../values/app_colors.dart';
@@ -30,9 +31,9 @@ class AppDialog extends StatelessWidget {
               Positioned(
                 right: 4,
                 top: 4,
-                child: IconButton(
+                child: AppIconButton(
+                  icon: Icons.close_rounded,
                   tooltip: 'action_close'.tr,
-                  icon: Icon(Icons.close_rounded, color: c.iconDefault),
                   onPressed: onClose,
                 ),
               ),
@@ -169,9 +170,8 @@ class _ConfirmDialogState extends State<_ConfirmDialog> {
                   child: PrimaryButton(
                     label: widget.cancelLabel,
                     variant: ButtonVariant.secondary,
-                    onPressed: _pending
-                        ? null
-                        : () async => Get.back(result: false),
+                    onPressed:
+                        _pending ? null : () async => Get.back(result: false),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),

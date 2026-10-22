@@ -17,6 +17,7 @@ class MainActivity : AudioServiceActivity() {
     companion object {
         const val SYSTEM_UI_CHANNEL = "com.asctechsoft.muvik/system_ui"
         const val NUDGE_CHANNEL = "com.asctechsoft.muvik/nudge"
+        const val ONGOING_CHANNEL = "com.asctechsoft.muvik/ongoing"
     }
 
     private var mediaLibrary: MediaLibraryHandler? = null
@@ -47,6 +48,26 @@ class MainActivity : AudioServiceActivity() {
                 }
                 "cancel" -> {
                     NudgeScheduler.cancel(this)
+                    result.success(null)
+                }
+                else -> result.notImplemented()
+            }
+        }
+
+        MethodChannel(messenger, ONGOING_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "update" -> {
+                    OngoingNotification.update(
+                        this,
+                        call.argument<String>("title") ?: "",
+                        call.argument<String>("desc") ?: "",
+                        call.argument<String>("openLabel") ?: "",
+                        call.argument<String>("channelName") ?: "",
+                    )
+                    result.success(null)
+                }
+                "disable" -> {
+                    OngoingNotification.disable(this)
                     result.success(null)
                 }
                 else -> result.notImplemented()

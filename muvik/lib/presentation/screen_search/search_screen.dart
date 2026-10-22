@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../common_components/app_touchable.dart';
 import 'package:get/get.dart';
 
 import '../../controller/playback_controller.dart';
@@ -37,9 +38,10 @@ class SearchScreen extends GetView<MusicSearchController> {
               ),
               child: Row(
                 children: [
-                  IconButton(
+                  AppIconButton(
+                    icon: Icons.arrow_back_rounded,
                     tooltip: 'action_back'.tr,
-                    icon: Icon(Icons.arrow_back_rounded, color: c.textPrimary),
+                    color: c.textPrimary,
                     onPressed: () => Get.back<void>(),
                   ),
                   Expanded(

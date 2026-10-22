@@ -21,13 +21,13 @@ class StorageVolumeInfo {
   final int? freeBytes;
 
   factory StorageVolumeInfo.fromMap(Map m) => StorageVolumeInfo(
-    name: m['name'] as String,
-    description: (m['description'] as String?) ?? '',
-    isPrimary: (m['isPrimary'] as bool?) ?? false,
-    isRemovable: (m['isRemovable'] as bool?) ?? false,
-    mounted: (m['mounted'] as bool?) ?? true,
-    freeBytes: (m['freeBytes'] as num?)?.toInt(),
-  );
+        name: m['name'] as String,
+        description: (m['description'] as String?) ?? '',
+        isPrimary: (m['isPrimary'] as bool?) ?? false,
+        isRemovable: (m['isRemovable'] as bool?) ?? false,
+        mounted: (m['mounted'] as bool?) ?? true,
+        freeBytes: (m['freeBytes'] as num?)?.toInt(),
+      );
 }
 
 /// A raw audio row from MediaStore or a SAF tree.
@@ -67,20 +67,20 @@ class RawAudioFile {
   final String? genre;
 
   factory RawAudioFile.fromMap(Map m) => RawAudioFile(
-    uri: m['uri'] as String,
-    mediaId: (m['mediaId'] as num?)?.toInt(),
-    title: m['title'] as String?,
-    artist: m['artist'] as String?,
-    album: m['album'] as String?,
-    albumId: (m['albumId'] as num?)?.toInt(),
-    durationMs: (m['durationMs'] as num?)?.toInt() ?? 0,
-    sizeBytes: (m['size'] as num?)?.toInt() ?? 0,
-    mimeType: m['mime'] as String?,
-    relativePath: (m['relativePath'] as String?) ?? '',
-    fileName: (m['displayName'] as String?) ?? '',
-    dateAddedMs: (m['dateAddedMs'] as num?)?.toInt() ?? 0,
-    genre: m['genre'] as String?,
-  );
+        uri: m['uri'] as String,
+        mediaId: (m['mediaId'] as num?)?.toInt(),
+        title: m['title'] as String?,
+        artist: m['artist'] as String?,
+        album: m['album'] as String?,
+        albumId: (m['albumId'] as num?)?.toInt(),
+        durationMs: (m['durationMs'] as num?)?.toInt() ?? 0,
+        sizeBytes: (m['size'] as num?)?.toInt() ?? 0,
+        mimeType: m['mime'] as String?,
+        relativePath: (m['relativePath'] as String?) ?? '',
+        fileName: (m['displayName'] as String?) ?? '',
+        dateAddedMs: (m['dateAddedMs'] as num?)?.toInt() ?? 0,
+        genre: m['genre'] as String?,
+      );
 }
 
 class AudioFormatInfo {
@@ -178,6 +178,16 @@ class MediaLibraryChannel {
         'uri': uri,
         'size': size,
       });
+    } on PlatformException {
+      return null;
+    }
+  }
+
+  /// Lyrics embedded in the file tags (plain or LRC text), or null.
+  static Future<String?> getLyrics(String uri) async {
+    if (!isSupported) return null;
+    try {
+      return await _ch.invokeMethod<String>('getLyrics', {'uri': uri});
     } on PlatformException {
       return null;
     }

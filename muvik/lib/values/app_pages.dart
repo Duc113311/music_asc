@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+import '../presentation/common_components/cards.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
@@ -20,7 +22,6 @@ import '../presentation/screen_statistics/statistics_songs_screen.dart';
 import '../presentation/screens_onboarding/onboarding_screen.dart';
 import '../presentation/screens_playlist/playlist_detail_screen.dart';
 import '../presentation/screens_playlist/playlist_form_screen.dart';
-import '../presentation/screens_settings/about_screen.dart';
 import '../presentation/screens_settings/equalizer_screen.dart';
 import '../presentation/screens_settings/feedback_screen.dart';
 import '../presentation/screens_settings/headphones_screen.dart';
@@ -119,7 +120,6 @@ class AppPages {
     GetPage(name: RouteName.headphones, page: () => const HeadphonesScreen()),
     GetPage(name: RouteName.theme, page: () => const ThemeScreen()),
     GetPage(name: RouteName.permissions, page: () => const PermissionsScreen()),
-    GetPage(name: RouteName.about, page: () => const AboutScreen()),
     GetPage(
       name: RouteName.feedback,
       page: () => const FeedbackScreen(),
@@ -137,6 +137,9 @@ class AppPages {
 
 /// Replaces the route animation with none while screen transitions are off.
 class _TransitionMiddleware extends GetMiddleware {
+  @override
+  Widget onPageBuilt(Widget page) => AppBackground(child: page);
+
   @override
   GetPage<dynamic>? onPageCalled(GetPage<dynamic>? page) {
     if (page == null ||
