@@ -16,7 +16,7 @@ import '../common_components/cards.dart';
 import '../common_components/mini_player.dart';
 import '../common_components/primary_button.dart';
 import '../common_components/state_views.dart';
-import 'statistics_screen.dart';
+import 'statistics_tab.dart';
 
 class StatisticsArtistArgs {
   const StatisticsArtistArgs({required this.artist, required this.period});

@@ -9,7 +9,7 @@ import '../bottom_sheets/song_actions_sheet.dart';
 import '../common_components/app_controls.dart';
 import '../common_components/cards.dart';
 import '../common_components/mini_player.dart';
-import 'statistics_screen.dart';
+import 'statistics_tab.dart';
 
 class StatisticsSongsArgs {
   const StatisticsSongsArgs({required this.period, required this.songs});

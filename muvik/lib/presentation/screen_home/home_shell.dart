@@ -12,7 +12,7 @@ import '../../values/app_dimensions.dart';
 import '../../values/app_typography.dart';
 import '../common_components/mini_player.dart';
 import '../screen_dashboard/dashboard_tab.dart';
-import '../screen_explore/explore_tab.dart';
+import '../screen_statistics/statistics_tab.dart';
 import '../screen_library/library_tab.dart';
 import '../screens_settings/settings_tab.dart';
 
@@ -90,7 +90,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
             onOpenLibrary: () => _select(1),
           ),
         1 => LibraryTab(scrollController: _scrolls[1]),
-        2 => ExploreTab(scrollController: _scrolls[2]),
+        2 => StatisticsTab(scrollController: _scrolls[2]),
         _ => SettingsTab(scrollController: _scrolls[3]),
       };
 
@@ -138,7 +138,7 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   }
 }
 
-/// sc_navibar: exactly 4 tabs — Trang chủ, Thư viện, Khám phá, Cài đặt.
+/// sc_navibar: exactly 4 tabs — Trang chủ, Thư viện, Thống kê, Cài đặt.
 class _NavBar extends StatelessWidget {
   const _NavBar({required this.index, required this.onSelect});
   final int index;
@@ -147,7 +147,7 @@ class _NavBar extends StatelessWidget {
   static const _items = [
     (Icons.home_outlined, Icons.home_rounded, 'tab_home'),
     (Icons.library_music_outlined, Icons.library_music_rounded, 'tab_library'),
-    (Icons.explore_outlined, Icons.explore_rounded, 'tab_explore'),
+    (Icons.insights_outlined, Icons.insights_rounded, 'tab_stats'),
     (Icons.settings_outlined, Icons.settings_rounded, 'tab_settings'),
   ];
 

@@ -84,7 +84,7 @@ S = {
     # ---- tabs
     'tab_home': ('Home', 'Trang chủ'),
     'tab_library': ('Library', 'Thư viện'),
-    'tab_explore': ('Explore', 'Khám phá'),
+    'tab_stats': ('Stats', 'Thống kê'),
     'tab_settings': ('Settings', 'Cài đặt'),
     # ---- onboarding
     'onb1_title': ('Music on your phone,', 'Nhạc trong máy,'),
@@ -503,6 +503,10 @@ S = {
     'stats_plays_n': ('%1$s plays', '%1$s lượt'),
     'stats_vs_previous': ('%1$s vs previous', '%1$s so với kỳ trước'),
     'stats_no_comparison': ('No data to compare', 'Chưa có dữ liệu so sánh'),
+    'stats_vs_prev_week': ('%1$s vs last week', '%1$s so với tuần trước'),
+    'stats_vs_prev_month': ('%1$s vs last month', '%1$s so với tháng trước'),
+    'stats_vs_prev_year': ('%1$s vs last year', '%1$s so với năm trước'),
+    'stats_from_library': ('From your on-device library', 'Từ thư viện trên máy'),
     'stats_rhythm_week': ('Listening this week', 'Nhịp nghe trong tuần'),
     'stats_rhythm_month': ('Listening this month', 'Nhịp nghe trong tháng'),
     'stats_rhythm_year': ('Listening this year', 'Nhịp nghe trong năm'),

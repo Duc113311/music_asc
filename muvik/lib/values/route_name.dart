@@ -14,7 +14,6 @@ class RouteName {
   static const String playlistDetail = '/playlist';
   static const String playlistForm =
       '/playlist/form'; // sc_bthShet_tao_playlist (full form)
-  static const String statistics = '/statistics'; // Sc_thong_ke_tuan/thang/nam
   static const String statisticsSongs = '/statistics/songs';
   static const String statisticsArtist = '/statistics/artist';
   static const String scanLibrary = '/settings/scan'; // sc_quet_thu_vien

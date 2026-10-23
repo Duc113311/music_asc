@@ -91,6 +91,7 @@ Hiện tại: sau khi cấp quyền, người dùng phải tự **chọn nguồn
 | CL-19 | Chính sách riêng tư trống | `AppConfig.privacyPolicyUrl = ''` (ghi chú `P20-06`). Bắt buộc trước khi phát hành, nhất là khi có Firebase. | P0 trước khi lên store | |
 | CL-20 | Quyền và sao lưu | Manifest còn `INTERNET` (Firebase cần, giữ), `RECEIVE_BOOT_COMPLETED`, `FOREGROUND_SERVICE_SPECIAL_USE`: kiểm tra từng quyền có dùng thật không (Play Console sẽ hỏi). Chưa đặt `android:allowBackup`/`dataExtractionRules` → DB nghe nhạc có thể bị sao lưu lên Drive; chốt có muốn không. | P1 | |
 | CL-21 | Đặc tả còn lỗi thời | `APP_BASE_STRUCTURE.md` vẫn mô tả `commRunApp`/`CommLocalize`/`PrefAssist`. Cập nhật theo `muvik/docs/base_packages.md`. | P2 | |
+| CL-55 | **`tool/strings_src.py` đã lệch với XML — đừng chạy `gen_strings.py`** | `check_strings.py` báo thiếu hơn 25 key chỉ tồn tại trong XML (vd. `accent_fuchsia/indigo/lime/ruby`, `eq_preset_tiktok`, `eq_loud_mode`, `lyrics_empty`, `nudge_*`, `ongoing_*`, `settings_*_desc`) và nhiều key trong nguồn không còn dùng. Chạy `gen_strings.py` sẽ **xoá các key đó khỏi XML** (mình đã lỡ chạy một lần khi làm tab Thống kê và đã khôi phục từ git). Cần đồng bộ ngược XML → `strings_src.py` (hoặc bỏ script, sửa thẳng XML) rồi mới dùng lại. | P1 | |
 
 ## 5. Điểm chạm & animation
 

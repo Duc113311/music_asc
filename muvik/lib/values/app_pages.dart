@@ -9,7 +9,6 @@ import '../controller/playlist_detail_controller.dart';
 import '../controller/search_controller.dart';
 import '../controller/settings_controller.dart';
 import '../controller/setup_controller.dart';
-import '../controller/statistics_controller.dart';
 import '../presentation/screen_debug/component_preview_screen.dart';
 import '../presentation/screen_home/home_shell.dart';
 import '../presentation/screen_library/song_list_screen.dart';
@@ -17,7 +16,6 @@ import '../presentation/screen_player/now_playing_screen.dart';
 import '../presentation/screen_search/search_screen.dart';
 import '../presentation/screen_splash/splash_screen.dart';
 import '../presentation/screen_statistics/statistics_artist_screen.dart';
-import '../presentation/screen_statistics/statistics_screen.dart';
 import '../presentation/screen_statistics/statistics_songs_screen.dart';
 import '../presentation/screens_onboarding/onboarding_screen.dart';
 import '../presentation/screens_playlist/playlist_detail_screen.dart';
@@ -94,13 +92,6 @@ class AppPages {
     GetPage(
       name: RouteName.playlistForm,
       page: () => const PlaylistFormScreen(),
-    ),
-    GetPage(
-      name: RouteName.statistics,
-      page: () => const StatisticsScreen(),
-      binding: BindingsBuilder(() {
-        Get.put(StatisticsController());
-      }),
     ),
     GetPage(
       name: RouteName.statisticsSongs,

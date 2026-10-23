@@ -10,7 +10,7 @@ import '../../values/app_dimensions.dart';
 import '../../values/app_typography.dart';
 import '../common_components/primary_button.dart';
 import '../common_components/primary_dialog.dart';
-import '../screen_statistics/statistics_screen.dart';
+import '../screen_statistics/statistics_tab.dart';
 
 /// Sc_dialog_tuan / sc_dialog_thang / Sc_dialoh_nam. Selection only edits a
 /// draft; "Áp dụng" returns it, Cancel/X/Back return null (P16-13..P16-16).

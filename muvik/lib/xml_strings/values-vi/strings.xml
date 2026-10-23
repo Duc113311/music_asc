@@ -443,6 +443,10 @@
     <string name="stats_load_failed">Không tải được thống kê</string>
     <string name="stats_next_period">Kỳ sau</string>
     <string name="stats_no_comparison">Chưa có dữ liệu so sánh</string>
+    <string name="stats_vs_prev_week">%1$s so với tuần trước</string>
+    <string name="stats_vs_prev_month">%1$s so với tháng trước</string>
+    <string name="stats_vs_prev_year">%1$s so với năm trước</string>
+    <string name="stats_from_library">Từ thư viện trên máy</string>
     <string name="stats_no_data">Chưa có dữ liệu nghe nhạc</string>
     <string name="stats_no_data_desc">Nghe ít nhất 30 giây và dữ liệu sẽ hiện ở đây.</string>
     <string name="stats_peak">Nghe nhiều nhất vào %1$s</string>
@@ -487,6 +491,7 @@
     <string name="tab_home">Trang chủ</string>
     <string name="tab_library">Thư viện</string>
     <string name="tab_settings">Cài đặt</string>
+    <string name="tab_stats">Thống kê</string>
     <string name="theme_dark">Tối</string>
     <string name="theme_desc">Chọn giao diện sáng hoặc tối cho Muvik.</string>
     <string name="theme_light">Sáng</string>

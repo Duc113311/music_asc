@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../../controller/library_controller.dart';
 import '../../controller/playback_controller.dart';
 import '../../controller/statistics_controller.dart';
 import '../../models/ui_models/period_type.dart';
@@ -64,11 +65,37 @@ String bucketLongLabel(StatsPeriod p, int i) {
   return DateFormat.yMMMEd(locale).format(AppDateUtils.addDays(p.start, i));
 }
 
-/// Sc_thong_ke_tuan / thang / nam — opened from Explore, not a tab.
-class StatisticsScreen extends GetView<StatisticsController> {
-  const StatisticsScreen({super.key});
+/// Short name of a bucket for the "most listening" line: weekday for a week
+/// ("Chủ nhật"), day/month for a month ("18/9"), month for a year ("Tháng 8").
+String bucketPeakLabel(StatsPeriod p, int i) {
+  final locale = Get.locale?.toLanguageTag();
+  switch (p.type) {
+    case PeriodType.week:
+      return toBeginningOfSentenceCase(
+        DateFormat.EEEE(locale).format(AppDateUtils.addDays(p.start, i)),
+      );
+    case PeriodType.month:
+      final d = AppDateUtils.addDays(p.start, i);
+      return '${d.day}/${d.month}';
+    case PeriodType.year:
+      return toBeginningOfSentenceCase(
+        DateFormat.MMMM(locale).format(DateTime(p.start.year, i + 1)),
+      );
+  }
+}
 
-  Future<void> _pickPeriod() async {
+/// Tab "Thống kê" (week / month / year), the third tab of the home shell.
+class StatisticsTab extends StatelessWidget {
+  const StatisticsTab({super.key, required this.scrollController});
+  final ScrollController scrollController;
+
+  /// Lives as long as the tab: created on first open, kept by the shell.
+  static StatisticsController _controller() =>
+      Get.isRegistered<StatisticsController>()
+          ? Get.find<StatisticsController>()
+          : Get.put(StatisticsController(), permanent: true);
+
+  Future<void> _pickPeriod(StatisticsController controller) async {
     final p = controller.period.value;
     final picked = switch (p.type) {
       PeriodType.week => await showWeekPicker(p),
@@ -81,147 +108,170 @@ class StatisticsScreen extends GetView<StatisticsController> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return ScaffoldWithMiniPlayer(
-      body: GradientBackground(
-        child: SafeArea(
-          bottom: false,
-          child: Obx(() {
-            final p = controller.period.value;
-            final s = controller.stats.value;
-            return RefreshIndicator(
-              onRefresh: controller.load,
-              child: ListView(
-                children: [
-                  const SizedBox(height: AppSpacing.md),
-                  Row(
+    final controller = _controller();
+    return GradientBackground(
+      child: SafeArea(
+        bottom: false,
+        child: Obx(() {
+          final p = controller.period.value;
+          final s = controller.stats.value;
+          return RefreshIndicator(
+            onRefresh: controller.load,
+            child: ListView(
+              controller: scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.screenH,
+                    AppSpacing.md,
+                    AppSpacing.xs,
+                    0,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AppIconButton(
-                        icon: Icons.arrow_back_rounded,
-                        tooltip: 'action_back'.tr,
-                        color: c.textPrimary,
-                        onPressed: () => Get.back<void>(),
-                      ),
                       Expanded(
-                        child: Text(
-                          'stats_title'.tr,
-                          style: AppTypography.headingL.copyWith(
-                            color: c.textPrimary,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'stats_title'.tr,
+                              style: AppTypography.headingL.copyWith(
+                                color: c.textPrimary,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'stats_subtitle'.tr,
+                              style: AppTypography.bodyL.copyWith(
+                                color: c.textSecondary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       AppIconButton(
                         icon: Icons.calendar_month_rounded,
                         tooltip: 'stats_pick_period'.tr,
                         filled: true,
-                        onPressed: _pickPeriod,
+                        onPressed: () => _pickPeriod(controller),
                       ),
-                      const SizedBox(width: AppSpacing.xs),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.screenH,
-                    ),
-                    child: Text(
-                      'stats_subtitle'.tr,
-                      style: AppTypography.bodyL.copyWith(
-                        color: c.textSecondary,
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.screenH,
+                    AppSpacing.md,
+                    AppSpacing.screenH,
+                    0,
+                  ),
+                  child: SegmentedTabs(
+                    labels: [
+                      'period_week'.tr,
+                      'period_month'.tr,
+                      'period_year'.tr,
+                    ],
+                    index: p.type.index,
+                    onChanged: (i) => controller.setType(PeriodType.values[i]),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xs,
+                  ),
+                  child: Row(
+                    children: [
+                      AppIconButton(
+                        icon: Icons.chevron_left_rounded,
+                        tooltip: 'stats_prev_period'.tr,
+                        color: c.textPrimary,
+                        onPressed: controller.previous,
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.screenH,
-                      AppSpacing.md,
-                      AppSpacing.screenH,
-                      0,
-                    ),
-                    child: SegmentedTabs(
-                      labels: [
-                        'period_week'.tr,
-                        'period_month'.tr,
-                        'period_year'.tr,
-                      ],
-                      index: p.type.index,
-                      onChanged: (i) =>
-                          controller.setType(PeriodType.values[i]),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.xs,
-                    ),
-                    child: Row(
-                      children: [
-                        AppIconButton(
-                          icon: Icons.chevron_left_rounded,
-                          tooltip: 'stats_prev_period'.tr,
-                          color: c.textPrimary,
-                          onPressed: controller.previous,
-                        ),
-                        Expanded(
-                          child: Semantics(
-                            button: true,
-                            label: 'stats_pick_period'.tr,
-                            child: InkWell(
-                              onTap: _pickPeriod,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: AppSpacing.sm,
-                                ),
-                                child: Text(
-                                  periodLabel(p),
-                                  textAlign: TextAlign.center,
-                                  style: AppTypography.headingS.copyWith(
-                                    color: c.textPrimary,
-                                  ),
+                      Expanded(
+                        child: Semantics(
+                          button: true,
+                          label: 'stats_pick_period'.tr,
+                          child: InkWell(
+                            onTap: () => _pickPeriod(controller),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: AppSpacing.sm,
+                              ),
+                              child: Text(
+                                periodLabel(p),
+                                textAlign: TextAlign.center,
+                                style: AppTypography.headingS.copyWith(
+                                  color: c.textPrimary,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        AppIconButton(
-                          icon: Icons.chevron_right_rounded,
-                          tooltip: 'stats_next_period'.tr,
-                          color: c.textPrimary,
-                          onPressed:
-                              controller.canGoNext ? controller.next : null,
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (controller.loading.value)
-                    const Padding(
-                      padding: EdgeInsets.all(AppSpacing.xxl),
-                      child: LoadingState(),
-                    )
-                  else if (controller.failed.value)
-                    ErrorState(
-                      message: 'stats_load_failed'.tr,
-                      onRetry: controller.load,
-                    )
-                  else if (s != null) ...[
-                    _Summary(stats: s),
-                    _ChartCard(stats: s),
-                    if (s.isEmpty)
-                      EmptyState(
-                        compact: true,
-                        icon: Icons.insights_rounded,
-                        title: 'stats_no_data'.tr,
-                        message: 'stats_no_data_desc'.tr,
-                      )
-                    else ...[
-                      _TopSongs(stats: s),
-                      _TopArtists(stats: s),
+                      ),
+                      AppIconButton(
+                        icon: Icons.chevron_right_rounded,
+                        tooltip: 'stats_next_period'.tr,
+                        color: c.textPrimary,
+                        onPressed: controller.canGoNext ? controller.next : null,
+                      ),
                     ],
+                  ),
+                ),
+                if (controller.loading.value)
+                  const Padding(
+                    padding: EdgeInsets.all(AppSpacing.xxl),
+                    child: LoadingState(),
+                  )
+                else if (controller.failed.value)
+                  ErrorState(
+                    message: 'stats_load_failed'.tr,
+                    onRetry: controller.load,
+                  )
+                else if (s != null) ...[
+                  _Summary(stats: s),
+                  _ChartCard(stats: s),
+                  if (s.isEmpty)
+                    EmptyState(
+                      compact: true,
+                      icon: Icons.insights_rounded,
+                      title: 'stats_no_data'.tr,
+                      message: 'stats_no_data_desc'.tr,
+                    )
+                  else ...[
+                    _TopSongs(stats: s),
+                    _TopArtist(stats: s),
                   ],
-                  const MiniPlayerSpacer(),
                 ],
-              ),
-            );
-          }),
-        ),
+                const MiniPlayerSpacer(),
+              ],
+            ),
+          );
+        }),
       ),
+    );
+  }
+}
+
+/// Icon in a tinted circle, as on the two summary cards.
+class _IconCircle extends StatelessWidget {
+  const _IconCircle({required this.icon, required this.color});
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color.withValues(alpha: 0.16),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Icon(icon, color: color, size: 22),
     );
   }
 }
@@ -233,29 +283,37 @@ class _Summary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
+    final vsKey = switch (stats.period.type) {
+      PeriodType.week => 'stats_vs_prev_week',
+      PeriodType.month => 'stats_vs_prev_month',
+      PeriodType.year => 'stats_vs_prev_year',
+    };
+
     Widget change(double? pct) {
       if (pct == null) {
         return Text(
           'stats_no_comparison'.tr,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: AppTypography.caption.copyWith(color: c.textMuted),
         );
       }
       final up = pct >= 0;
+      final color = up ? c.success : c.error;
       return Row(
         children: [
           Icon(
-            up ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
-            size: 14,
-            color: up ? c.success : c.error,
+            up ? Icons.star_rounded : Icons.arrow_downward_rounded,
+            size: 12,
+            color: color,
           ),
+          const SizedBox(width: 3),
           Flexible(
             child: Text(
-              'stats_vs_previous'.trParams({
-                'args1': '${up ? '+' : ''}${pct.round()}%',
-              }),
-              style: AppTypography.caption.copyWith(
-                color: up ? c.success : c.error,
-              ),
+              vsKey.trParams({'args1': '${up ? '+' : ''}${pct.round()}%'}),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.caption.copyWith(color: color),
             ),
           ),
         ],
@@ -274,67 +332,90 @@ class _Summary extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              child: AppCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(Icons.headphones_rounded, color: c.primary),
-                    const SizedBox(height: 4),
-                    Text(
-                      'stats_listen_time'.tr,
-                      style: AppTypography.caption.copyWith(
-                        color: c.textSecondary,
-                      ),
-                    ),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        DurationFormatter.listening(stats.totalMs),
-                        style: AppTypography.headingS.copyWith(
-                          color: c.textPrimary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    change(stats.totalChangePct),
-                  ],
-                ),
+              child: _StatCard(
+                icon: Icons.headphones_rounded,
+                color: c.primary,
+                label: 'stats_listen_time'.tr,
+                value: DurationFormatter.listening(stats.totalMs),
+                footer: change(stats.totalChangePct),
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
-              child: AppCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(Icons.music_note_rounded, color: c.info),
-                    const SizedBox(height: 4),
-                    Text(
-                      'stats_songs_listened'.tr,
-                      style: AppTypography.caption.copyWith(
-                        color: c.textSecondary,
-                      ),
-                    ),
-                    Text(
-                      'count_songs_n'.trParams({
-                        'args1': '${stats.distinctSongs}',
-                      }),
-                      style: AppTypography.headingS.copyWith(
-                        color: c.textPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      'stats_plays_n'.trParams({'args1': '${stats.plays}'}),
-                      style: AppTypography.caption.copyWith(color: c.textMuted),
-                    ),
-                  ],
+              child: _StatCard(
+                icon: Icons.music_note_rounded,
+                color: c.info,
+                label: 'stats_songs_listened'.tr,
+                value: 'count_songs_n'.trParams({
+                  'args1': '${stats.distinctSongs}',
+                }),
+                footer: Text(
+                  'stats_from_library'.tr,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.caption.copyWith(color: c.textMuted),
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  const _StatCard({
+    required this.icon,
+    required this.color,
+    required this.label,
+    required this.value,
+    required this.footer,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String label;
+  final String value;
+  final Widget footer;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return AppCard(
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      child: Row(
+        children: [
+          _IconCircle(icon: icon, color: color),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.caption.copyWith(color: c.textSecondary),
+                ),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    value,
+                    maxLines: 1,
+                    style: AppTypography.headingS.copyWith(
+                      color: c.textPrimary,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                footer,
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -364,8 +445,9 @@ class _ChartCard extends GetView<StatisticsController> {
     final maxH = hours.fold<double>(0, (a, b) => b > a ? b : a);
     // Minutes when the period is small, hours otherwise.
     final useMinutes = maxH < 1;
-    final values =
-        useMinutes ? buckets.map((b) => b.listenedMs / 60000).toList() : hours;
+    final values = useMinutes
+        ? buckets.map((b) => b.listenedMs / 60000).toList()
+        : hours;
     final maxV = values.fold<double>(0, (a, b) => b > a ? b : a);
     final maxY = _niceMax(maxV <= 0 ? 1 : maxV * 1.05, 5);
     final interval = maxY / 5;
@@ -395,29 +477,19 @@ class _ChartCard extends GetView<StatisticsController> {
                       title,
                       style: AppTypography.headingS.copyWith(
                         color: c.textPrimary,
+                        fontWeight: FontWeight.w800,
                       ),
+                    ),
+                  ),
+                  Text(
+                    useMinutes ? 'unit_minutes'.tr : 'unit_hours'.tr,
+                    style: AppTypography.caption.copyWith(
+                      color: c.textSecondary,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
-              SizedBox(
-                width: 34,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 4),
-                  child: Text(
-                    useMinutes ? 'unit_minutes'.tr : 'unit_hours'.tr,
-                    textAlign: TextAlign.right,
-                    maxLines: 1,
-                    softWrap: false,
-                    style: AppTypography.caption.copyWith(
-                      fontSize: 11,
-                      color: c.textSecondary,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
               SizedBox(
                 height: 190,
                 child: stats.totalMs == 0
@@ -491,7 +563,8 @@ class _ChartCard extends GetView<StatisticsController> {
                                   interval: 1,
                                   getTitlesWidget: (v, meta) {
                                     final i = v.toInt();
-                                    final show = p.type != PeriodType.month ||
+                                    final show =
+                                        p.type != PeriodType.month ||
                                         i == 0 ||
                                         ((i + 1) % 5 == 0 &&
                                             (values.length - i - 1 >= 2 ||
@@ -525,13 +598,11 @@ class _ChartCard extends GetView<StatisticsController> {
                                     Colors.black.withValues(alpha: 0.75),
                                 getTooltipItem: (group, gi, rod, ri) =>
                                     BarTooltipItem(
-                                  '${bucketLongLabel(p, gi)}\n${DurationFormatter.listening(buckets[gi].listenedMs)} • ${'stats_plays_n'.trParams({
-                                        'args1': '${buckets[gi].plays}'
-                                      })}',
-                                  AppTypography.caption.copyWith(
-                                    color: c.textPrimary,
-                                  ),
-                                ),
+                                      '${bucketLongLabel(p, gi)}\n${DurationFormatter.listening(buckets[gi].listenedMs)} • ${'stats_plays_n'.trParams({'args1': '${buckets[gi].plays}'})}',
+                                      AppTypography.caption.copyWith(
+                                        color: c.textPrimary,
+                                      ),
+                                    ),
                               ),
                             ),
                             barGroups: [
@@ -542,17 +613,14 @@ class _ChartCard extends GetView<StatisticsController> {
                                     BarChartRodData(
                                       toY: values[i],
                                       width: switch (p.type) {
-                                        PeriodType.week => 24,
+                                        PeriodType.week => 26,
                                         PeriodType.month => 8,
-                                        PeriodType.year => 16,
+                                        PeriodType.year => 18,
                                       },
-                                      borderRadius: BorderRadius.zero,
-                                      backDrawRodData:
-                                          BackgroundBarChartRodData(
-                                        show: true,
-                                        toY: maxY,
-                                        color: c.textPrimary.withValues(
-                                          alpha: 0.08,
+                                      // Rounded top like the design.
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(
+                                          p.type == PeriodType.month ? 3 : 6,
                                         ),
                                       ),
                                       gradient: LinearGradient(
@@ -572,48 +640,11 @@ class _ChartCard extends GetView<StatisticsController> {
               ),
               if (peak != null || sel != null) ...[
                 const SizedBox(height: AppSpacing.sm),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.sm,
-                  ),
-                  decoration: BoxDecoration(
-                    color: c.surfaceSelected,
-                    borderRadius: BorderRadius.circular(AppRadius.input),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        sel != null
-                            ? Icons.touch_app_rounded
-                            : Icons.emoji_events_rounded,
-                        color: c.primary,
-                        size: 20,
-                      ),
-                      const SizedBox(width: AppSpacing.xs),
-                      Expanded(
-                        child: Text(
-                          sel != null
-                              ? '${bucketLongLabel(p, sel)} • ${DurationFormatter.listening(buckets[sel].listenedMs)}'
-                              : 'stats_peak'.trParams({
-                                  'args1': bucketLongLabel(p, peak!),
-                                }),
-                          style: AppTypography.bodyM.copyWith(
-                            color: c.textPrimary,
-                          ),
-                        ),
-                      ),
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          minimumSize: const Size(48, 48),
-                        ),
-                        onPressed: () => _openBucket(sel ?? peak!),
-                        child: Text(
-                          'stats_view_songs'.tr,
-                          style: AppTypography.label.copyWith(color: c.primary),
-                        ),
-                      ),
-                    ],
-                  ),
+                _PeakPill(
+                  stats: stats,
+                  bucket: sel ?? peak!,
+                  selected: sel != null,
+                  onTap: () => _openBucket(sel ?? peak!),
                 ),
               ],
             ],
@@ -643,6 +674,77 @@ class _ChartCard extends GetView<StatisticsController> {
         subtitle: 'stats_songs_in_period'.tr,
         songs: () => songs,
         emptyMessage: 'stats_no_data'.tr,
+      ),
+    );
+  }
+}
+
+/// "Nghe nhiều nhất vào **Chủ nhật**": crown, text with the value in the
+/// accent color. Tapping opens the songs listened in that bucket.
+class _PeakPill extends StatelessWidget {
+  const _PeakPill({
+    required this.stats,
+    required this.bucket,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final PeriodStats stats;
+  final int bucket;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    final p = stats.period;
+    final value = bucketPeakLabel(p, bucket);
+    final full = selected
+        ? '$value • ${DurationFormatter.listening(stats.buckets[bucket].listenedMs)}'
+        : 'stats_peak'.trParams({'args1': value});
+    final base = AppTypography.bodyM.copyWith(color: c.textPrimary);
+    final at = full.indexOf(value);
+    final text = at < 0
+        ? Text(full, style: base)
+        : Text.rich(
+            TextSpan(
+              style: base,
+              children: [
+                TextSpan(text: full.substring(0, at)),
+                TextSpan(
+                  text: value,
+                  style: base.copyWith(
+                    color: c.secondary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                TextSpan(text: full.substring(at + value.length)),
+              ],
+            ),
+          );
+    return Semantics(
+      button: true,
+      label: '${'stats_view_songs'.tr}: $value',
+      child: Material(
+        color: c.surfaceSelected,
+        borderRadius: BorderRadius.circular(AppRadius.input),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppRadius.input),
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+              child: Row(
+                children: [
+                  Icon(Icons.workspace_premium_rounded, color: c.primary),
+                  const SizedBox(width: AppSpacing.xs),
+                  Expanded(child: text),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -787,15 +889,20 @@ class RankedSongRow extends StatelessWidget {
   }
 }
 
-class _TopArtists extends StatelessWidget {
-  const _TopArtists({required this.stats});
+/// "Nghệ sĩ bạn nghe nhiều nhất": the single top artist of the period with a
+/// round cover (taken from one of their songs), name, time and a bars icon.
+class _TopArtist extends StatelessWidget {
+  const _TopArtist({required this.stats});
   final PeriodStats stats;
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final top = stats.topArtists.take(3).toList();
-    if (top.isEmpty) return const SizedBox.shrink();
+    if (stats.topArtists.isEmpty) return const SizedBox.shrink();
+    final a = stats.topArtists.first;
+    final cover = LibraryController.to.songs.firstWhereOrNull(
+      (s) => s.available && s.artistOrNull == a.artist,
+    );
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screenH,
@@ -817,36 +924,75 @@ class _TopArtists extends StatelessWidget {
                 AppSpacing.xs,
               ),
             ),
-            for (final a in top)
-              ListTile(
-                minTileHeight: 64,
-                leading: CircleAvatar(
-                  radius: 24,
-                  backgroundColor: c.surfaceSelected,
-                  child: Icon(Icons.person_rounded, color: c.primary),
-                ),
-                title: Text(
-                  a.artist ?? 'unknown_artist'.tr,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.songTitle.copyWith(color: c.textPrimary),
-                ),
-                subtitle: Text(
-                  DurationFormatter.listening(a.listenedMs),
-                  style: AppTypography.bodyM.copyWith(color: c.textSecondary),
-                ),
-                trailing: Icon(
-                  Icons.chevron_right_rounded,
-                  color: c.iconDefault,
-                ),
-                onTap: () => Get.toNamed(
-                  RouteName.statisticsArtist,
-                  arguments: StatisticsArtistArgs(
-                    artist: a.artist,
-                    period: stats.period,
-                  ),
+            InkWell(
+              onTap: () => Get.toNamed(
+                RouteName.statisticsArtist,
+                arguments: StatisticsArtistArgs(
+                  artist: a.artist,
+                  period: stats.period,
                 ),
               ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  AppSpacing.xs,
+                  AppSpacing.md,
+                  AppSpacing.sm,
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [c.secondary, c.primary],
+                        ),
+                      ),
+                      child: ClipOval(
+                        child: cover == null
+                            ? Container(
+                                width: 60,
+                                height: 60,
+                                color: c.surfaceSelected,
+                                child: Icon(
+                                  Icons.person_rounded,
+                                  color: c.primary,
+                                  size: 32,
+                                ),
+                              )
+                            : SongArtwork(song: cover, size: 60),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            a.artist ?? 'unknown_artist'.tr,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.headingS.copyWith(
+                              color: c.textPrimary,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            DurationFormatter.listening(a.listenedMs),
+                            style: AppTypography.bodyM.copyWith(
+                              color: c.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.bar_chart_rounded, color: c.primary, size: 28),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
