@@ -8,6 +8,33 @@ Quy ước: `[ ]` chưa làm · `[~]` làm một phần / cần xác nhận · `
 
 ---
 
+## 0. LỖI NGHIÊM TRỌNG – lần mở app đầu tiên bị màn trắng, không vào được (P0)
+
+**Hiện tượng (bạn báo):** bấm vào app lần đầu (sau khi cài) chỉ thấy màn trắng, đợi mãi không vào. Vuốt tắt app rồi mở lại thì vào bình thường.
+**Trạng thái:** chưa tái hiện được (điện thoại mất kết nối) nên **chưa xác định được nguyên nhân chắc chắn**. Dưới đây là kết quả đọc code và các nghi phạm xếp theo khả năng.
+
+**Màn trắng này là gì:** đó là màn khởi động native của Android (`LaunchTheme` → `launch_background.xml` chỉ có nền trắng). Nó hiện cho tới khi Flutter vẽ được khung hình đầu tiên, tức là cho tới khi `runApp()` chạy. Màn Splash của app (logo Muvik) chỉ xuất hiện **sau** `runApp()`. Vậy lỗi nằm ở đoạn khởi động **trước `runApp()`** (hoặc engine không khởi động), không nằm ở `BootstrapService` của màn Splash (phần đó có màn Thử lại và timeout 15 s).
+
+**Đoạn code chạy trước `runApp()` trên `main` hiện tại** (`commRunApp` của `dsp_base` 1.1.3 + `main.dart`), tất cả tuần tự và chặn việc hiện giao diện:
+`PrefAssist.init` → nạp chuỗi của base → `CommFigs.classifyDevice` (plugin `system_info_plus`, không có timeout) → `SystemChrome` ×2 → `SystemUiChannel.hideNavigationBar` (không có timeout) → `Firebase.initializeApp` (timeout 5 s) → `initializeDateFormatting` → `AppLocalize.ensureConfigured/loadTranslations` → `MixedUtils.currentVersionCode` → (alpha/dev) lấy Android ID cho thiết bị test AdMob (không có timeout) → cài Crashlytics.
+
+| # | Nghi phạm | Vì sao đáng nghi | Cách kiểm tra |
+|---|---|---|---|
+| CL-45 | **Một `await` trước `runApp()` không bao giờ trả về** | Chỉ cần 1 plugin/channel không trả lời lần đầu (`system_info_plus` đã cũ 0.0.7, `hideNavigationBar`, Android ID) là app treo ở màn trắng vĩnh viễn. Lần 2 vào được vì tiến trình/engine đã ấm và kết quả khác. | Chạy `flutter run --flavor dev` trên máy **vừa gỡ app** và `flutter logs`; thêm log mốc thời gian trước/sau từng bước ở `commRunApp`/`_onBindingInitialized` xem dừng ở bước nào. |
+| CL-46 | **Khởi động lạnh lần đầu quá chậm** (không treo thật) | Bản debug/JIT và lần chạy đầu sau khi cài (ART chưa biên dịch, Firebase + Play Services khởi tạo lần đầu, Firebase tối đa 5 s) có thể kéo dài 10–30 s trong khi người dùng chỉ thấy màn trắng nên tưởng là treo. | So thời gian với **bản release** (`flutter build apk --flavor dev --release`): nếu release vào ngay thì chủ yếu do bản debug. `adb shell am start -W -n com.asctechsoft.muvik/.MainActivity` cho `TotalTime`. |
+| CL-47 | **Mở app từ trình cài đặt / lúc cấp quyền** | Mở bằng nút "Mở" của trình cài đặt hoặc ngay lúc hệ thống đang hiện hộp thoại có thể tạo activity thứ hai song song (manifest có `launchMode=singleTop`, `taskAffinity=""`), activity đầu đứng im. Vuốt tắt xong mở lại chỉ còn một. | Thử 2 cách: mở từ nút "Mở" của trình cài đặt và mở từ icon launcher; xem có khác nhau không. |
+| CL-48 | **Chưa rõ bản build đang test** | Bản debug cài bằng `flutter run` rồi mở lại bằng tay từ launcher khi máy tính không còn kết nối đôi khi cũng kẹt màn trắng. | Ghi rõ lần lỗi là flavor nào (alpha/dev/product), debug hay release, cài bằng `flutter run` hay `.apk`. |
+
+**Hướng sửa đề xuất (làm theo thứ tự):**
+- [ ] **CL-49 – Hiện giao diện sớm, đưa việc nặng vào Splash.** `main()` chỉ giữ những gì bắt buộc rồi gọi `runApp()` ngay: prefs + locale (đọc nhanh). Firebase/Crashlytics, `classifyDevice`, AdMob, Remote Config khởi động **sau** khi Splash đã hiện (nền, có timeout, thất bại thì bỏ qua). Màn Splash đã có sẵn trạng thái Thử lại, tái sử dụng được.
+- [ ] **CL-50 – Mọi bước trước `runApp()` phải có timeout** (3–5 s) và bắt lỗi: `SystemUiChannel.hideNavigationBar`, `classifyDevice`, lấy Android ID, `SystemChrome`. Một bước hỏng chỉ được bỏ qua, không được làm treo cả app.
+- [ ] **CL-51 – Thay màn trắng native bằng màn thương hiệu.** `launch_background.xml` (và `values-night`) đang nền trắng; đổi sang màu nền Muvik + logo, và dùng Android 12 SplashScreen API (`windowSplashScreen*`). Người dùng sẽ không thấy "trắng" nữa, và khi có lỗi cũng phân biệt được "đang tải" với "treo".
+- [ ] **CL-52 – Watchdog khởi động.** Ghi mốc thời gian từng bước (`AppLog.info` + breadcrumb Crashlytics). Nếu sau ~8 s vẫn chưa tới `runApp()` thì ghi một báo cáo không-nghiêm-trọng để biết lỗi xảy ra ở bước nào trên máy người dùng.
+- [ ] **CL-53 – Kiểm tra lại sau khi merge nhánh `feature/asc-base-alignment`.** Nhánh này đã bỏ `classifyDevice`/AdMob Android ID khỏi đường khởi động (đổi sang `DspBase.start`, có timeout 6 s, không ném lỗi) nên có thể giảm nguy cơ; **chưa kiểm chứng trên máy**, và vẫn cần CL-49…CL-51.
+- [ ] **CL-54 – Kịch bản test bắt buộc trước khi phát hành:** gỡ app → cài mới → mở lần đầu (đo thời gian đến Splash) → lặp 5 lần trên ít nhất 2 máy (một máy yếu), cả flavor `dev` release và `product` release, cả mở từ trình cài đặt và từ launcher.
+
+---
+
 ## 1. Luồng khởi động mới (bạn yêu cầu)
 
 Hiện tại: `Splash → Onboarding → Setup (quyền → chọn nguồn → quét → kết quả) → Home` (`splash_screen.dart` `nextRoute()`).
@@ -114,6 +141,7 @@ Hiện tại: sau khi cấp quyền, người dùng phải tự **chọn nguồn
 
 ### Gợi ý chia việc cho ngày mai
 
+0. **Làm trước nhất – lỗi màn trắng lần đầu (1 người, cần máy thật):** CL-45…CL-54 (`main.dart`, `launch_background.xml`, `splash_screen.dart`). Nên chốt nguyên nhân trước rồi mới làm phần 1, vì cả hai cùng sửa luồng khởi động.
 1. **Luồng đầu tiên (1 người):** CL-01, CL-02, CL-03, CL-05 (thay đổi chung `splash_screen`, `app_pages`, `setup_controller`).
 2. **Quét tự động (1 người):** CL-06, CL-07, CL-08, CL-09, CL-10 (`library_scan_service`, Kotlin `MediaLibraryHandler`).
 3. **UI/animation (1 người):** mục 3 (rate app, màu nhấn), 5 (CL-22…CL-30).
