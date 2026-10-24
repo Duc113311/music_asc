@@ -51,3 +51,9 @@ app.*.map.json
 *.keystore
 /android/app/google-services.json
 /ios/Runner/GoogleService-Info.plist
+
+# Build automation (python build.py): per-machine counters/notes and secrets
+/build_version.txt
+/build_release_notes.txt
+/build_auth.json
+/tool/build/build_secrets.json

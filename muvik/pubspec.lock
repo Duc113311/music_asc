@@ -25,6 +25,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.7.0"
+  asc_common:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: "96a4c3b"
+      resolved-ref: "96a4c3b573fa16e8c4bb3bb28a004b66881ed7d0"
+      url: "https://github.com/asctechsoft/asc_common.git"
+    source: git
+    version: "0.2.0"
   async:
     dependency: transitive
     description:
@@ -105,6 +114,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.1"
+  connectivity_plus:
+    dependency: transitive
+    description:
+      name: connectivity_plus
+      sha256: d7749fd36d8b404a4935612b94eca7c3ce3705377ab678e24ff2a4301436f741
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.3.2"
+  connectivity_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: connectivity_plus_platform_interface
+      sha256: "3c09627c536d22fd24691a905cdd8b14520de69da52c7a97499c8be5284a32ed"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   cross_file:
     dependency: transitive
     description:
@@ -129,6 +154,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.9"
+  dbus:
+    dependency: transitive
+    description:
+      name: dbus
+      sha256: f7db8504e715b835f5ebe5fe74604ccd961d504c73389a5d8e81bafc2e2f3612
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.8.0"
   device_info_plus:
     dependency: transitive
     description:
@@ -149,11 +182,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "2e8d22ebef6061dc9c1290e3659bd99a5a461948"
-      resolved-ref: "2e8d22ebef6061dc9c1290e3659bd99a5a461948"
+      ref: "2692ce3"
+      resolved-ref: "2692ce31593044bc1723e2d7ecd870ca629939d8"
       url: "https://github.com/asctechsoft/dsp_base_app.git"
     source: git
-    version: "1.1.3"
+    version: "2.0.0"
   equatable:
     dependency: transitive
     description:
@@ -282,30 +315,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.9.0"
-  firebase_messaging:
-    dependency: transitive
-    description:
-      name: firebase_messaging
-      sha256: "47a8142a0b897783103b01018ad69f123b819b0120483847bde30d1b2fa89b36"
-      url: "https://pub.dev"
-    source: hosted
-    version: "16.7.0"
-  firebase_messaging_platform_interface:
-    dependency: transitive
-    description:
-      name: firebase_messaging_platform_interface
-      sha256: f9707e185b8ce1155d58e7e29348245072d99981f899fa8d3214abb2652c4ccb
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.10.0"
-  firebase_messaging_web:
-    dependency: transitive
-    description:
-      name: firebase_messaging_web
-      sha256: "311b16c75fc645c7a70c9ade38908abb12310dfce449fc3d3cee1771f196351e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.2.5"
   firebase_remote_config:
     dependency: transitive
     description:
@@ -351,14 +360,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_animate:
-    dependency: transitive
-    description:
-      name: flutter_animate
-      sha256: "7befe2d3252728afb77aecaaea1dec88a89d35b9b1d2eea6d04479e8af9117b5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.5.2"
   flutter_cache_manager:
     dependency: transitive
     description:
@@ -367,14 +368,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.5"
-  flutter_emoji:
-    dependency: transitive
-    description:
-      name: flutter_emoji
-      sha256: "3cc794d2459738e6489cee63f50e85de3732257042f425611d255c8049ce1b81"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.5.1"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -388,22 +381,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_screenutil:
-    dependency: transitive
-    description:
-      name: flutter_screenutil
-      sha256: "8239210dd68bee6b0577aa4a090890342d04a136ce1c81f98ee513fc0ce891de"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.9.3"
-  flutter_shaders:
-    dependency: transitive
-    description:
-      name: flutter_shaders
-      sha256: "34794acadd8275d971e02df03afee3dee0f98dbfb8c4837082ad0034f612a3e2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.3"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -422,14 +399,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  fluttertoast:
-    dependency: transitive
-    description:
-      name: fluttertoast
-      sha256: "144ddd74d49c865eba47abe31cbc746c7b311c82d6c32e571fd73c4264b740e2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "9.0.0"
   get:
     dependency: "direct main"
     description:
@@ -646,6 +615,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.19.2"
+  nm:
+    dependency: transitive
+    description:
+      name: nm
+      sha256: "2ae480aa3379716b8bb58dfebb168e2919394c92b629efaaa0baaa5d140786e6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.0"
   objective_c:
     dependency: transitive
     description:
@@ -751,13 +728,13 @@ packages:
     source: hosted
     version: "13.0.2"
   permission_handler_android:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: permission_handler_android
-      sha256: "1e3bc410ca1bf84662104b100eb126e066cb55791b7451307f9708d4007350e6"
+      sha256: b1ce660f4d0dcaffdf2605a19544c129fb5adda4e6fd039992ae356c4e437039
       url: "https://pub.dev"
     source: hosted
-    version: "13.0.1"
+    version: "14.1.0"
   permission_handler_apple:
     dependency: transitive
     description:
@@ -1011,14 +988,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.0"
-  system_info_plus:
-    dependency: transitive
-    description:
-      name: system_info_plus
-      sha256: "29bb78cf334e1a6cb1dedb29f1cb134056da7961edbce9ed80bc2571a815c012"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.7"
   term_glyph:
     dependency: transitive
     description:
@@ -1236,5 +1205,5 @@ packages:
     source: hosted
     version: "3.1.4"
 sdks:
-  dart: ">=3.11.0-0 <4.0.0"
+  dart: ">=3.13.3 <4.0.0"
   flutter: ">=3.38.4"

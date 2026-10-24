@@ -8,6 +8,12 @@ class AppConfig {
   static const String playStoreUrl =
       'https://play.google.com/store/apps/details?id=$androidPackage';
 
+  /// Muvik shows no ads yet. While false, startup runs only the Firebase part
+  /// of dsp_base (no AdMob init, no GDPR/UMP consent form for EEA users). Turn
+  /// it on together with real ad unit ids and the real AdMob app id in
+  /// AndroidManifest.xml.
+  static const bool adsEnabled = false;
+
   /// Privacy policy page (hosted on the AscTechSoft site, P20-06).
   static const String privacyPolicyUrl =
       'https://asctechsoft.com/privacy/policy-muvik';

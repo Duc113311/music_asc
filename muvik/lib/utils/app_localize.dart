@@ -1,41 +1,51 @@
 import 'dart:ui';
 
-import 'package:dsp_base/app_localize.dart';
-import 'package:dsp_base/convenience_imports.dart';
+import 'package:asc_common/asc_common.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-/// Muvik's language policy on top of dsp_base [CommLocalize] (P00-09).
+import '../configs/locale_config.dart';
+import '../configs/pref_const.dart';
+
+/// Muvik's language policy on top of asc_common [AscLocale] (P00-09), the same
+/// localization base smart_drink uses.
 ///
-/// CommLocalize loads the XML strings into GetX and keeps the chosen locale in
-/// `PrefComm.CONFIGURED_LOCALE_BY_USER`. Muvik only ships real EN and VI text;
-/// the other CommLocalize folders hold the English fallback
-/// (tool/gen_strings.py), so any other language shows English.
+/// AscLocale loads the XML strings into GetX (`.tr`) and persists the chosen
+/// locale under [PrefConst.language]. Muvik only ships real EN and VI text, so
+/// any other device language resolves to English.
 class AppLocalize {
   AppLocalize._();
 
-  static const Locale fallbackLocale = Locale('en', 'US');
+  static const Locale fallbackLocale = AppLocaleConfig.fallbackLocale;
 
   /// Languages with a real Muvik translation.
-  static const List<Locale> translatedLocales = [
-    Locale('en', 'US'),
-    Locale('vi', 'VN'),
-  ];
+  static const List<Locale> translatedLocales =
+      AppLocaleConfig.supportedLocales;
+
+  /// Key the previous base (dsp_base 1.x `PrefComm`) stored the locale under;
+  /// read once so an upgrade keeps the user's language.
+  static const String _legacyLocaleKey = 'CONFIGURED_LOCALE_BY_USER';
 
   /// Saved choice if translated, else the best match for the device, else
   /// English. The result is saved so the next boot skips detection.
   static Future<Locale> ensureConfigured() async {
-    final saved = CommLocalize.getConfiguredLocale();
-    if (saved != null && translatedLocales.contains(saved)) return saved;
-    final best = resolve(CommLocalize.getSystemLocale());
-    await PrefAssist.setString(
-      PrefComm.CONFIGURED_LOCALE_BY_USER,
-      best.toString(),
-    );
-    return best;
+    AppLocaleConfig.configure();
+    final prefs = await SharedPreferences.getInstance();
+    final followSystem = prefs.getBool(PrefConst.followSystemLanguage) ?? false;
+    final saved = followSystem
+        ? null
+        : _parse(
+            prefs.getString(PrefConst.language) ??
+                prefs.getString(_legacyLocaleKey),
+          );
+    final locale = saved != null && translatedLocales.contains(saved)
+        ? saved
+        : resolve(AscLocale.getSystemLocale());
+    await AscLocale.setAppLocale(locale);
+    return locale;
   }
 
   /// Muvik strings; call after [ensureConfigured] so the app language is known.
-  static Future<void> loadTranslations() =>
-      CommLocalize.loadTranslations('lib/xml_strings', 'strings.xml');
+  static Future<void> loadTranslations() => AscLocale.loadTranslations();
 
   /// Best translated locale for [device], else English.
   static Locale resolve(Locale? device) {
@@ -44,5 +54,11 @@ class AppLocalize {
       (l) => l.languageCode == device.languageCode,
       orElse: () => fallbackLocale,
     );
+  }
+
+  static Locale? _parse(String? value) {
+    if (value == null || value.isEmpty) return null;
+    final parts = value.split('_');
+    return parts.length == 2 ? Locale(parts[0], parts[1]) : Locale(parts[0]);
   }
 }

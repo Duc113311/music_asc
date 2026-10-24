@@ -2,15 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Muvik (dev)",
-      "request": "launch",
-      "type": "dart",
-      "cwd": "muvik",
-      "program": "lib/main.dart",
-      "args": ["--flavor", "dev"]
-    },
-    {
-      "name": "Muvik (alpha)",
+      "name": "Muvik (NoAds Debug)",
       "request": "launch",
       "type": "dart",
       "cwd": "muvik",
@@ -18,7 +10,41 @@
       "args": ["--flavor", "alpha"]
     },
     {
-      "name": "Muvik (product, release)",
+      "name": "Muvik (NoAds Release)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "muvik",
+      "program": "lib/main.dart",
+      "flutterMode": "release",
+      "args": ["--flavor", "alpha"]
+    },
+    {
+      "name": "Muvik (Dev Debug)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "muvik",
+      "program": "lib/main.dart",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "Muvik (Dev Release)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "muvik",
+      "program": "lib/main.dart",
+      "flutterMode": "release",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "Muvik (Product Debug)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "muvik",
+      "program": "lib/main.dart",
+      "args": ["--flavor", "product"]
+    },
+    {
+      "name": "Muvik (Product Release)",
       "request": "launch",
       "type": "dart",
       "cwd": "muvik",

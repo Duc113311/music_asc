@@ -1,18 +1,20 @@
-import 'package:dsp_base/convenience_imports.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Typed access to the SharedPreferences instance owned by dsp_base
-/// [PrefAssist] (initialized by `commRunApp`). Callers always pass a key from
-/// PrefConst and a default from PrefDefaults, so missing keys never fall back
-/// to PrefAssist's implicit ''/0/false.
+/// Typed access to SharedPreferences. Callers always pass a key from PrefConst
+/// and a default from PrefDefaults, so missing keys never fall back to an
+/// implicit ''/0/false.
 class PrefStore {
   PrefStore._();
 
+  static SharedPreferences? _prefs;
+
   /// Idempotent; tests call it after `SharedPreferences.setMockInitialValues`.
-  static Future<void> init() => PrefAssist.init();
+  static Future<void> init() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
 
   static SharedPreferences get _p {
-    final p = PrefAssist.pref;
+    final p = _prefs;
     if (p == null) {
       throw StateError('PrefStore.init() must complete before use');
     }

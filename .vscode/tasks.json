@@ -1,0 +1,44 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build APK (menu)",
+      "type": "shell",
+      "command": "python",
+      "args": ["build.py"],
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "shared", "focus": true },
+      "problemMatcher": [],
+      "options": { "cwd": "${workspaceFolder}/muvik" }
+    },
+    {
+      "label": "Build AAB (Play Store)",
+      "type": "shell",
+      "command": "python",
+      "args": ["tool/build/build_aab.py"],
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared", "focus": true },
+      "problemMatcher": [],
+      "options": { "cwd": "${workspaceFolder}/muvik" }
+    },
+    {
+      "label": "Check strings",
+      "type": "shell",
+      "command": "python",
+      "args": ["build.py", "check-strings"],
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": [],
+      "options": { "cwd": "${workspaceFolder}/muvik" }
+    },
+    {
+      "label": "Flutter analyze + test",
+      "type": "shell",
+      "command": "flutter analyze; flutter test",
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": [],
+      "options": { "cwd": "${workspaceFolder}/muvik" }
+    }
+  ]
+}
