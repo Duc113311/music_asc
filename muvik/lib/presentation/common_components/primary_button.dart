@@ -125,11 +125,10 @@ class _PrimaryButtonState extends State<PrimaryButton> {
       ],
     );
 
-    final radius = BorderRadius.circular(
-      v == ButtonVariant.primary || v == ButtonVariant.gradient
-          ? AppRadius.full
-          : AppRadius.button,
-    );
+    // Every variant is a full pill, so the fill, the border and the tap
+    // ripple share one shape (the secondary/tertiary buttons used to have
+    // rounded corners of 16 and a ripple that did not look round).
+    final radius = BorderRadius.circular(AppRadius.full);
     return Semantics(
       button: true,
       enabled: !_disabled,

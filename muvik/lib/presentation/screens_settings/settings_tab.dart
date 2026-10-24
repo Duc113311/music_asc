@@ -228,7 +228,7 @@ class SettingsTab extends StatelessWidget {
                           'about_version'
                               .trParams({'args1': snap.data!.version}),
                           style: AppTypography.caption.copyWith(
-                            fontSize: 12.5,
+                            fontSize: 14,
                             color: c.textMuted,
                           ),
                         ),

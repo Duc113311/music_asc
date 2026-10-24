@@ -57,6 +57,8 @@ class _SleepSheetState extends State<_SleepSheet> {
               child: PrimaryButton(
                 label: 'sleep_custom'.tr,
                 variant: ButtonVariant.secondary,
+                // Same height and pill shape as "Bắt đầu" next to it.
+                height: AppSizes.buttonSecondary,
                 onPressed: () async {
                   Get.back<void>();
                   await Get.toNamed(RouteName.sleepTimer);
@@ -69,6 +71,7 @@ class _SleepSheetState extends State<_SleepSheet> {
                   ? PrimaryButton(
                       label: 'sleep_cancel'.tr,
                       variant: ButtonVariant.destructive,
+                      height: AppSizes.buttonSecondary,
                       onPressed: () async {
                         await pc.sleepTimer.cancel();
                         Get.back<void>();
@@ -115,8 +118,14 @@ class _SleepSheetState extends State<_SleepSheet> {
             if (!active)
               InkWell(
                 onTap: () => setState(() => _wait = !_wait),
+                // Rounded like the info card below, with room on the sides so
+                // the tap highlight does not touch the checkbox or the text.
+                borderRadius: BorderRadius.circular(AppRadius.input),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: AppSpacing.sm,
+                  ),
                   child: Row(
                     children: [
                       AppCheckbox(value: _wait),

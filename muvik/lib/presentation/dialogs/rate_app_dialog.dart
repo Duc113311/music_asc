@@ -141,9 +141,12 @@ class _RateDialogState extends State<_RateDialog> {
                     if (!ok) ToastUtils.error('error_no_store_app'.tr);
                   },
           ),
+          const SizedBox(height: AppSpacing.xs),
           PrimaryButton(
             label: 'action_later'.tr,
             variant: ButtonVariant.tertiary,
+            // Same height as "Đánh giá" above it.
+            height: AppSizes.buttonPrimary,
             onPressed: () async => Get.back<void>(),
           ),
         ],

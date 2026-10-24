@@ -52,8 +52,8 @@ class AppTypography {
     fontWeight: FontWeight.w400,
   );
   static const TextStyle navigation = TextStyle(
-    fontSize: 12,
-    height: 16 / 12,
+    fontSize: 13.5,
+    height: 18 / 13.5,
     fontWeight: FontWeight.w600,
   );
   static const TextStyle songTitle = TextStyle(
