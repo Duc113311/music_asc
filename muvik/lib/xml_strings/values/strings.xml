@@ -576,6 +576,7 @@
     <string name="explore_month">Most played this month</string>
     <string name="explore_month_desc">Your top songs of the month</string>
     <string name="settings_privacy_desc">How Muvik handles your data</string>
+    <string name="settings_share_message">Listen to the music on your phone, offline, with Muvik:</string>
     <string name="eq_loud_mode">Loud sound</string>
     <string name="eq_loud_mode_desc">Compressor and limiter: loud, dense and even like TikTok</string>
     <string name="eq_preset_tiktok">TikTok</string>

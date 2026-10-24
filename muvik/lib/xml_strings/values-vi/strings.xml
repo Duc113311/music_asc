@@ -576,6 +576,7 @@
     <string name="explore_month">Nghe nhiều tháng này</string>
     <string name="explore_month_desc">Top bài hát trong tháng</string>
     <string name="settings_privacy_desc">Cách Muvik xử lý dữ liệu của bạn</string>
+    <string name="settings_share_message">Nghe nhạc trong máy không cần mạng với Muvik:</string>
     <string name="eq_loud_mode">Âm thanh lớn</string>
     <string name="eq_loud_mode_desc">Nén âm và giới hạn đỉnh: nghe to, dày và đều như TikTok</string>
     <string name="eq_preset_tiktok">TikTok</string>

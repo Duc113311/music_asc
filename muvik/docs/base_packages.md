@@ -85,3 +85,31 @@ Optional secrets (never committed): `ASC_TELEGRAM_BOT_TOKEN`, `ASC_TELEGRAM_CHAT
 variables, or the same keys in `tool/build/build_secrets.json`. Firebase App Distribution
 uses `build_auth.json` (service account) or the logged-in `firebase` CLI. Missing values
 only skip that step.
+
+## Structure parity with smart_drink
+
+Same layout, same helper names, so a developer moving between the two apps finds things in the same place.
+
+| smart_drink | Muvik | Note |
+|---|---|---|
+| `lib/configs/app_figs.dart` | same | `AscBuildFlavor` alias |
+| `lib/configs/locale_config.dart` | same | Muvik: EN + VI only |
+| `lib/configs/ads_config.dart` | same | Google sample units, ads are off |
+| `lib/configs/legal_config.dart` + `utils/legal_utils.dart` | same | privacy policy URL + opener |
+| `lib/services/app_ads.dart` | same | shared App Open ad |
+| `lib/utils/analytics.dart` + `route_analytics.dart` | same | gateway with the `screen_view` event only; spec in `docs/analytics_spec.md` |
+| `lib/utils/share_utils.dart`, `loading_utils.dart`, `toast_utils.dart` | same | `ToastUtils.show(message)` has no context argument in Muvik |
+| `build.py` + `dsp_base/build_helper.py` | `build.py` + `tool/build/build_helper.py` | secrets removed, see above |
+| `.vscode/launch.json`, `tasks.json` | same (in the repo root) | six run configs + build tasks |
+| `.mcp.json` (Figma) | `../.mcp.json` | repo root |
+| `devtools_options.yaml`, `analysis_options.yaml` | same | |
+| `CLAUDE.md`, `docs/` | same | |
+
+Not copied on purpose: smart_drink's real AdMob unit ids and keystores, the `.claude/settings.json`
+Stop hook that runs `python3 build.py claude` after every Claude turn (see below), Firestore/Firebase
+hosting files (Muvik has no Firestore), water-specific events and the guided `tour`.
+
+The Stop hook builds and distributes an APK after every Claude Code turn. It is a standing action with side
+effects (build time, version bump, tester notification), so it is not enabled here. To turn it on,
+create `.claude/settings.json` in the repo root with
+`{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"cd \"$CLAUDE_PROJECT_DIR/muvik\" && python build.py claude"}]}]}}`.

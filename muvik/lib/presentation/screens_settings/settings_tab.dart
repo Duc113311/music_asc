@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-import '../../configs/app_config.dart';
 import '../../controller/playback_controller.dart';
 import '../../controller/settings_controller.dart';
-import '../../services/feedback_service.dart';
 import '../../utils/duration_formatter.dart';
-import '../../utils/toast_utils.dart';
+import '../../utils/legal_utils.dart';
 import '../../values/app_colors.dart';
 import '../../values/app_typography.dart';
 import '../../values/route_name.dart';
@@ -183,17 +181,7 @@ class SettingsTab extends StatelessWidget {
                     icon: const _GradientIcon(Icons.privacy_tip_outlined),
                     title: 'about_privacy'.tr,
                     subtitle: 'settings_privacy_desc'.tr,
-                    onTap: () async {
-                      final ok = await FeedbackService.openUrl(
-                        AppConfig.privacyPolicyUrl,
-                      );
-                      if (!ok) {
-                        ToastUtils.show(
-                          'about_privacy_unavailable'.tr,
-                          type: ToastType.warning,
-                        );
-                      }
-                    },
+                    onTap: LegalUtils.openPrivacyPolicy,
                   ),
                   if (kDebugMode)
                     _Row(

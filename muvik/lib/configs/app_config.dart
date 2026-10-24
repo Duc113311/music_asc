@@ -14,10 +14,6 @@ class AppConfig {
   /// AndroidManifest.xml.
   static const bool adsEnabled = false;
 
-  /// Privacy policy page (hosted on the AscTechSoft site, P20-06).
-  static const String privacyPolicyUrl =
-      'https://asctechsoft.com/privacy/policy-muvik';
-
   /// OAuth "Web client" id of the publisher's Google Cloud project, needed by
   /// Google sign-in on Android (P15-01). Taken from google-services.json
   /// (Firebase project muvik-app, oauth_client type 3). Not a secret.
