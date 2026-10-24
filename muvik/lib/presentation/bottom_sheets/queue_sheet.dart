@@ -139,10 +139,8 @@ class _QueueSheet extends StatelessWidget {
                   ),
                 SliverReorderableList(
                   itemCount: upcoming.length,
-                  onReorder: (from, to) {
-                    if (to > from) to -= 1;
-                    pc.handler.reorderUpcoming(from, to);
-                  },
+                  onReorderItem: (from, to) =>
+                      pc.handler.reorderUpcoming(from, to),
                   itemBuilder: (context, i) {
                     final QueueEntry e = upcoming[i];
                     return Material(

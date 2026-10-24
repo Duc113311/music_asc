@@ -1,3 +1,4 @@
+import 'package:asc_common/asc_common.dart' show AscLocale, LanguageNames;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,6 +7,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../controller/playback_controller.dart';
 import '../../controller/settings_controller.dart';
 import '../../utils/duration_formatter.dart';
+import '../../utils/app_localize.dart';
 import '../../utils/legal_utils.dart';
 import '../../values/app_colors.dart';
 import '../../values/app_typography.dart';
@@ -42,6 +44,21 @@ class SettingsTab extends StatelessWidget {
                     title: 'settings_scan'.tr,
                     subtitle: 'settings_scan_desc'.tr,
                     onTap: () => Get.toNamed(RouteName.scanLibrary),
+                  ),
+                  Obx(
+                    () => _Row(
+                      icon: const _GradientIcon(Icons.sync_rounded),
+                      title: 'settings_auto_scan'.tr,
+                      subtitle: 'settings_auto_scan_desc'.tr,
+                      chevron: false,
+                      trailing: Switch(
+                        value: settings.autoScanNewMusic.value,
+                        onChanged: settings.setAutoScanNewMusic,
+                      ),
+                      onTap: () => settings.setAutoScanNewMusic(
+                        !settings.autoScanNewMusic.value,
+                      ),
+                    ),
                   ),
                   Obx(() {
                     final st = pc.sleep.value;
@@ -129,6 +146,16 @@ class SettingsTab extends StatelessWidget {
                       ),
                       onTap: showAccentSheet,
                     ),
+                  ),
+                  _Row(
+                    icon: const _GradientIcon(Icons.language_rounded),
+                    title: 'settings_language'.tr,
+                    subtitle: 'settings_language_desc'.tr,
+                    value: LanguageNames.nativeName(
+                      AppLocalize.resolve(AscLocale.getAppLocale()),
+                    ),
+                    onTap: () =>
+                        Get.toNamed(RouteName.language, arguments: true),
                   ),
                 ],
               ),

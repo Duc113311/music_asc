@@ -1,6 +1,6 @@
 /// Asset paths (ASCII snake_case). Screen mapping:
-/// - img_logo_app_v2 (png): splash, about, rate dialog
-/// - bg_on_01..03: sc_onBrg_01..03
+/// - img_logo_muvik_v4 (png): splash, about, rate dialog; also the source of the launcher icons
+/// - bg_on_01..03 (webp): backgrounds of sc_onBrg_01..03
 /// - ic_step_01..03: sc_step_01..03
 /// - bg_theme_dark/light: splash backgrounds
 /// - img_theme_cover: cover art in the sc_theme player mockups
@@ -13,7 +13,11 @@
 class AppAssets {
   AppAssets._();
   static const String _webp = 'assets/images/webp';
-  static const String logo = 'assets/images/png/img_logo_app_v2.png';
+  // Home hero slides (1706x922, artwork on the right, dark on the left for text).
+  static const String homeSlide1 = '$_webp/slide_1.webp';
+  static const String homeSlide2 = '$_webp/slide_2.webp';
+  static const String homeSlide3 = '$_webp/slide_3.webp';
+  static const String logo = 'assets/images/png/img_logo_muvik_v4.png';
   static const String onboarding1 = '$_webp/bg_on_01.webp';
   static const String onboarding2 = '$_webp/bg_on_02.webp';
   static const String onboarding3 = '$_webp/bg_on_03.webp';

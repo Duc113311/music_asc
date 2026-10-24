@@ -28,6 +28,7 @@ import urllib.request
 
 PATH_APK = os.path.join("build", "app", "outputs", "flutter-apk")
 RELEASE_NOTES_FILE = "build_release_notes.txt"
+DISTRIBUTE_TIMEOUT_S = 15 * 60
 VERSION_FILE = "build_version.txt"
 
 MENU_OPTIONS = [
@@ -216,10 +217,27 @@ def distribute_apk(build):
     env = os.environ.copy()
     if build.service_account and os.path.exists(build.service_account):
         env["GOOGLE_APPLICATION_CREDENTIALS"] = build.service_account
-    r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
-    print(r.stdout)
-    if r.returncode != 0:
-        print(f"Error distributing {path}: {r.stderr}")
+    # Stream the CLI output as it arrives (the upload of a 30 MB APK takes
+    # minutes and a silent terminal looks like a hang) and stop waiting after
+    # DISTRIBUTE_TIMEOUT_S so a stuck upload cannot block the build forever.
+    print(f"Uploading {path} to Firebase App Distribution (testers: {build.testers})...")
+    proc = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+        encoding="utf-8", errors="replace", env=env,
+    )
+    timer = threading.Timer(DISTRIBUTE_TIMEOUT_S, proc.kill)
+    timer.start()
+    try:
+        for line in proc.stdout:
+            print("  firebase:", line.rstrip())
+        proc.wait()
+    finally:
+        timed_out = not timer.is_alive()
+        timer.cancel()
+    if timed_out and proc.returncode != 0:
+        print(f"Firebase upload stopped after {DISTRIBUTE_TIMEOUT_S // 60} minutes.")
+    elif proc.returncode != 0:
+        print(f"Error distributing {path} (exit code {proc.returncode}).")
 
 
 # --- notifications (optional) ------------------------------------------------
@@ -311,12 +329,21 @@ def check_strings():
     return subprocess.run([sys.executable, script]).returncode == 0
 
 
-def main_build(argv, package_name, tester_emails="", tool_dir=None):
-    """`python build.py [flavor] [debug|release]`; no args shows the menu."""
+def main_build(argv, package_name, tester_emails="", email_to="", email_from="",
+               tool_dir=None):
+    """`python build.py [flavor] [debug|release]`; no args shows the menu.
+
+    [tester_emails]: Firebase App Distribution testers (comma separated).
+    [email_to]/[email_from]: build-result e-mail addresses (not secrets); the
+    SMTP password is never passed here, it comes from ASC_EMAIL_PASSWORD or
+    tool/build/build_secrets.json. Env vars / the secrets file override both.
+    """
     build = Build()
-    build.testers = tester_emails or os.environ.get("ASC_TESTER_EMAILS", "")
+    build.testers = os.environ.get("ASC_TESTER_EMAILS") or tester_emails
     build.service_account = os.path.join(os.getcwd(), "build_auth.json")
     build.secrets = load_secrets(tool_dir or os.path.dirname(os.path.abspath(__file__)))
+    build.secrets.setdefault("email_to", email_to)
+    build.secrets.setdefault("email_from", email_from)
     build.firebase_app_id = firebase_app_id_from_google_services(package_name)
 
     if len(argv) > 1 and argv[1].lower() == "check-strings":

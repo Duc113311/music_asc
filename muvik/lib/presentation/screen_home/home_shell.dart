@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 
 import '../../controller/library_controller.dart';
 import '../../controller/playback_controller.dart';
+import '../../controller/settings_controller.dart';
+import '../../models/ui_models/scan_state.dart';
 import '../../services/application/app_lifecycle_service.dart';
 import '../../services/native/nudge_service.dart';
 import '../../services/application/listening_stats_service.dart';
@@ -42,6 +44,7 @@ class _HomeShellState extends State<HomeShell> {
       ..addResumedListener(_onResumed)
       ..addBackgroundListener(_onBackground);
     WidgetsBinding.instance.addPostFrameCallback((_) => NudgeService.refresh());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkNewMusic());
     // Cold start from the media notification: show Now Playing (P17-06).
     if (AudioService.notificationClicked.value) {
       WidgetsBinding.instance.addPostFrameCallback(
@@ -66,6 +69,32 @@ class _HomeShellState extends State<HomeShell> {
   void _onResumed() {
     LibraryController.to.scanService.refreshOnResume();
     NudgeService.refresh();
+    _checkNewMusic();
+  }
+
+  /// Quiet check for songs added or removed since the last scan: nothing is
+  /// scanned until the user taps "Quét nhạc" on the toast.
+  Future<void> _checkNewMusic() async {
+    final scan = LibraryController.to.scanService;
+    final diff = await scan.checkForChanges();
+    if (diff == 0 || !mounted) return;
+    if (SettingsController.to.autoScanNewMusic.value) {
+      final result = await scan.scan();
+      if (!mounted) return;
+      if (result.status == ScanStatus.success ||
+          result.status == ScanStatus.partial) {
+        ToastUtils.success('scan_done'.tr);
+      }
+      return;
+    }
+    ToastUtils.show(
+      diff > 0
+          ? 'scan_new_found'.trParams({'args1': '$diff'})
+          : 'scan_library_changed'.tr,
+      actionLabel: 'action_scan_music'.tr,
+      onAction: scan.scan,
+      duration: const Duration(seconds: 10),
+    );
   }
 
   void _onBackground() {

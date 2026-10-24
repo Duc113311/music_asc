@@ -1,7 +1,7 @@
 # Muvik
 
 Offline local music player for Android (iOS project scaffolded, not in scope yet).
-No account or network is needed to listen; Google sign-in is optional.
+No account, sign-in or network is needed to listen.
 
 ## Run
 
@@ -24,7 +24,7 @@ Product x Debug / Release) and `.vscode/tasks.json` the build tasks.
 
 | File | Why |
 |---|---|
-| `android/app/google-services.json` | Firebase project `muvik-app` (Crashlytics, Analytics, Google sign-in client ids). Download it from the Firebase console (Project settings → Android app `com.asctechsoft.muvik`); the build fails without it. Google sign-in only works when the machine's SHA-1 (`keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android`) is registered there |
+| `android/app/google-services.json` | Firebase project `muvik-app` (Crashlytics, Analytics). Download it from the Firebase console (Project settings → Android app `com.asctechsoft.muvik`); the build fails without it. Google sign-in only works when the machine's SHA-1 (`keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android`) is registered there |
 | `android/key.properties` | Only for store signing (`keyAlias`, `keyPassword`, `storeFile`, `storePassword`). Without it release builds are signed with the debug key |
 
 No other local file is needed; a fresh clone builds with just `google-services.json`.
@@ -97,7 +97,6 @@ Figma key → file → route: see [docs/screen_map.md](docs/screen_map.md).
 
 - Locking the screen keeps playing; power-off or force-stop ends playback (restored paused on next launch).
 - Swipe-away from Recents keeps playing while Android keeps the media service; behaviour varies by OEM.
-- Google sign-in needs `AppConfig.googleServerClientId` and an OAuth client for the release SHA-1; until then the button reports "not configured" and local use is unaffected.
 - `AppConfig.privacyPolicyUrl` must be set before release.
 - Release signing: create `android/key.properties` + keystore (git-ignored); `app/build.gradle.kts` picks it up for release builds and falls back to the debug key without it.
 - Gradle heap is set to 3 GB (`android/gradle.properties`) because the dev machine has limited free RAM; raise it on CI if builds are slow.

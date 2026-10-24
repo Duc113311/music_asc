@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../configs/app_config.dart';
+import '../../configs/pref_const.dart';
+import '../../configs/pref_defaults.dart';
 import '../../models/data_models/excluded_item.dart';
 import '../../models/data_models/music_source.dart';
 import '../../models/data_models/song.dart';
@@ -13,6 +15,7 @@ import '../../repository/song_repository.dart';
 import '../../repository/source_repository.dart';
 import '../native/media_library_channel.dart';
 import '../storage/database_helper.dart';
+import '../storage/pref_store.dart';
 import 'library_data_service.dart';
 import 'song_identity.dart';
 import '../../utils/app_log.dart';
@@ -278,6 +281,9 @@ class LibraryScanService {
               ? (s.processed > 0 ? ScanStatus.partial : ScanStatus.error)
               : (s.skipped > 0 ? ScanStatus.partial : ScanStatus.success));
       s = s.copyWith(status: status);
+      if (status == ScanStatus.success || status == ScanStatus.partial) {
+        await _rememberDeviceCount();
+      }
     } catch (e, st) {
       AppLog.error('LibraryScanService.scan', e, st);
       s = s.copyWith(status: ScanStatus.error, errorCode: e.toString());
@@ -480,6 +486,60 @@ class LibraryScanService {
         ? relativePath.substring(0, relativePath.length - 1)
         : relativePath;
     return rel.isEmpty ? root : '$root/$rel';
+  }
+
+  /// MediaStore audio files on the enabled, accessible volumes (SAF folders
+  /// have no cheap count and are left out).
+  Future<int> _deviceAudioCount() async {
+    var n = 0;
+    for (final s in sources.value) {
+      if (s.accessible && s.enabled && s.type == SourceType.volume) {
+        n += await MediaLibraryChannel.countVolume(s.uri);
+      }
+    }
+    return n;
+  }
+
+  Future<void> _rememberDeviceCount() async {
+    try {
+      await PrefStore.setInt(
+        PrefConst.lastDeviceAudioCount,
+        await _deviceAudioCount(),
+      );
+    } catch (e) {
+      AppLog.info('LibraryScanService.rememberDeviceCount: $e');
+    }
+  }
+
+  int? _notifiedFor;
+
+  /// Cheap "is there new music?" check (no scan): compares the number of
+  /// audio files on the device with the number seen at the last scan.
+  /// Returns the signed difference (> 0 new files, < 0 removed), or 0 when
+  /// nothing changed, there is no permission, a scan is running, or this
+  /// exact change was already reported. A first run with no remembered count
+  /// just records it.
+  Future<int> checkForChanges() async {
+    try {
+      if (state.value.isRunning) return 0;
+      if (await checkPermission() != AudioPermissionStatus.granted) return 0;
+      await refreshSources();
+      final now = await _deviceAudioCount();
+      final saved = PrefStore.getInt(
+        PrefConst.lastDeviceAudioCount,
+        PrefDefaults.lastDeviceAudioCount,
+      );
+      if (saved < 0) {
+        await PrefStore.setInt(PrefConst.lastDeviceAudioCount, now);
+        return 0;
+      }
+      if (now == saved || now == _notifiedFor) return 0;
+      _notifiedFor = now;
+      return now - saved;
+    } catch (e) {
+      AppLog.info('LibraryScanService.checkForChanges: $e');
+      return 0;
+    }
   }
 
   /// Light check on resume: permission + source availability, no full scan

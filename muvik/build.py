@@ -20,6 +20,10 @@ if __name__ == "__main__":
     main_build(
         argv=sys.argv,
         package_name="com.asctechsoft.muvik",
-        # Firebase App Distribution testers; or set ASC_TESTER_EMAILS.
-        tester_emails="",
+        # Same recipients as smart_drink. Override with ASC_TESTER_EMAILS,
+        # ASC_EMAIL_TO, ASC_EMAIL_FROM. The e-mail password is NOT here: set
+        # ASC_EMAIL_PASSWORD or tool/build/build_secrets.json.
+        tester_emails="asctechsoft888@gmail.com",
+        email_to="dsp.entertainment.99@gmail.com",
+        email_from="dsp.entertainment.99@gmail.com",
     )

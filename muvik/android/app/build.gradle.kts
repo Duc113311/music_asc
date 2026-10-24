@@ -92,6 +92,15 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
+            // R8 shrinks and obfuscates release builds; proguard-rules.pro
+            // keeps what is only reached by name (audio_service, just_audio,
+            // the native handlers).
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }

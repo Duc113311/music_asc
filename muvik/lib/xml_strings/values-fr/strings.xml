@@ -19,11 +19,6 @@
     <string name="accent_pink">Pink</string>
     <string name="accent_preview">Preview</string>
     <string name="accent_teal">Teal</string>
-    <string name="account_desc">Sign in to connect your account</string>
-    <string name="account_google_sign_in">Sign in with Google</string>
-    <string name="account_optional">You can listen to music without signing in.</string>
-    <string name="account_sign_out">Sign out</string>
-    <string name="account_title">Muvik account</string>
     <string name="action_add_playlist">Add to playlist</string>
     <string name="action_add_queue">Add to queue</string>
     <string name="action_apply">Apply</string>
@@ -503,8 +498,6 @@
     <string name="toast_removed_from_playlist">Removed from playlist</string>
     <string name="toast_removed_from_queue">Removed from queue</string>
     <string name="toast_saved">Saved</string>
-    <string name="toast_signed_in">Signed in</string>
-    <string name="toast_signed_out">Signed out</string>
     <string name="toast_timer_cancelled">Sleep timer cancelled</string>
     <string name="toast_timer_started">Music will stop at %1$s</string>
     <string name="transitions_desc">Use smooth transitions between screens.</string>
@@ -525,4 +518,28 @@
     <string name="weekday_short_5">Fri</string>
     <string name="weekday_short_6">Sat</string>
     <string name="weekday_short_7">Sun</string>
+    <string name="language_title">Choose your language</string>
+    <string name="language_subtitle">You can change it any time in Settings.</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_desc">Language of the app</string>
+    <string name="scan_new_found">%1$s new songs found</string>
+    <string name="scan_library_changed">Your music changed on the phone</string>
+    <string name="settings_auto_scan">Scan new music automatically</string>
+    <string name="settings_auto_scan_desc">Add new songs without asking</string>
+    <string name="home_s1_badge">For you</string>
+    <string name="home_s1_title">Daily Mix</string>
+    <string name="home_s1_sub">Familiar tunes,
+fresh inspiration</string>
+    <string name="home_s1_cta">Shuffle play</string>
+    <string name="home_s2_badge">Rediscover the feeling</string>
+    <string name="home_s2_title">Not played
+in a while</string>
+    <string name="home_s2_sub">Meet the songs you
+once loved again</string>
+    <string name="home_s2_cta">Rediscover</string>
+    <string name="home_s3_badge">Get in the mood</string>
+    <string name="home_s3_title">Power up
+your energy</string>
+    <string name="home_s3_sub">Upbeat rhythms from
+your library</string>
 </resources>

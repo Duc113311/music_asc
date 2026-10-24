@@ -99,7 +99,9 @@ class AppSwitch extends StatelessWidget {
         type: MaterialType.transparency,
         child: InkResponse(
           onTap: enabled ? () => onChanged!(!value) : null,
-          radius: AppSizes.touch / 2,
+          customBorder: const StadiumBorder(),
+          containedInkWell: true,
+          highlightShape: BoxShape.rectangle,
           child: SizedBox(
             width: AppSizes.touch + 8,
             height: AppSizes.touch,

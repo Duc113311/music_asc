@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import '../../controller/library_controller.dart';
 import '../../controller/playback_controller.dart';
 import '../../models/data_models/song.dart';
+import '../../utils/mood_rules.dart';
 import '../../values/app_assets.dart';
 import '../../values/app_colors.dart';
 import '../../values/app_dimensions.dart';
@@ -245,22 +246,39 @@ const _headerPad = EdgeInsets.fromLTRB(
   0,
 );
 
-class _BannerData {
-  const _BannerData({
+/// One hero slide of Home: artwork + copy + one action, in the colors of its
+/// accent (purple Daily Mix, cyan "not played in a while", coral energy).
+class _SlideData {
+  const _SlideData({
     required this.image,
-    required this.title,
+    required this.accent,
+    required this.badge,
+    required this.titleSpans,
     required this.subtitle,
-    required this.onPlay,
-    this.badge,
+    required this.buttonLabel,
+    required this.buttonIcon,
+    required this.buttonFill,
+    required this.buttonText,
+    required this.onTap,
   });
+
   final String image;
-  final String title;
+
+  /// Eyebrow, card border and the active page dot.
+  final Color accent;
+  final String badge;
+  final List<TextSpan> titleSpans;
   final String subtitle;
-  final String? badge;
-  final VoidCallback onPlay;
+  final String buttonLabel;
+  final IconData buttonIcon;
+  final Color buttonFill;
+  final Color buttonText;
+  final VoidCallback onTap;
+
+  String get title => titleSpans.map((s) => s.text).join();
 }
 
-/// Swipeable hero slides on Home (replaces the old "Nhạc của bạn" card).
+/// Swipeable hero slides on Home (one at a time, dots under the card).
 class _HomeBanners extends StatefulWidget {
   const _HomeBanners();
 
@@ -272,212 +290,327 @@ class _HomeBannersState extends State<_HomeBanners> {
   final _controller = PageController();
   int _page = 0;
 
+  /// Slide artwork size (1706x922): the card keeps that ratio, nothing is
+  /// cropped.
+  static const double _ratio = 1706 / 922;
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
-  List<_BannerData> _slides() {
-    final lib = LibraryController.to;
-    final pc = PlaybackController.to;
-    final song = pc.state.value.currentSong;
-    final most = lib.mostPlayed(limit: 50);
-    final least = lib.leastPlayed(limit: 50);
+  /// "Daily Mix" -> white "Daily " + lavender "Mix".
+  List<TextSpan> _twoTone(String t, Color first, Color rest) {
+    final i = t.indexOf(' ');
+    if (i <= 0) return [TextSpan(text: t, style: TextStyle(color: rest))];
     return [
-      if (song != null)
-        _BannerData(
-          image: AppAssets.sleepSunset,
-          badge: 'home_continue'.tr,
-          title: song.displayTitle,
-          subtitle: song.artistOrNull ?? 'unknown_artist'.tr,
-          onPlay: () {
-            if (!pc.state.value.playing) pc.togglePlay();
-            pc.openNowPlaying();
-          },
+      TextSpan(text: t.substring(0, i + 1), style: TextStyle(color: first)),
+      TextSpan(text: t.substring(i + 1), style: TextStyle(color: rest)),
+    ];
+  }
+
+  /// First line white, the other lines in [rest].
+  List<TextSpan> _lines(String t, Color first, Color rest) {
+    final i = t.indexOf('\n');
+    if (i <= 0) return [TextSpan(text: t, style: TextStyle(color: rest))];
+    return [
+      TextSpan(text: t.substring(0, i + 1), style: TextStyle(color: first)),
+      TextSpan(text: t.substring(i + 1), style: TextStyle(color: rest)),
+    ];
+  }
+
+  // Looked up when a button is tapped, not while building the slides.
+  LibraryController get _lib => LibraryController.to;
+  PlaybackController get _pc => PlaybackController.to;
+
+  List<_SlideData> _slides() {
+    const purple = Color(0xFF8E6BFF);
+    const cyan = Color(0xFF7FDCFB);
+    const coral = Color(0xFFF0746E);
+    return [
+      _SlideData(
+        image: AppAssets.homeSlide1,
+        accent: purple,
+        badge: 'home_s1_badge'.tr,
+        titleSpans: _twoTone(
+          'home_s1_title'.tr,
+          Colors.white,
+          const Color(0xFFB9A3FF),
         ),
-      _BannerData(
-        image: AppAssets.exploreRandom,
-        badge: 'home_banner_badge'.tr,
-        title: 'explore_random'.tr,
-        subtitle: 'explore_random_desc'.tr,
-        onPlay: () => pc.playAll(lib.songs.toList(), shuffle: true),
+        subtitle: 'home_s1_sub'.tr,
+        buttonLabel: 'home_s1_cta'.tr,
+        buttonIcon: Icons.shuffle_rounded,
+        buttonFill: const Color(0xFF7C5CF4),
+        buttonText: Colors.white,
+        onTap: () => _pc.playAll(_lib.songs.toList(), shuffle: true),
       ),
-      if (most.isNotEmpty)
-        _BannerData(
-          image: AppAssets.exploreReplay,
-          badge: 'home_banner_badge'.tr,
-          title: 'explore_replay'.tr,
-          subtitle: 'explore_replay_desc'.tr,
-          onPlay: () => pc.playAll(most),
-        ),
-      if (least.isNotEmpty)
-        _BannerData(
-          image: AppAssets.exploreLeast,
-          badge: 'home_banner_badge'.tr,
-          title: 'explore_least'.tr,
-          subtitle: 'explore_least_desc'.tr,
-          onPlay: () => pc.playAll(least),
-        ),
+      _SlideData(
+        image: AppAssets.homeSlide2,
+        accent: cyan,
+        badge: 'home_s2_badge'.tr,
+        titleSpans: [
+          TextSpan(
+            text: 'home_s2_title'.tr,
+            style: const TextStyle(color: Color(0xFF8FE3FF)),
+          ),
+        ],
+        subtitle: 'home_s2_sub'.tr,
+        buttonLabel: 'home_s2_cta'.tr,
+        buttonIcon: Icons.explore_outlined,
+        buttonFill: cyan,
+        buttonText: const Color(0xFF08233A),
+        // "Rediscover": the list of the least played songs.
+        onTap: () {
+          final least = _lib.leastPlayed();
+          AppNav.openSongs(
+            SongListArgs(
+              title: 'explore_least'.tr,
+              subtitle: 'explore_least_desc'.tr,
+              songs: () => least,
+              emptyMessage: 'home_recent_empty'.tr,
+            ),
+          );
+        },
+      ),
+      _SlideData(
+        image: AppAssets.homeSlide3,
+        accent: coral,
+        badge: 'home_s3_badge'.tr,
+        titleSpans: _lines('home_s3_title'.tr, Colors.white, coral),
+        subtitle: 'home_s3_sub'.tr,
+        buttonLabel: 'home_listen_now'.tr,
+        buttonIcon: Icons.play_arrow_rounded,
+        buttonFill: const Color(0xFFEF7A74),
+        buttonText: Colors.white,
+        // Upbeat genres first, else what is played most, else a mix.
+        onTap: () {
+          var songs = _lib.songsByMood(Mood.energetic);
+          if (songs.isEmpty) songs = _lib.mostPlayed();
+          if (songs.isEmpty) songs = _lib.randomMix();
+          _pc.playAll(songs, shuffle: true);
+        },
+      ),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      PlaybackController.to.state.value; // rebuild on playback changes
-      final slides = _slides();
-      final page = _page.clamp(0, slides.length - 1);
-      return Padding(
-        padding: const EdgeInsets.only(top: AppSpacing.md),
-        child: SizedBox(
-          height: 190,
-          child: PageView.builder(
-            controller: _controller,
-            itemCount: slides.length,
-            onPageChanged: (i) => setState(() => _page = i),
-            itemBuilder: (_, i) => Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.screenH,
-              ),
-              child: _BannerCard(
-                data: slides[i],
-                count: slides.length,
-                index: page,
-              ),
-            ),
+    final slides = _slides();
+    final page = _page.clamp(0, slides.length - 1);
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.md),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          LayoutBuilder(
+            builder: (context, box) {
+              final cardW = box.maxWidth - 2 * AppSpacing.screenH;
+              return SizedBox(
+                height: cardW / _ratio,
+                child: PageView.builder(
+                  controller: _controller,
+                  itemCount: slides.length,
+                  onPageChanged: (i) => setState(() => _page = i),
+                  itemBuilder: (_, i) => Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.screenH,
+                    ),
+                    child: _SlideCard(data: slides[i]),
+                  ),
+                ),
+              );
+            },
           ),
-        ),
-      );
-    });
+          const SizedBox(height: 12),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < slides.length; i++)
+                Semantics(
+                  button: true,
+                  selected: i == page,
+                  label: '${i + 1} / ${slides.length}',
+                  excludeSemantics: true,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => _controller.animateToPage(
+                      i,
+                      duration: AppMotion.overlay,
+                      curve: AppMotion.curve,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 6,
+                      ),
+                      child: AnimatedContainer(
+                        duration: AppMotion.state,
+                        curve: AppMotion.curve,
+                        width: i == page ? 22 : 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(3),
+                          color: i == page
+                              ? slides[i].accent
+                              : const Color(0xFF3A4160),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
 
-class _BannerCard extends StatelessWidget {
-  const _BannerCard({
-    required this.data,
-    required this.count,
-    required this.index,
-  });
-  final _BannerData data;
-  final int count;
-  final int index;
+class _SlideCard extends StatelessWidget {
+  const _SlideCard({required this.data});
+  final _SlideData data;
 
   @override
   Widget build(BuildContext context) {
-    final c = context.colors;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AppRadius.card),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(data.image, fit: BoxFit.cover),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  Colors.black.withValues(alpha: 0.75),
-                  Colors.black.withValues(alpha: 0.15),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (data.badge != null)
-                  Text(
-                    data.badge!.toUpperCase(),
-                    style: AppTypography.caption.copyWith(
-                      color: c.primaryLight,
-                      fontWeight: FontWeight.w700,
-                    ),
+    const radius = 22.0;
+    return Semantics(
+      container: true,
+      label: '${data.badge}. ${data.title.replaceAll('\n', ' ')}. '
+          '${data.subtitle.replaceAll('\n', ' ')}',
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(radius),
+          border: Border.all(color: data.accent.withValues(alpha: 0.35)),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(radius - 1),
+          child: LayoutBuilder(
+            builder: (context, box) {
+              final w = box.maxWidth;
+              final titleSize = (w * 0.078).clamp(22.0, 30.0);
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    data.image,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.centerRight,
+                    filterQuality: FilterQuality.medium,
                   ),
-                const SizedBox(height: 4),
-                SizedBox(
-                  width: 220,
-                  child: Text(
-                    data.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.headingS.copyWith(
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 2),
-                SizedBox(
-                  width: 220,
-                  child: Text(
-                    data.subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.bodyM.copyWith(
-                      color: Colors.white.withValues(alpha: 0.8),
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Material(
-                  color: c.primary,
-                  shape: const StadiumBorder(),
-                  child: InkWell(
-                    customBorder: const StadiumBorder(),
-                    onTap: data.onPlay,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.xs,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                  Padding(
+                    padding: EdgeInsets.all((w * 0.05).clamp(14.0, 20.0)),
+                    child: SizedBox(
+                      width: w * 0.56,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            Icons.play_arrow_rounded,
-                            size: 20,
-                            color: c.onPrimary,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'home_listen_now'.tr,
-                            style: AppTypography.label.copyWith(
-                              color: c.onPrimary,
-                              fontWeight: FontWeight.w700,
+                          // The copy shrinks to fit the space above the button,
+                          // so a long translation or a large system font scales
+                          // the text down instead of overflowing the card.
+                          Expanded(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.topLeft,
+                              child: SizedBox(
+                                width: w * 0.56,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      data.badge.toUpperCase(),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: AppTypography.caption.copyWith(
+                                        color: data.accent,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 1.2,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Text.rich(
+                                      TextSpan(children: data.titleSpans),
+                                      style: AppTypography.headingL.copyWith(
+                                        fontSize: titleSize,
+                                        height: 1.08,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      data.subtitle,
+                                      style: AppTypography.bodyM.copyWith(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.85,
+                                        ),
+                                        fontSize: 13,
+                                        height: 1.3,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
+                          const SizedBox(height: 8),
+                          _SlideButton(data: data),
                         ],
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              );
+            },
           ),
-          Positioned(
-            top: AppSpacing.sm,
-            right: AppSpacing.md,
-            child: Row(
-              children: [
-                for (var i = 0; i < count; i++)
-                  Container(
-                    width: 8,
-                    height: 8,
-                    margin: const EdgeInsets.only(left: 4),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withValues(
-                        alpha: i == index ? 0.95 : 0.4,
+        ),
+      ),
+    );
+  }
+}
+
+class _SlideButton extends StatelessWidget {
+  const _SlideButton({required this.data});
+  final _SlideData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: data.buttonLabel,
+      excludeSemantics: true,
+      child: Material(
+        color: data.buttonFill,
+        shape: const StadiumBorder(),
+        child: InkWell(
+          customBorder: const StadiumBorder(),
+          onTap: data.onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 38),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(data.buttonIcon, size: 20, color: data.buttonText),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      data.buttonLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.label.copyWith(
+                        color: data.buttonText,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13.5,
                       ),
                     ),
                   ),
-              ],
+                ],
+              ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -680,3 +813,7 @@ class _ForYouRow extends StatelessWidget {
     );
   }
 }
+
+/// The hero slides alone, for render tests (they need no controllers).
+@visibleForTesting
+Widget homeBannersForTest() => const _HomeBanners();

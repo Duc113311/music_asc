@@ -79,8 +79,8 @@ class PlaylistDetailController extends GetxController {
     load();
   }
 
+  /// [to] is already the final index (ReorderableListView.onReorderItem).
   void reorder(int from, int to) {
-    if (to > from) to -= 1;
     final s = draft.removeAt(from);
     draft.insert(to, s);
   }

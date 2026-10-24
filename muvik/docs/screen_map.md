@@ -16,7 +16,7 @@ Figma keys are kept exactly as in the business spec (§1.3), typos included.
 | sc_kham_pha | `presentation/screen_explore/explore_tab.dart` | tab 2 | empty library CTA | P11 |
 | Sc_thong_ke_tuan / thang / nam | `presentation/screen_statistics/statistics_screen.dart` | `/statistics` (from Explore) | loading, error + retry, no data | P16 |
 | Sc_dialog_tuan / sc_dialog_thang / Sc_dialoh_nam | `presentation/dialogs/period_picker_dialogs.dart` | dialog | draft, Apply/Cancel/X, future disabled | P16-13..16 |
-| sc_cat_dat | `presentation/screens_settings/settings_tab.dart` | tab 3 | account signed in/out | P14-01 |
+| sc_cat_dat | `presentation/screens_settings/settings_tab.dart` | tab 3 | settings rows | P14-01 |
 | sc_quet_thu_vien | `presentation/screens_settings/scan_library_screen.dart` | `/settings/scan` | running/partial/error/cancelled | P14-02/03 |
 | sc_hen_gio_tat | `presentation/screens_settings/sleep_timer_screen.dart` | `/settings/sleep-timer` | invalid input, active countdown | P13-01 |
 | sc_bo_chinh_am | `presentation/screens_settings/equalizer_screen.dart` + `common_components/equalizer_panel.dart` | `/settings/equalizer` | unsupported device / effect | P14-05..08 |

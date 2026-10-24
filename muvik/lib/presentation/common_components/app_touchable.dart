@@ -76,22 +76,26 @@ class AppIconButton extends StatelessWidget {
           dimension: AppSizes.touch,
           child: Material(
             type: MaterialType.transparency,
-            child: InkResponse(
-              onTap: onPressed,
-              radius: AppSizes.touch / 2,
-              child: Center(
-                child: filled
-                    ? Container(
-                        width: AppSizes.touch - 4,
-                        height: AppSizes.touch - 4,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: c.surface,
-                          border: Border.all(color: c.border),
-                        ),
-                        child: Icon(icon, size: size, color: fg),
+            child: Center(
+              // The ripple and the press highlight are clipped to the round
+              // button itself, so no square corners show at any tap point.
+              child: Ink(
+                width: filled ? AppSizes.touch - 4 : AppSizes.touch,
+                height: filled ? AppSizes.touch - 4 : AppSizes.touch,
+                decoration: filled
+                    ? BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: c.surface,
+                        border: Border.all(color: c.border),
                       )
-                    : Icon(icon, size: size, color: fg),
+                    : null,
+                child: InkResponse(
+                  onTap: onPressed,
+                  customBorder: const CircleBorder(),
+                  containedInkWell: true,
+                  highlightShape: BoxShape.circle,
+                  child: Center(child: Icon(icon, size: size, color: fg)),
+                ),
               ),
             ),
           ),

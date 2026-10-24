@@ -8,6 +8,25 @@ Quy ước: `[ ]` chưa làm · `[~]` làm một phần / cần xác nhận · `
 
 ---
 
+## Tình trạng trước khi đẩy app (cập nhật 2026-10-24, cuối ngày)
+
+**Đã làm xong trong code (đã qua `flutter analyze` + 116 test, CHƯA thử trên máy thật):**
+CL-01 màn chọn ngôn ngữ (Splash → Ngôn ngữ → Onboarding) · CL-02 mục Ngôn ngữ trong Cài đặt · CL-03 test định tuyến · CL-05 tự quét ngay sau khi cấp quyền · CL-06 tự phát hiện nhạc mới/bị xoá khi mở app và khi quay lại app (toast "Quét nhạc") · CL-14 bỏ 2 chỗ nuốt lỗi · CL-15 `onReorderItem` · CL-16 cảnh báo `AudioDeviceType` (đã có ignore kèm lý do) · CL-18 cấu hình R8 (`proguard-rules.pro`, `isMinifyEnabled`) · CL-19 URL chính sách riêng tư đã điền · CL-20 `allowBackup=false` · CL-49/50/51 màn trắng lần đầu (sửa phía code) · CL-55 đồng bộ chuỗi · tab Thống kê · logo v4 · onboarding dùng ảnh + hiệu ứng hiện dần, nút CTA full-width · ripple nút icon tròn · dialog đánh giá đã có animation sao lần lượt (mục trong bảng ở phần 3 cũ).
+
+**Còn lại, cần người/máy thật:**
+- **CL-10 / CL-54 / CL-45…48:** test trên máy thật (gỡ cài → cài mới → mở lần đầu ×5; quét 0 bài / hàng nghìn bài; rút tai nghe; tắt màn hình; thông báo). Không làm được bằng code.
+- **CL-11 / CL-12:** chạy thật `python build.py` và bản `product release` rồi cài thử (R8 chỉ kiểm chứng được khi mở app bản release trên máy).
+- **CL-13:** đổi mật khẩu Gmail / Telegram token đã lộ trong smart_drink (**chủ app hẹn làm sau** — chưa làm; mật khẩu Gmail hiện nằm trong `tool/build/build_secrets.json` đã gitignore, đổi xong thì cập nhật file này).
+- **Quyết định sản phẩm đã chốt 2026-10-24:** bỏ hẳn đăng nhập Google (đã dọn mã, chuỗi `account_*`, `AppConfig.googleServerClientId`, README) · màu nhấn còn **8 màu, 2 hàng x 4** (bỏ fuchsia, lime, indigo, ruby) · còn mở: ảnh "Playlist dành cho bạn" 170 hay 140.
+- **Firebase App Check:** Play Integrity đã đăng ký cho `com.asctechsoft.muvik`; app bật App Check ở flavor `product` (dev/alpha tắt vì APK cài ngoài sẽ không qua attestation). Cần kiểm tra trên bản đã ký bằng khóa release từ Play (Play Integrity yêu cầu app phân phối qua Play).
+- **CL-24 xong:** đổi lặp lại / ngẫu nhiên ở màn Phát nhạc hiện toast ngắn kèm haptic.
+- **CL-07 xong (2026-10-24):** Cài đặt → "Tự quét khi có nhạc mới" (mặc định tắt: chỉ hiện toast + nút Quét; bật: tự quét rồi báo "Đã cập nhật thư viện").
+- **CL-17 đã thử và hoàn tác (2026-10-24):** nâng Gradle 9.1.0 + AGP 9.0.1 + Kotlin 2.3.20 làm `app/build.gradle.kts` không biên dịch (cú pháp `android {}` và `kotlinOptions { jvmTarget }` cũ bị coi là lỗi). Cần viết lại khối `android` theo `ApplicationExtension` / `kotlin { compilerOptions }` rồi thử lại từng plugin (firebase, audio_service, just_audio...). Không làm ngay trước phát hành; Flutter 3.47 vẫn build được với bộ cũ (chỉ cảnh báo "sắp bỏ hỗ trợ").
+- **Chưa làm (P2):** CL-08 `ContentObserver` realtime, CL-22/23/24 đồng bộ hiệu ứng nhấn + toast đổi chế độ lặp/ngẫu nhiên, CL-25…CL-30 animation nâng cao, CL-31…CL-44 mở rộng tính năng/hiệu năng.
+- **Lưu ý khi dùng CL-06:** phát hiện bằng cách so số file âm thanh trên các ổ máy (MediaStore) với số đã thấy ở lần quét trước; thư mục SAF tự chọn không được tính. Lần đầu sau khi cập nhật app chỉ ghi nhận số hiện tại, không báo.
+
+---
+
 ## 0. LỖI NGHIÊM TRỌNG – lần mở app đầu tiên bị màn trắng, không vào được (P0)
 
 **Hiện tượng (bạn báo):** bấm vào app lần đầu (sau khi cài) chỉ thấy màn trắng, đợi mãi không vào. Vuốt tắt app rồi mở lại thì vào bình thường.
@@ -24,6 +43,12 @@ Quy ước: `[ ]` chưa làm · `[~]` làm một phần / cần xác nhận · `
 | CL-46 | **Khởi động lạnh lần đầu quá chậm** (không treo thật) | Bản debug/JIT và lần chạy đầu sau khi cài (ART chưa biên dịch, Firebase + Play Services khởi tạo lần đầu, Firebase tối đa 5 s) có thể kéo dài 10–30 s trong khi người dùng chỉ thấy màn trắng nên tưởng là treo. | So thời gian với **bản release** (`flutter build apk --flavor dev --release`): nếu release vào ngay thì chủ yếu do bản debug. `adb shell am start -W -n com.asctechsoft.muvik/.MainActivity` cho `TotalTime`. |
 | CL-47 | **Mở app từ trình cài đặt / lúc cấp quyền** | Mở bằng nút "Mở" của trình cài đặt hoặc ngay lúc hệ thống đang hiện hộp thoại có thể tạo activity thứ hai song song (manifest có `launchMode=singleTop`, `taskAffinity=""`), activity đầu đứng im. Vuốt tắt xong mở lại chỉ còn một. | Thử 2 cách: mở từ nút "Mở" của trình cài đặt và mở từ icon launcher; xem có khác nhau không. |
 | CL-48 | **Chưa rõ bản build đang test** | Bản debug cài bằng `flutter run` rồi mở lại bằng tay từ launcher khi máy tính không còn kết nối đôi khi cũng kẹt màn trắng. | Ghi rõ lần lỗi là flavor nào (alpha/dev/product), debug hay release, cài bằng `flutter run` hay `.apk`. |
+
+**Cập nhật 2026-10-24 – đã sửa phía code, CHƯA kiểm chứng trên máy thật:**
+- **CL-49 + CL-50 (xong):** `main()` giờ gọi `runApp` ngay; phần khởi động chạy thành các bước có timeout riêng sau một màn chờ (`lib/presentation/screen_splash/startup_gate.dart`). Bước nào treo thì bị bỏ qua sau 2–6 giây; bước bắt buộc (prefs, ngôn ngữ, dịch vụ) lỗi thì hiện nút Thử lại. Có 5 test cho cơ chế này.
+- **CL-51 (xong):** cửa sổ native không còn trắng: nền xanh đen `#090F20` + logo, cả Android 11 trở xuống (`launch_background.xml`) và Android 12+ (`values-v31/styles.xml`, `windowSplashScreenBackground`; mặc định của Android 12 là nền trắng kèm icon, rất có thể chính là "màn trắng" bạn thấy). `NormalTheme` cũng đổi nền để không chớp trắng.
+- **CL-52 (một phần):** mỗi bước ghi thời gian vào log (`startup: <bước> <ms>`); ở flavor alpha/dev tên bước đang chạy hiện nhỏ ngay trên màn chờ, nên nếu còn kẹt sẽ biết kẹt ở bước nào.
+- **Còn lại:** CL-45…48 (xác định chính xác nguyên nhân) và CL-54 (kịch bản test gỡ cài → mở lần đầu ×5) cần máy thật. Nếu sau bản này vẫn trắng **trước khi thấy màn chờ logo**, nguyên nhân nằm ngoài code Dart (engine/GPU/Play Protect) → lấy `adb logcat` lúc mở lần đầu.
 
 **Hướng sửa đề xuất (làm theo thứ tự):**
 - [ ] **CL-49 – Hiện giao diện sớm, đưa việc nặng vào Splash.** `main()` chỉ giữ những gì bắt buộc rồi gọi `runApp()` ngay: prefs + locale (đọc nhanh). Firebase/Crashlytics, `classifyDevice`, AdMob, Remote Config khởi động **sau** khi Splash đã hiện (nền, có timeout, thất bại thì bỏ qua). Màn Splash đã có sẵn trạng thái Thử lại, tái sử dụng được.
@@ -70,8 +95,8 @@ Hiện tại: sau khi cấp quyền, người dùng phải tự **chọn nguồn
 | Ẩn thanh điều hướng của máy | `[x]` `SystemUiChannel.hideNavigationBar` + gọi lại khi resume | Test vuốt cạnh dưới, xoay, đa nhiệm |
 | Hiệu ứng chạm toàn app | `[~]` đã đặt ripple ở theme (`AppInkRipple`, `app_theme.dart:121`) | Còn `GestureDetector` không ripple: `app_controls.dart`, `now_playing_screen.dart`, `player_widgets.dart` → đổi sang `AppTouchable`/`InkWell`. Test Phát qua tai nghe, Chủ đề, Bộ chỉnh âm |
 | Rate app: sao sáng lần lượt khi mở | `[ ]` `rate_app_dialog.dart` chỉ có hiệu ứng phóng khi bấm, **chưa** có animation tự chạy khi mở | Làm animation stagger 1→5 sao khi dialog mở (~120 ms/sao, tôn trọng `disableAnimations`) |
-| Màu nhấn: 8 màu, 2 hàng | `[~]` Comment ghi "8 accents on 2 rows of 4" nhưng `AccentColor` có **12** màu (`app_colors.dart`) → đang thành 3 hàng | Chốt 8 hay 12; sửa enum hoặc lưới + comment cho khớp (cả `accent_sheet.dart` và `theme_screen.dart`) |
-| Login Google | `[ ]` **Đã bị gỡ khỏi code**: không còn `google_sign_in` trong `pubspec.yaml`, đã xoá `auth_controller.dart`/`auth_service.dart`. `bootstrap_service.dart` vẫn ghi chú "Auth runs detached" (lỗi thời) | Quyết định: làm lại hay bỏ hẳn. Nếu làm lại: thêm package, OAuth client + SHA-1 debug/release trong Firebase, `AppConfig.googleServerClientId` |
+| Màu nhấn: 8 màu, 2 hàng | `[x]` (đã chốt 8 màu, 2 hàng x 4 — 2026-10-24) — cũ: `[~]` Comment ghi "8 accents on 2 rows of 4" nhưng `AccentColor` có **12** màu (`app_colors.dart`) → đang thành 3 hàng | Chốt 8 hay 12; sửa enum hoặc lưới + comment cho khớp (cả `accent_sheet.dart` và `theme_screen.dart`) |
+| Login Google | `[x]` ĐÃ CHỐT BỎ (2026-10-24) — cũ: `[ ]` **Đã bị gỡ khỏi code**: không còn `google_sign_in` trong `pubspec.yaml`, đã xoá `auth_controller.dart`/`auth_service.dart`. `bootstrap_service.dart` vẫn ghi chú "Auth runs detached" (lỗi thời) | Quyết định: làm lại hay bỏ hẳn. Nếu làm lại: thêm package, OAuth client + SHA-1 debug/release trong Firebase, `AppConfig.googleServerClientId` |
 | Bỏ bottom sheet thứ tự phát / lặp lại | `[x]` Player không còn `showModalBottomSheet` | Thêm toast/haptic báo chế độ mới (xem CL-24) |
 | Ảnh "Playlist dành cho bạn" nhỏ lại | `[~]` `_cardWidth = 170` (`dashboard_tab.dart:666`) | Xác nhận kích thước mong muốn; nếu còn to, giảm ~140 |
 | Loudness Boost (nghe to như TikTok) | `[~]` Đã có `_LoudnessSlider` + `eq_loudness_gain_db` | Test trên máy: méo tiếng, mức an toàn, cảnh báo khi kéo cao, lưu lại sau khi thoát app |
@@ -91,7 +116,7 @@ Hiện tại: sau khi cấp quyền, người dùng phải tự **chọn nguồn
 | CL-19 | Chính sách riêng tư trống | `AppConfig.privacyPolicyUrl = ''` (ghi chú `P20-06`). Bắt buộc trước khi phát hành, nhất là khi có Firebase. | P0 trước khi lên store | |
 | CL-20 | Quyền và sao lưu | Manifest còn `INTERNET` (Firebase cần, giữ), `RECEIVE_BOOT_COMPLETED`, `FOREGROUND_SERVICE_SPECIAL_USE`: kiểm tra từng quyền có dùng thật không (Play Console sẽ hỏi). Chưa đặt `android:allowBackup`/`dataExtractionRules` → DB nghe nhạc có thể bị sao lưu lên Drive; chốt có muốn không. | P1 | |
 | CL-21 | Đặc tả còn lỗi thời | `APP_BASE_STRUCTURE.md` vẫn mô tả `commRunApp`/`CommLocalize`/`PrefAssist`. Cập nhật theo `muvik/docs/base_packages.md`. | P2 | |
-| CL-55 | **`tool/strings_src.py` đã lệch với XML — đừng chạy `gen_strings.py`** | `check_strings.py` báo thiếu hơn 25 key chỉ tồn tại trong XML (vd. `accent_fuchsia/indigo/lime/ruby`, `eq_preset_tiktok`, `eq_loud_mode`, `lyrics_empty`, `nudge_*`, `ongoing_*`, `settings_*_desc`) và nhiều key trong nguồn không còn dùng. Chạy `gen_strings.py` sẽ **xoá các key đó khỏi XML** (mình đã lỡ chạy một lần khi làm tab Thống kê và đã khôi phục từ git). Cần đồng bộ ngược XML → `strings_src.py` (hoặc bỏ script, sửa thẳng XML) rồi mới dùng lại. | P1 | |
+| CL-55 | **[ĐÃ XONG 2026-10-24] `tool/strings_src.py` đã đồng bộ lại với XML** (56 key chỉ có trong XML đã được thêm ngược vào nguồn, 0 key lệch nội dung; `check_strings.py` không còn báo thiếu, `python build.py` không còn bị chặn). Mô tả lỗi cũ bên dưới để tham khảo: | `check_strings.py` báo thiếu hơn 25 key chỉ tồn tại trong XML (vd. `accent_fuchsia/indigo/lime/ruby`, `eq_preset_tiktok`, `eq_loud_mode`, `lyrics_empty`, `nudge_*`, `ongoing_*`, `settings_*_desc`) và nhiều key trong nguồn không còn dùng. Chạy `gen_strings.py` sẽ **xoá các key đó khỏi XML** (mình đã lỡ chạy một lần khi làm tab Thống kê và đã khôi phục từ git). Cần đồng bộ ngược XML → `strings_src.py` (hoặc bỏ script, sửa thẳng XML) rồi mới dùng lại. | P1 | |
 
 ## 5. Điểm chạm & animation
 

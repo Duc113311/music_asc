@@ -4,6 +4,7 @@ class RouteName {
   RouteName._();
 
   static const String splash = '/splash'; // sc_splash
+  static const String language = '/language'; // first-run language picker / Settings
   static const String onboarding = '/onboarding'; // sc_onBrg_01..03
   static const String setup = '/setup'; // sc_step_01..03
   static const String home =

@@ -19,20 +19,24 @@ import 'services/storage/pref_store.dart';
 import 'utils/app_localize.dart';
 import 'utils/app_log.dart';
 import 'utils/route_analytics.dart';
+import 'presentation/screen_splash/startup_gate.dart';
 import 'values/app_pages.dart';
 import 'values/app_theme.dart';
 import 'values/route_name.dart';
 
-/// Startup order (P06-01), same skeleton as smart_drink on the shared base:
-/// guarded zone -> system UI -> prefs -> Firebase/Remote Config (dsp_base) ->
-/// locale -> strings -> permanent controllers/services -> app.
+/// The first frame is drawn right away by [StartupGate]; the start-up work runs
+/// as bounded steps behind a boot screen (see [StartupGate] for why: a hung
+/// step used to leave a blank white window on the first launch).
+///
+/// Order (P06-01), same skeleton as smart_drink on the shared base:
+/// system UI -> prefs -> Firebase/Remote Config (dsp_base) -> date formats ->
+/// locale + strings -> permanent controllers/services -> app.
 /// DB, library and audio are initialized by the splash via BootstrapService.
 Future<void> main() async {
   runZonedGuarded(
-    () async {
+    () {
       WidgetsFlutterBinding.ensureInitialized();
-      await _bootstrap();
-      runApp(const MuvikApp());
+      runApp(StartupGate(steps: _steps, builder: (_) => const MuvikApp()));
     },
     (error, stack) {
       if (DspFirebaseService.isCoreReady) {
@@ -44,24 +48,45 @@ Future<void> main() async {
   );
 }
 
-Future<void> _bootstrap() async {
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+final List<StartupStep> _steps = [
+  StartupStep(
+    'orientation',
+    () => SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]),
+    timeout: const Duration(seconds: 2),
+  ),
+  StartupStep(
+    'system ui',
+    () => SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge),
+    timeout: const Duration(seconds: 2),
+  ),
   // Immersive: no device navigation bar at the bottom.
-  await SystemUiChannel.hideNavigationBar();
-
-  await PrefStore.init();
-  await _startDspBase();
-
-  await initializeDateFormatting();
-  await AppLocalize.ensureConfigured();
-  await AppLocalize.loadTranslations();
-
+  StartupStep(
+    'navigation bar',
+    SystemUiChannel.hideNavigationBar,
+    timeout: const Duration(seconds: 2),
+  ),
+  StartupStep('preferences', PrefStore.init, critical: true),
+  StartupStep('firebase', _startDspBase, timeout: _dspBaseTimeout),
+  StartupStep(
+    'date formats',
+    initializeDateFormatting,
+    timeout: const Duration(seconds: 3),
+  ),
+  StartupStep('language', () async {
+    await AppLocalize.ensureConfigured();
+    await AppLocalize.loadTranslations();
+  }, critical: true),
   // Permanent: survive route changes. The lifecycle hub goes first so screens
-  // created later can subscribe to it.
-  Get.put(AppLifecycleService(), permanent: true);
-  Get.put(SettingsController(), permanent: true);
-}
+  // created later can subscribe to it. Idempotent: a retry re-runs this.
+  StartupStep('services', () {
+    if (!Get.isRegistered<AppLifecycleService>()) {
+      Get.put(AppLifecycleService(), permanent: true);
+    }
+    if (!Get.isRegistered<SettingsController>()) {
+      Get.put(SettingsController(), permanent: true);
+    }
+  }, critical: true),
+];
 
 /// Firebase (core + Crashlytics) and Remote Config, plus consent and AdMob
 /// only when [AppConfig.adsEnabled]. Firebase only feeds Crashlytics and
@@ -72,23 +97,24 @@ const Duration _dspBaseTimeout = Duration(seconds: 6);
 Future<void> _startDspBase() async {
   final started = AppConfig.adsEnabled
       ? DspBase.start(
-          // App Check stays off, as before the base switch.
-          enableAppCheck: false,
+          // App Check (Play Integrity is registered for com.asctechsoft.muvik in
+          // the Firebase console) runs on the store flavor only: dev/alpha APKs
+          // are sideloaded and would fail attestation.
+          enableAppCheck: AppFigs.isProduct,
           hideAds: AppFigs.isAlpha,
           useTestAdIds: kDebugMode || AppFigs.isAlpha || AppFigs.isDev,
           registerTestAdDevice: AppFigs.isShowTestOption,
           debugEeaConsent: AppFigs.isShowTestOption,
         )
       : _startFirebaseOnly();
-  await started.timeout(
-    _dspBaseTimeout,
-    onTimeout: () => AppLog.info('dsp_base start timed out, continuing'),
-  );
+  await started;
 }
 
 Future<void> _startFirebaseOnly() async {
   DspBase.register();
-  final firebaseUp = await DspFirebaseService.to.start(enableAppCheck: false);
+  final firebaseUp = await DspFirebaseService.to.start(
+    enableAppCheck: AppFigs.isProduct,
+  );
   if (firebaseUp) await DspRemoteConfigRepository.to.start(defaults: const {});
 }
 

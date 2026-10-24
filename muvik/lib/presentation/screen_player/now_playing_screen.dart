@@ -9,6 +9,7 @@ import '../../controller/playback_controller.dart';
 import '../../controller/settings_controller.dart';
 import '../../models/data_models/song.dart';
 import '../../models/ui_models/repeat_mode.dart';
+import '../../utils/toast_utils.dart';
 import '../../values/app_colors.dart';
 import '../../values/app_dimensions.dart';
 import '../../values/app_typography.dart';
@@ -465,12 +466,25 @@ Future<void> _toggleShuffle(PlaybackController pc) async {
   final on = !pc.state.value.shuffle;
   await pc.setShuffle(on);
   HapticFeedback.selectionClick();
+  // No sheet any more: a short toast says which mode is now on.
+  ToastUtils.show(
+    on ? 'shuffle_on'.tr : 'shuffle_off'.tr,
+    duration: const Duration(milliseconds: 1200),
+  );
 }
 
 Future<void> _cycleRepeat(PlaybackController pc) async {
   final next = pc.state.value.repeat.next;
   await pc.setRepeat(next);
   HapticFeedback.selectionClick();
+  ToastUtils.show(
+    switch (next) {
+      RepeatMode.off => 'repeat_off'.tr,
+      RepeatMode.all => 'repeat_all'.tr,
+      RepeatMode.one => 'repeat_one'.tr,
+    },
+    duration: const Duration(milliseconds: 1200),
+  );
 }
 
 /// Swipeable middle of the player: the spinning record, and (swipe right to

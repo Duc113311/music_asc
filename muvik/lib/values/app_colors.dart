@@ -65,38 +65,6 @@ enum AccentColor {
     Color(0xFFC2410C),
     Color(0xFFF97316),
     Color(0xFF9A3412),
-  ),
-  fuchsia(
-    'fuchsia',
-    'accent_fuchsia',
-    Color(0xFFD946EF),
-    Color(0xFFA21CAF),
-    Color(0xFFC026D3),
-    Color(0xFF86198F),
-  ),
-  lime(
-    'lime',
-    'accent_lime',
-    Color(0xFFA3E635),
-    Color(0xFF4D7C0F),
-    Color(0xFF84CC16),
-    Color(0xFF3F6212),
-  ),
-  indigo(
-    'indigo',
-    'accent_indigo',
-    Color(0xFF6366F1),
-    Color(0xFF4338CA),
-    Color(0xFF4F46E5),
-    Color(0xFF3730A3),
-  ),
-  ruby(
-    'ruby',
-    'accent_ruby',
-    Color(0xFFFF3B5C),
-    Color(0xFFC8102E),
-    Color(0xFFE11D48),
-    Color(0xFF9F1239),
   );
 
   const AccentColor(

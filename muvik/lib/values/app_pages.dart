@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 import '../controller/feedback_controller.dart';
+import '../controller/language_controller.dart';
 import '../controller/onboarding_controller.dart';
 import '../controller/playlist_detail_controller.dart';
 import '../controller/search_controller.dart';
@@ -17,6 +18,7 @@ import '../presentation/screen_search/search_screen.dart';
 import '../presentation/screen_splash/splash_screen.dart';
 import '../presentation/screen_statistics/statistics_artist_screen.dart';
 import '../presentation/screen_statistics/statistics_songs_screen.dart';
+import '../presentation/screens_onboarding/language_screen.dart';
 import '../presentation/screens_onboarding/onboarding_screen.dart';
 import '../presentation/screens_playlist/playlist_detail_screen.dart';
 import '../presentation/screens_playlist/playlist_form_screen.dart';
@@ -46,6 +48,15 @@ class AppPages {
 
   static final List<GetPage<dynamic>> _pages = [
     GetPage(name: RouteName.splash, page: () => const SplashScreen()),
+    GetPage(
+      name: RouteName.language,
+      page: () => const LanguageScreen(),
+      // Get.arguments == true when opened from Settings.
+      binding: BindingsBuilder(() {
+        Get.put(LanguageController(fromSettings: Get.arguments == true));
+      }),
+      transition: Transition.fadeIn,
+    ),
     GetPage(
       name: RouteName.onboarding,
       page: () => const OnboardingScreen(),

@@ -8,6 +8,7 @@ import '../models/data_models/music_source.dart';
 import '../models/ui_models/scan_state.dart';
 import '../services/application/library_scan_service.dart';
 import '../services/storage/pref_store.dart';
+import '../utils/app_log.dart';
 import '../values/route_name.dart';
 import 'library_controller.dart';
 
@@ -41,7 +42,9 @@ class SetupController extends GetxController with WidgetsBindingObserver {
     _onPermission();
     _onSources();
     _onScan();
-    _scan.refreshSources();
+    _scan.refreshSources().then((_) {
+      if (step.value == 1) _autoScanOnce();
+    });
   }
 
   @override
@@ -85,6 +88,23 @@ class SetupController extends GetxController with WidgetsBindingObserver {
   void goTo(int s) {
     step.value = s;
     PrefStore.setInt(PrefConst.setupStep, s);
+    if (s == 1) _autoScanOnce();
+  }
+
+  bool _autoScanned = false;
+
+  /// With audio access granted, the first visit to the sources step scans every
+  /// accessible source right away, so a phone that has music is ready without
+  /// the user picking anything. "Choose again" / "Rescan" later stay manual.
+  Future<void> _autoScanOnce() async {
+    if (_autoScanned) return;
+    if (permission.value != AudioPermissionStatus.granted) return;
+    if (scanState.value.isRunning) return;
+    await _scan.refreshSources();
+    selected.addAll(selectableSources.map((s) => s.id!));
+    if (selected.isEmpty) return;
+    _autoScanned = true;
+    await startScan();
   }
 
   // ---------- step 1 ----------
@@ -115,7 +135,9 @@ class SetupController extends GetxController with WidgetsBindingObserver {
   Future<void> _askNotifications() async {
     try {
       await Permission.notification.request();
-    } catch (_) {}
+    } catch (e) {
+      AppLog.info('SetupController.askNotifications: $e');
+    }
   }
 
   /// "Để sau": continue with current access; folders can still be picked.

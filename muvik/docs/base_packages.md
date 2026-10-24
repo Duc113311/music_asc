@@ -80,6 +80,8 @@ Version: `pubspec.yaml` `version: x.y.z+N` gives the build number `N`;
 `build_version.txt` (git-ignored) holds `minor(N)`, bumped on every build;
 the name is `1.N.minor`. Same scheme as smart_drink.
 
+Default recipients (same as smart_drink, set in `build.py`): Firebase App Distribution testers `asctechsoft888@gmail.com`; build-result e-mail from/to `dsp.entertainment.99@gmail.com`. The e-mail is only sent when a password is configured.
+
 Optional secrets (never committed): `ASC_TELEGRAM_BOT_TOKEN`, `ASC_TELEGRAM_CHAT_ID`,
 `ASC_EMAIL_TO`, `ASC_EMAIL_FROM`, `ASC_EMAIL_PASSWORD`, `ASC_TESTER_EMAILS` as environment
 variables, or the same keys in `tool/build/build_secrets.json`. Firebase App Distribution

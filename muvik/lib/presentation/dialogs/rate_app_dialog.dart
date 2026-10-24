@@ -98,7 +98,9 @@ class _RateDialogState extends State<_RateDialog> {
                     excludeSemantics: true,
                     child: InkResponse(
                       onTap: () => _pick(i),
-                      radius: 24,
+                      customBorder: const CircleBorder(),
+                      containedInkWell: true,
+                      highlightShape: BoxShape.circle,
                       child: SizedBox.square(
                         dimension: AppSizes.touch,
                         // Pops in when it lights up.

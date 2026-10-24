@@ -3,12 +3,15 @@ class PrefConst {
   PrefConst._();
 
   // App flow
+  static const String languageChosen = 'language_chosen';
   static const String onboardingCompleted = 'onboarding_completed';
   static const String setupCompleted = 'setup_completed';
   static const String setupStep = 'setup_step';
   static const String permissionDeferred = 'permission_deferred';
   // One rescan after DB v2 so existing songs get their genre tag.
   static const String genreBackfillDone = 'genre_backfill_done';
+  // Audio files MediaStore reported at the end of the last scan (-1 = never).
+  static const String lastDeviceAudioCount = 'last_device_audio_count';
 
   // Appearance
   static const String language = 'language'; // AscLocale: en_US | vi_VN
@@ -37,6 +40,8 @@ class PrefConst {
   static const String headphoneResumeOnConnect = 'headphone_resume_on_connect';
   static const String headphoneButtonsEnabled = 'headphone_buttons_enabled';
   static const String nudgeEnabled = 'nudge_enabled';
+  // Scan by itself (and say so) when new music is found; off = only offer.
+  static const String autoScanNewMusic = 'auto_scan_new_music';
   static const String ongoingNotification = 'ongoing_notification';
 
   // Library

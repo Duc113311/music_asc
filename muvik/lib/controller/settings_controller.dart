@@ -31,6 +31,9 @@ class SettingsController extends GetxController {
   /// Daily "come back and listen" reminder (NudgeService).
   final RxBool nudgeEnabled = PrefDefaults.nudgeEnabled.obs;
 
+  /// Scan automatically when music is added or removed (off: toast + button).
+  final RxBool autoScanNewMusic = PrefDefaults.autoScanNewMusic.obs;
+
   /// Always-visible quick-player notification (OngoingNotificationService).
   final RxBool ongoingNotification = PrefDefaults.ongoingNotification.obs;
 
@@ -67,6 +70,10 @@ class SettingsController extends GetxController {
     nudgeEnabled.value = PrefStore.getBool(
       PrefConst.nudgeEnabled,
       PrefDefaults.nudgeEnabled,
+    );
+    autoScanNewMusic.value = PrefStore.getBool(
+      PrefConst.autoScanNewMusic,
+      PrefDefaults.autoScanNewMusic,
     );
     ongoingNotification.value = PrefStore.getBool(
       PrefConst.ongoingNotification,
@@ -113,6 +120,11 @@ class SettingsController extends GetxController {
   Future<void> setScreenTransitions(bool v) async {
     screenTransitions.value = v;
     await PrefStore.setBool(PrefConst.screenTransitions, v);
+  }
+
+  Future<void> setAutoScanNewMusic(bool v) async {
+    autoScanNewMusic.value = v;
+    await PrefStore.setBool(PrefConst.autoScanNewMusic, v);
   }
 
   Future<void> setNudgeEnabled(bool v) async {

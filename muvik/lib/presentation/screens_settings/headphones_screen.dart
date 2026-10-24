@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../controller/settings_controller.dart';
 import '../../services/application/audio_handler.dart';
+import '../../utils/app_log.dart';
 import '../../values/app_assets.dart';
 import '../../values/app_colors.dart';
 import '../../values/app_typography.dart';
@@ -167,7 +168,9 @@ class _OutputDevicesState extends State<_OutputDevices> {
       final session = await AudioSession.instance;
       final d = await session.getDevices(includeInputs: false);
       if (mounted) setState(() => _devices = d);
-    } catch (_) {}
+    } catch (e) {
+      AppLog.info('HeadphonesScreen.load: $e');
+    }
   }
 
   @override

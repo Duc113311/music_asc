@@ -14,12 +14,6 @@ class AppConfig {
   /// AndroidManifest.xml.
   static const bool adsEnabled = false;
 
-  /// OAuth "Web client" id of the publisher's Google Cloud project, needed by
-  /// Google sign-in on Android (P15-01). Taken from google-services.json
-  /// (Firebase project muvik-app, oauth_client type 3). Not a secret.
-  static const String googleServerClientId =
-      '456698221835-eg1vm700707idaf78fb394vgci1egku4.apps.googleusercontent.com';
-
   // Playback rules
   static const Duration previousRestartThreshold = Duration(seconds: 3);
   static const Duration qualifyingListen = Duration(seconds: 30);

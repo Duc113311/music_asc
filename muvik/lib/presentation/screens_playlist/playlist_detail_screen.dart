@@ -148,7 +148,7 @@ class PlaylistDetailScreen extends GetView<PlaylistDetailController> {
               AppSizes.miniPlayer + 40 + MediaQuery.paddingOf(context).bottom,
         ),
         itemCount: draft.length,
-        onReorder: controller.reorder,
+        onReorderItem: controller.reorder,
         itemBuilder: (context, i) {
           final s = draft[i];
           return SongTile(

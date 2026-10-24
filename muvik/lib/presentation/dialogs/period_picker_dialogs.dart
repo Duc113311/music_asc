@@ -343,6 +343,9 @@ class _Cell extends StatelessWidget {
       selected: inRange,
       child: InkResponse(
         onTap: enabled ? onTap : null,
+        customBorder: const CircleBorder(),
+        containedInkWell: true,
+        highlightShape: BoxShape.circle,
         child: SizedBox(
           height: 40,
           child: Center(

@@ -2,7 +2,9 @@
 class PrefDefaults {
   PrefDefaults._();
 
+  static const bool languageChosen = false;
   static const bool onboardingCompleted = false;
+  static const int lastDeviceAudioCount = -1;
   static const bool setupCompleted = false;
   static const int setupStep = 0;
   static const bool permissionDeferred = false;
@@ -30,6 +32,7 @@ class PrefDefaults {
   static const bool headphoneResumeOnConnect = false;
   static const bool headphoneButtonsEnabled = true;
   static const bool nudgeEnabled = true;
+  static const bool autoScanNewMusic = false;
   static const bool ongoingNotification = true;
 
   static const String songSort = 'title_asc';

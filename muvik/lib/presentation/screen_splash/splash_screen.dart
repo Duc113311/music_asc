@@ -20,6 +20,31 @@ import '../../utils/app_log.dart';
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
+  /// language → onboarding → setup → shell (P06-03). The language screen is
+  /// shown once, on a fresh install; an install that already finished
+  /// onboarding before the screen existed is treated as having chosen.
+  static String nextRoute() {
+    final onboarded = PrefStore.getBool(
+      PrefConst.onboardingCompleted,
+      PrefDefaults.onboardingCompleted,
+    );
+    if (!onboarded &&
+        !PrefStore.getBool(
+          PrefConst.languageChosen,
+          PrefDefaults.languageChosen,
+        )) {
+      return RouteName.language;
+    }
+    if (!onboarded) return RouteName.onboarding;
+    if (!PrefStore.getBool(
+      PrefConst.setupCompleted,
+      PrefDefaults.setupCompleted,
+    )) {
+      return RouteName.setup;
+    }
+    return RouteName.home;
+  }
+
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
@@ -46,24 +71,7 @@ class _SplashScreenState extends State<SplashScreen> {
       return;
     }
     if (!mounted) return;
-    Get.offAllNamed(nextRoute());
-  }
-
-  /// onboarding → setup → shell (P06-03).
-  static String nextRoute() {
-    if (!PrefStore.getBool(
-      PrefConst.onboardingCompleted,
-      PrefDefaults.onboardingCompleted,
-    )) {
-      return RouteName.onboarding;
-    }
-    if (!PrefStore.getBool(
-      PrefConst.setupCompleted,
-      PrefDefaults.setupCompleted,
-    )) {
-      return RouteName.setup;
-    }
-    return RouteName.home;
+    Get.offAllNamed(SplashScreen.nextRoute());
   }
 
   @override

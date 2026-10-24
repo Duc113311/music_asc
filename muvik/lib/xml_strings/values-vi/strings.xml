@@ -13,21 +13,12 @@
     <string name="accent_blue">Xanh dương</string>
     <string name="accent_coral">Hồng san hô</string>
     <string name="accent_desc">Chọn màu nhấn sử dụng trong toàn bộ ứng dụng.</string>
-    <string name="accent_fuchsia">Hồng tím neon</string>
-    <string name="accent_lime">Xanh chanh</string>
-    <string name="accent_indigo">Chàm</string>
-    <string name="accent_ruby">Đỏ ruby</string>
     <string name="accent_green">Xanh lá</string>
     <string name="accent_lavender">Tím lavender</string>
     <string name="accent_orange">Cam</string>
     <string name="accent_pink">Hồng phấn</string>
     <string name="accent_preview">Xem trước</string>
     <string name="accent_teal">Xanh ngọc</string>
-    <string name="account_desc">Đăng nhập để kết nối tài khoản</string>
-    <string name="account_google_sign_in">Đăng nhập bằng Google</string>
-    <string name="account_optional">Bạn vẫn có thể nghe nhạc không cần đăng nhập.</string>
-    <string name="account_sign_out">Đăng xuất</string>
-    <string name="account_title">Tài khoản Muvik</string>
     <string name="action_add_playlist">Thêm vào playlist</string>
     <string name="action_add_queue">Thêm vào hàng chờ</string>
     <string name="action_apply">Áp dụng</string>
@@ -512,8 +503,6 @@
     <string name="toast_removed_from_playlist">Đã bỏ khỏi playlist</string>
     <string name="toast_removed_from_queue">Đã gỡ khỏi hàng chờ</string>
     <string name="toast_saved">Đã lưu</string>
-    <string name="toast_signed_in">Đã đăng nhập</string>
-    <string name="toast_signed_out">Đã đăng xuất</string>
     <string name="toast_timer_cancelled">Đã hủy hẹn giờ</string>
     <string name="toast_timer_started">Nhạc sẽ dừng lúc %1$s</string>
     <string name="transitions_desc">Sử dụng hiệu ứng chuyển cảnh mượt mà giữa các màn hình.</string>
@@ -580,4 +569,28 @@
     <string name="eq_loud_mode">Âm thanh lớn</string>
     <string name="eq_loud_mode_desc">Nén âm và giới hạn đỉnh: nghe to, dày và đều như TikTok</string>
     <string name="eq_preset_tiktok">TikTok</string>
+    <string name="language_title">Chọn ngôn ngữ của bạn</string>
+    <string name="language_subtitle">Bạn có thể đổi lại bất cứ lúc nào trong Cài đặt.</string>
+    <string name="settings_language">Ngôn ngữ</string>
+    <string name="settings_language_desc">Ngôn ngữ của ứng dụng</string>
+    <string name="scan_new_found">Tìm thấy %1$s bài hát mới</string>
+    <string name="scan_library_changed">Nhạc trong máy đã thay đổi</string>
+    <string name="settings_auto_scan">Tự quét khi có nhạc mới</string>
+    <string name="settings_auto_scan_desc">Tự thêm bài hát mới, không cần hỏi</string>
+    <string name="home_s1_badge">Dành riêng cho bạn</string>
+    <string name="home_s1_title">Daily Mix</string>
+    <string name="home_s1_sub">Giai điệu quen,
+cảm hứng mới</string>
+    <string name="home_s1_cta">Phát ngẫu nhiên</string>
+    <string name="home_s2_badge">Tìm lại cảm xúc</string>
+    <string name="home_s2_title">Lâu rồi
+chưa nghe</string>
+    <string name="home_s2_sub">Gặp lại những bài hát
+từng yêu thích</string>
+    <string name="home_s2_cta">Khám phá lại</string>
+    <string name="home_s3_badge">Bật chế độ hứng khởi</string>
+    <string name="home_s3_title">Nạp
+năng lượng</string>
+    <string name="home_s3_sub">Nhịp điệu sôi động từ
+thư viện của bạn</string>
 </resources>
