@@ -2,6 +2,7 @@ package com.asctechsoft.muvik
 
 import android.content.Intent
 import android.os.Build
+import android.os.PowerManager
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
@@ -30,6 +31,10 @@ class MainActivity : AudioServiceActivity() {
         val library = MediaLibraryHandler(this)
         MethodChannel(messenger, MediaLibraryHandler.CHANNEL).setMethodCallHandler(library)
         mediaLibrary = library
+
+        // Ringtone cutter: uses the application context, not this activity.
+        MethodChannel(messenger, RingtoneHandler.CHANNEL)
+            .setMethodCallHandler(RingtoneHandler(applicationContext))
 
         val effects = AudioEffectsHandler()
         MethodChannel(messenger, AudioEffectsHandler.CHANNEL).setMethodCallHandler(effects)
@@ -76,11 +81,18 @@ class MainActivity : AudioServiceActivity() {
 
         // Dart re-hides after changing the system UI mode at startup.
         MethodChannel(messenger, SYSTEM_UI_CHANNEL).setMethodCallHandler { call, result ->
-            if (call.method == "hideNavigationBar") {
-                hideNavigationBar()
-                result.success(null)
-            } else {
-                result.notImplemented()
+            when (call.method) {
+                "hideNavigationBar" -> {
+                    hideNavigationBar()
+                    result.success(null)
+                }
+                // Dart asks for the CPU to stay awake while the next track is
+                // opened (the screen may be off and the UI gone).
+                "holdCpu" -> {
+                    holdCpu((call.argument<Int>("ms") ?: 30_000).toLong())
+                    result.success(null)
+                }
+                else -> result.notImplemented()
             }
         }
     }
@@ -96,6 +108,27 @@ class MainActivity : AudioServiceActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) hideNavigationBar()
+    }
+
+    private var trackChangeLock: PowerManager.WakeLock? = null
+
+    /**
+     * Partial wake lock with a timeout, held while the next track is being
+     * opened. Uses the application context so it still works after the
+     * activity was swiped away (the audio service keeps the engine alive).
+     * It releases itself after [ms]; the WAKE_LOCK permission is already in
+     * the manifest.
+     */
+    private fun holdCpu(ms: Long) {
+        val pm = applicationContext.getSystemService(POWER_SERVICE) as PowerManager
+        trackChangeLock?.let { if (it.isHeld) it.release() }
+        trackChangeLock = pm.newWakeLock(
+            PowerManager.PARTIAL_WAKE_LOCK,
+            "muvik:track-change",
+        ).apply {
+            setReferenceCounted(false)
+            acquire(ms.coerceIn(1_000L, 60_000L))
+        }
     }
 
     private fun hideNavigationBar() {

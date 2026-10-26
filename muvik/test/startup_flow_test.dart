@@ -96,10 +96,11 @@ void main() {
       expect('language_title'.tr, 'Chọn ngôn ngữ của bạn');
     });
 
-    test('offers exactly the languages that have a real translation', () {
+    test('offers all 16 languages that have a locale folder', () {
       final c = LanguageController();
       expect(c.languages, AppLocalize.translatedLocales);
-      expect(c.languages.map((l) => l.languageCode), ['en', 'vi']);
+      expect(c.languages.length, 16);
+      expect(c.languages.take(2).map((l) => l.languageCode), ['en', 'vi']);
     });
 
     testWidgets('Settings variant has no Continue button', (tester) async {

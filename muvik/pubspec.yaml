@@ -68,6 +68,7 @@ dependencies:
   xml: ^6.6.1
   path_provider: ^2.1.6
   rxdart: ^0.28.0
+  video_player: ^2.14.1
 
 
 dev_dependencies:
@@ -81,6 +82,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   sqflite_common_ffi: ^2.4.0+3
+  video_player_platform_interface: ^6.9.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -91,6 +93,7 @@ flutter:
   assets:
     - assets/images/webp/
     - assets/images/png/
+    - assets/images/mp4/
     - lib/xml_strings/values/
     - lib/xml_strings/values-vi/
     - lib/xml_strings/values-ar/

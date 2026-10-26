@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 
 import '../controller/feedback_controller.dart';
+import '../models/data_models/song.dart';
 import '../controller/language_controller.dart';
+import '../controller/ringtone_editor_controller.dart';
 import '../controller/onboarding_controller.dart';
 import '../controller/playlist_detail_controller.dart';
 import '../controller/search_controller.dart';
@@ -27,6 +29,8 @@ import '../presentation/screens_settings/feedback_screen.dart';
 import '../presentation/screens_settings/headphones_screen.dart';
 import '../presentation/screens_settings/permissions_screen.dart';
 import '../presentation/screens_settings/playback_quality_screen.dart';
+import '../presentation/screens_settings/ringtone_editor_screen.dart';
+import '../presentation/screens_settings/ringtone_pick_screen.dart';
 import '../presentation/screens_settings/scan_library_screen.dart';
 import '../presentation/screens_settings/sleep_timer_screen.dart';
 import '../presentation/screens_settings/theme_screen.dart';
@@ -111,6 +115,18 @@ class AppPages {
     GetPage(
       name: RouteName.statisticsArtist,
       page: () => const StatisticsArtistScreen(),
+    ),
+    GetPage(
+      name: RouteName.ringtonePick,
+      page: () => const RingtonePickScreen(),
+    ),
+    GetPage(
+      name: RouteName.ringtoneEdit,
+      page: () => const RingtoneEditorScreen(),
+      // Get.arguments is the Song chosen on the previous screen.
+      binding: BindingsBuilder(() {
+        Get.put(RingtoneEditorController(Get.arguments as Song));
+      }),
     ),
     GetPage(name: RouteName.scanLibrary, page: () => const ScanLibraryScreen()),
     GetPage(name: RouteName.sleepTimer, page: () => const SleepTimerScreen()),

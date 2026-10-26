@@ -542,4 +542,38 @@ once loved again</string>
 your energy</string>
     <string name="home_s3_sub">Upbeat rhythms from
 your library</string>
+    <string name="settings_ringtone">Ringtone maker</string>
+    <string name="settings_ringtone_desc">Cut a part of a song into a ringtone</string>
+    <string name="ringtone_pick_title">Choose a song</string>
+    <string name="ringtone_pick_hint">Pick the song you want to cut. Only songs on your phone are used.</string>
+    <string name="ringtone_search">Search songs</string>
+    <string name="ringtone_title">Cut ringtone</string>
+    <string name="ringtone_loading">Reading the song…</string>
+    <string name="ringtone_wave_failed">Couldn\'t draw the waveform. You can still choose the part with the buttons.</string>
+    <string name="ringtone_hint_handles">Drag the handles to choose the part. Drag inside it to move it.</string>
+    <string name="ringtone_start">Start</string>
+    <string name="ringtone_end">End</string>
+    <string name="ringtone_length">Length</string>
+    <string name="ringtone_limit">A clip is 3 to 40 seconds long.</string>
+    <string name="ringtone_type">Use it as</string>
+    <string name="ringtone_type_ringtone">Ringtone</string>
+    <string name="ringtone_type_notification">Notification</string>
+    <string name="ringtone_type_alarm">Alarm</string>
+    <string name="ringtone_preview">Listen to the part</string>
+    <string name="ringtone_stop">Stop</string>
+    <string name="ringtone_save">Save only</string>
+    <string name="ringtone_set_ringtone">Set as ringtone</string>
+    <string name="ringtone_set_notification">Set as notification sound</string>
+    <string name="ringtone_set_alarm">Set as alarm sound</string>
+    <string name="ringtone_saving">Cutting…</string>
+    <string name="ringtone_saved">Saved. You can pick it in your phone\'s sound settings.</string>
+    <string name="ringtone_done_ringtone">Set as your ringtone</string>
+    <string name="ringtone_done_notification">Set as your notification sound</string>
+    <string name="ringtone_done_alarm">Set as your alarm sound</string>
+    <string name="ringtone_failed">Couldn\'t cut this song. Try another one.</string>
+    <string name="ringtone_perm_title">Allow Muvik to change sounds</string>
+    <string name="ringtone_perm_msg">To set a ringtone, Android needs you to allow Muvik to \"Modify system settings\". Tap Open, turn it on, then come back and tap the button again.</string>
+    <string name="ringtone_perm_open">Open settings</string>
+    <string name="ringtone_perm_return">Allow it, then come back and tap again</string>
+    <string name="ringtone_storage_denied">Muvik needs storage access to save the clip</string>
 </resources>

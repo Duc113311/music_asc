@@ -31,7 +31,7 @@ class StepPermission extends GetView<SetupController> {
           AppSpacing.xl,
         ),
         children: [
-          Image.asset(AppAssets.step1, height: 220, fit: BoxFit.contain),
+          const SetupHero(asset: AppAssets.step1, aspect: 600 / 900),
           const SizedBox(height: AppSpacing.md),
           SetupTitle(
             title: 'step1_title'.tr,

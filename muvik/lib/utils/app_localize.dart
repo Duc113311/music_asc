@@ -17,7 +17,8 @@ class AppLocalize {
 
   static const Locale fallbackLocale = AppLocaleConfig.fallbackLocale;
 
-  /// Languages with a real Muvik translation.
+  /// Languages the app offers (all `values*/` folders). Only EN and VI are
+  /// fully translated so far; the others show the English strings.
   static const List<Locale> translatedLocales =
       AppLocaleConfig.supportedLocales;
 
@@ -50,6 +51,13 @@ class AppLocalize {
   /// Best translated locale for [device], else English.
   static Locale resolve(Locale? device) {
     if (device == null) return fallbackLocale;
+    // Same language and country first (zh_TW is not zh_CN), then the language.
+    for (final l in translatedLocales) {
+      if (l.languageCode == device.languageCode &&
+          l.countryCode == device.countryCode) {
+        return l;
+      }
+    }
     return translatedLocales.firstWhere(
       (l) => l.languageCode == device.languageCode,
       orElse: () => fallbackLocale,

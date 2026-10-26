@@ -134,6 +134,39 @@ class SetupHeader extends StatelessWidget {
 }
 
 /// Shared title block for setup steps.
+/// Illustration of a setup step, edge to edge: it breaks out of the list's
+/// side padding, so it is as wide as the screen instead of 40 px narrower.
+/// The height is capped so the copy below stays on screen on short phones.
+class SetupHero extends StatelessWidget {
+  const SetupHero({super.key, required this.asset, required this.aspect});
+
+  /// Image asset.
+  final String asset;
+
+  /// height / width of the image.
+  final double aspect;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final height = (size.width * aspect).clamp(0.0, size.height * 0.34);
+    return SizedBox(
+      height: height,
+      child: OverflowBox(
+        minWidth: size.width,
+        maxWidth: size.width,
+        child: Image.asset(
+          asset,
+          width: size.width,
+          height: height,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.medium,
+        ),
+      ),
+    );
+  }
+}
+
 class SetupTitle extends StatelessWidget {
   const SetupTitle({
     super.key,

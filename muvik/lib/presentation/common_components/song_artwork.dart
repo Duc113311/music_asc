@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../configs/app_config.dart';
 import '../../models/data_models/song.dart';
 import '../../services/native/media_library_channel.dart';
+import '../../values/app_assets.dart';
 import '../../values/app_colors.dart';
 
 /// Bounded LRU of decoded-size artwork bytes; requests are de-duplicated so a
@@ -140,11 +141,20 @@ class ArtworkPlaceholder extends StatelessWidget {
           colors: [c.surfaceSelected, c.primary.withValues(alpha: 0.35)],
         ),
       ),
-      child: Icon(
-        icon ?? Icons.music_note_rounded,
-        color: c.primary,
-        size: iconSize ?? size * 0.42,
-      ),
+      // A song without artwork shows the brand music note; a playlist or
+      // favorites placeholder passes its own [icon].
+      child: icon != null
+          ? Icon(icon, color: c.primary, size: iconSize ?? size * 0.42)
+          : Center(
+              child: Image.asset(
+                AppAssets.noteIcon,
+                width: iconSize ?? size * 0.54,
+                height: iconSize ?? size * 0.54,
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.medium,
+                excludeFromSemantics: true,
+              ),
+            ),
     );
   }
 }

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../controller/library_controller.dart';
 import '../../controller/playback_controller.dart';
 import '../../models/data_models/playlist.dart';
 import '../../models/ui_models/library_groups.dart';
+import '../../utils/toast_utils.dart';
 import '../../values/app_colors.dart';
 import '../../values/app_dimensions.dart';
 import '../../values/app_typography.dart';
 import '../../values/route_name.dart';
 import '../bottom_sheets/playlist_actions_sheet.dart';
 import '../bottom_sheets/song_actions_sheet.dart';
-import '../bottom_sheets/sort_sheet.dart';
 import '../common_components/app_nav.dart';
 import '../common_components/app_touchable.dart';
 import '../common_components/cards.dart';
@@ -41,6 +42,114 @@ void openGroup(SongGroup g) {
   );
 }
 
+/// Icon of the current song order, shown on the sort button.
+IconData _sortIcon(SongSort s) => switch (s) {
+  SongSort.titleAsc => Icons.sort_by_alpha_rounded,
+  SongSort.titleDesc => Icons.sort_rounded,
+  SongSort.recentlyAdded => Icons.schedule_rounded,
+  SongSort.artist => Icons.person_rounded,
+  SongSort.duration => Icons.timer_outlined,
+};
+
+/// Moves to the next order (A-Z, Z-A, recently added, artist, duration, back
+/// to A-Z), saves it and says which one is on now.
+Future<void> _nextSort(LibraryController lib) async {
+  const all = SongSort.values;
+  final next = all[(all.indexOf(lib.sort.value) + 1) % all.length];
+  HapticFeedback.selectionClick();
+  await lib.setSort(next);
+  ToastUtils.show(
+    next.labelKey.tr,
+    duration: const Duration(milliseconds: 1400),
+  );
+}
+
+/// "Quét nhạc" / "Tạo playlist": drops down under the button (not over the
+/// header), rounded, with a colored icon per entry.
+class _LibraryMenu extends StatelessWidget {
+  const _LibraryMenu({required this.onScan, required this.onNewPlaylist});
+  final VoidCallback onScan;
+  final VoidCallback onNewPlaylist;
+
+  PopupMenuItem<String> _item(
+    BuildContext context, {
+    required String value,
+    required IconData icon,
+    required Color color,
+    required String label,
+  }) {
+    final c = context.colors;
+    return PopupMenuItem<String>(
+      value: value,
+      height: 52,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: AppTypography.bodyL.copyWith(
+              color: c.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return PopupMenuButton<String>(
+      tooltip: 'more_options'.tr,
+      icon: Icon(Icons.more_vert_rounded, color: c.iconDefault),
+      // Under the 3-dots button, 6 px clear of it, instead of covering it.
+      position: PopupMenuPosition.under,
+      offset: const Offset(0, 6),
+      color: c.surfaceElevated,
+      elevation: 12,
+      shadowColor: Colors.black.withValues(alpha: 0.5),
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(color: c.primary.withValues(alpha: 0.35)),
+      ),
+      constraints: const BoxConstraints(minWidth: 220),
+      onSelected: (v) {
+        if (v == 'scan') onScan();
+        if (v == 'new') onNewPlaylist();
+      },
+      itemBuilder: (context) => [
+        _item(
+          context,
+          value: 'scan',
+          icon: Icons.manage_search_rounded,
+          color: c.primary,
+          label: 'action_scan_music'.tr,
+        ),
+        const PopupMenuDivider(height: 1),
+        _item(
+          context,
+          value: 'new',
+          icon: Icons.playlist_add_rounded,
+          color: c.secondary,
+          label: 'playlist_create'.tr,
+        ),
+      ],
+    );
+  }
+}
+
 /// Library tab: Songs / Albums / Artists / Folders / Playlists with real
 /// counts from the DB (P09-01).
 class LibraryTab extends StatelessWidget {
@@ -65,34 +174,22 @@ class LibraryTab extends StatelessWidget {
                   tooltip: 'action_search'.tr,
                   onPressed: () => Get.toNamed(RouteName.search),
                 ),
-                AppIconButton(
-                  icon: Icons.sort_rounded,
-                  tooltip: 'action_sort'.tr,
-                  onPressed: showSortSheet,
-                ),
-                PopupMenuButton<String>(
-                  tooltip: 'more_options'.tr,
-                  icon: Icon(Icons.more_vert_rounded, color: c.iconDefault),
-                  color: c.surfaceElevated,
-                  onSelected: (v) {
-                    if (v == 'scan') Get.toNamed(RouteName.scanLibrary);
-                    if (v == 'new') {
-                      Get.toNamed(
-                        RouteName.playlistForm,
-                        arguments: const PlaylistFormArgs(),
-                      );
-                    }
-                  },
-                  itemBuilder: (_) => [
-                    PopupMenuItem(
-                      value: 'scan',
-                      child: Text('action_scan_music'.tr),
-                    ),
-                    PopupMenuItem(
-                      value: 'new',
-                      child: Text('playlist_create'.tr),
-                    ),
-                  ],
+                // No sheet: each tap moves to the next order and the icon
+                // changes with it (a short toast names the new order).
+                Obx(() {
+                  final s = lib.sort.value;
+                  return AppIconButton(
+                    icon: _sortIcon(s),
+                    tooltip: '${'action_sort'.tr}: ${s.labelKey.tr}',
+                    onPressed: () => _nextSort(lib),
+                  );
+                }),
+                _LibraryMenu(
+                  onScan: () => Get.toNamed(RouteName.scanLibrary),
+                  onNewPlaylist: () => Get.toNamed(
+                    RouteName.playlistForm,
+                    arguments: const PlaylistFormArgs(),
+                  ),
                 ),
               ],
             ),

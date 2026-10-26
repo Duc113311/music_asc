@@ -593,4 +593,38 @@ từng yêu thích</string>
 năng lượng</string>
     <string name="home_s3_sub">Nhịp điệu sôi động từ
 thư viện của bạn</string>
+    <string name="settings_ringtone">Cắt nhạc chuông</string>
+    <string name="settings_ringtone_desc">Cắt một đoạn bài hát thành nhạc chuông</string>
+    <string name="ringtone_pick_title">Chọn bài hát</string>
+    <string name="ringtone_pick_hint">Chọn bài muốn cắt. Chỉ dùng các bài có trong máy.</string>
+    <string name="ringtone_search">Tìm bài hát</string>
+    <string name="ringtone_title">Cắt nhạc chuông</string>
+    <string name="ringtone_loading">Đang đọc bài hát…</string>
+    <string name="ringtone_wave_failed">Không vẽ được dạng sóng. Bạn vẫn chọn đoạn bằng các nút.</string>
+    <string name="ringtone_hint_handles">Kéo hai đầu để chọn đoạn nhạc. Kéo ở giữa để dời cả đoạn.</string>
+    <string name="ringtone_start">Bắt đầu</string>
+    <string name="ringtone_end">Kết thúc</string>
+    <string name="ringtone_length">Độ dài</string>
+    <string name="ringtone_limit">Đoạn nhạc dài từ 3 đến 40 giây.</string>
+    <string name="ringtone_type">Dùng làm</string>
+    <string name="ringtone_type_ringtone">Nhạc chuông</string>
+    <string name="ringtone_type_notification">Thông báo</string>
+    <string name="ringtone_type_alarm">Báo thức</string>
+    <string name="ringtone_preview">Nghe thử đoạn này</string>
+    <string name="ringtone_stop">Dừng</string>
+    <string name="ringtone_save">Chỉ lưu</string>
+    <string name="ringtone_set_ringtone">Đặt làm nhạc chuông</string>
+    <string name="ringtone_set_notification">Đặt làm âm thông báo</string>
+    <string name="ringtone_set_alarm">Đặt làm âm báo thức</string>
+    <string name="ringtone_saving">Đang cắt…</string>
+    <string name="ringtone_saved">Đã lưu. Bạn có thể chọn nó trong cài đặt âm thanh của máy.</string>
+    <string name="ringtone_done_ringtone">Đã đặt làm nhạc chuông</string>
+    <string name="ringtone_done_notification">Đã đặt làm âm thông báo</string>
+    <string name="ringtone_done_alarm">Đã đặt làm âm báo thức</string>
+    <string name="ringtone_failed">Không cắt được bài này. Hãy thử bài khác.</string>
+    <string name="ringtone_perm_title">Cho phép Muvik đổi âm thanh</string>
+    <string name="ringtone_perm_msg">Để đặt nhạc chuông, Android cần bạn cho phép Muvik \"Sửa đổi cài đặt hệ thống\". Bấm Mở, bật lên, rồi quay lại và bấm nút lần nữa.</string>
+    <string name="ringtone_perm_open">Mở cài đặt</string>
+    <string name="ringtone_perm_return">Bật cho phép rồi quay lại bấm lần nữa</string>
+    <string name="ringtone_storage_denied">Muvik cần quyền bộ nhớ để lưu đoạn nhạc</string>
 </resources>

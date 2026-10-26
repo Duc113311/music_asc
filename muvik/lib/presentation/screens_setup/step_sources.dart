@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../controller/setup_controller.dart';
 import '../../models/data_models/music_source.dart';
 import '../../services/application/library_scan_service.dart';
+import '../../values/app_assets.dart';
 import '../../values/app_colors.dart';
 import '../../values/app_dimensions.dart';
 import '../../values/app_typography.dart';
@@ -37,6 +38,8 @@ class StepSources extends GetView<SetupController> {
                 AppSpacing.md,
               ),
               children: [
+                const SetupHero(asset: AppAssets.step2, aspect: 539 / 900),
+                const SizedBox(height: AppSpacing.md),
                 SetupTitle(
                   title: 'step2_title'.tr,
                   highlight: 'step2_highlight'.tr,

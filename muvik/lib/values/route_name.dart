@@ -17,6 +17,8 @@ class RouteName {
       '/playlist/form'; // sc_bthShet_tao_playlist (full form)
   static const String statisticsSongs = '/statistics/songs';
   static const String statisticsArtist = '/statistics/artist';
+  static const String ringtonePick = '/settings/ringtone'; // choose a song
+  static const String ringtoneEdit = '/settings/ringtone/edit'; // cut it
   static const String scanLibrary = '/settings/scan'; // sc_quet_thu_vien
   static const String sleepTimer = '/settings/sleep-timer'; // sc_hen_gio_tat
   static const String equalizer = '/settings/equalizer'; // sc_bo_chinh_am

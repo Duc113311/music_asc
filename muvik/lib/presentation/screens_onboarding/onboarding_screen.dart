@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:video_player/video_player.dart';
 
 import '../../controller/onboarding_controller.dart';
+import '../../services/application/app_lifecycle_service.dart';
 import '../../values/app_assets.dart';
 import '../../values/app_typography.dart';
 
@@ -64,6 +66,7 @@ class _PageSpec {
   const _PageSpec({
     required this.index,
     required this.background,
+    required this.video,
     required this.titleKey,
     required this.highlightKey,
     required this.descKey,
@@ -80,6 +83,7 @@ class _PageSpec {
 
   final int index;
   final String background;
+  final String video;
   final String titleKey;
   final String highlightKey;
   final String descKey;
@@ -107,6 +111,7 @@ const _purpleCta = LinearGradient(
 const _page1 = _PageSpec(
   index: 0,
   background: AppAssets.onboarding1,
+  video: AppAssets.onboardingVideo1,
   titleKey: 'onb1_title',
   highlightKey: 'onb1_highlight',
   descKey: 'onb1_desc',
@@ -125,6 +130,7 @@ const _page1 = _PageSpec(
 const _page2 = _PageSpec(
   index: 1,
   background: AppAssets.onboarding2,
+  video: AppAssets.onboardingVideo2,
   titleKey: 'onb2_title',
   highlightKey: 'onb2_highlight',
   descKey: 'onb2_desc',
@@ -144,6 +150,7 @@ const _page2 = _PageSpec(
 const _page3 = _PageSpec(
   index: 2,
   background: AppAssets.onboarding3,
+  video: AppAssets.onboardingVideo3,
   titleKey: 'onb3_title',
   highlightKey: 'onb3_highlight',
   descKey: 'onb3_desc',
@@ -247,7 +254,7 @@ class _OnboardingPageState extends State<_OnboardingPage>
     return Stack(
       fit: StackFit.expand,
       children: [
-        _Background(spec.background),
+        _Background(image: spec.background, video: spec.video),
         // Title, highlight, description, dots, button: bottom-up stack.
         Positioned(
           left: 0,
@@ -423,25 +430,110 @@ class _Reveal extends StatelessWidget {
   }
 }
 
-/// Full-bleed picture from the top, fading into the dark background under the
-/// copy so the text stays readable.
-class _Background extends StatelessWidget {
-  const _Background(this.asset);
-  final String asset;
+/// Full-bleed background: a muted, looping video that fades in as soon as it
+/// can play. Until then the page shows the dark background color; if the video
+/// cannot be loaded, or the system asks for no animations, the still [image]
+/// is shown instead. A gradient fades the bottom into the background so the
+/// copy stays readable.
+class _Background extends StatefulWidget {
+  const _Background({required this.image, required this.video});
+  final String image;
+  final String video;
+
+  @override
+  State<_Background> createState() => _BackgroundState();
+}
+
+class _BackgroundState extends State<_Background> {
+  VideoPlayerController? _video;
+  bool _ready = false;
+  bool _failed = false;
+  bool _started = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_started) return;
+    _started = true;
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _failed = true; // still image only
+      return;
+    }
+    _start();
+    if (Get.isRegistered<AppLifecycleService>()) {
+      AppLifecycleService.to
+        ..addResumedListener(_resume)
+        ..addBackgroundListener(_pause);
+    }
+  }
+
+  Future<void> _start() async {
+    final c = VideoPlayerController.asset(
+      widget.video,
+      videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+    );
+    _video = c;
+    try {
+      await c.initialize();
+      await c.setVolume(0);
+      await c.setLooping(true);
+      if (!mounted) return;
+      await c.play();
+      if (mounted) setState(() => _ready = true);
+    } catch (e) {
+      // No plugin / unsupported codec: keep the still image.
+      if (mounted) setState(() => _failed = true);
+    }
+  }
+
+  void _pause() => _video?.pause();
+
+  void _resume() {
+    final c = _video;
+    if (c != null && _ready) c.play();
+  }
+
+  @override
+  void dispose() {
+    if (Get.isRegistered<AppLifecycleService>()) {
+      AppLifecycleService.to
+        ..removeResumedListener(_resume)
+        ..removeBackgroundListener(_pause);
+    }
+    _video?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final c = _video;
     return Stack(
       fit: StackFit.expand,
       children: [
-        // The art sits in the upper part of a tall canvas that already fades to
-        // the dark background; top aligned so the copy sits on the dark area.
-        Image.asset(
-          asset,
-          fit: BoxFit.cover,
-          alignment: Alignment.topCenter,
-          filterQuality: FilterQuality.medium,
-        ),
+        const ColoredBox(color: _bgColor),
+        if (_failed)
+          Image.asset(
+            widget.image,
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
+            filterQuality: FilterQuality.medium,
+          ),
+        if (c != null && _ready)
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: const Duration(milliseconds: 300),
+            builder: (context, v, child) => Opacity(opacity: v, child: child),
+            child: FittedBox(
+              fit: BoxFit.cover,
+              alignment: Alignment.topCenter,
+              clipBehavior: Clip.hardEdge,
+              child: SizedBox(
+                width: c.value.size.width,
+                height: c.value.size.height,
+                child: VideoPlayer(c),
+              ),
+            ),
+          ),
         const DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(

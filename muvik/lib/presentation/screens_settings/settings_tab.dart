@@ -45,6 +45,12 @@ class SettingsTab extends StatelessWidget {
                     subtitle: 'settings_scan_desc'.tr,
                     onTap: () => Get.toNamed(RouteName.scanLibrary),
                   ),
+                  _Row(
+                    icon: const _GradientIcon(Icons.content_cut_rounded),
+                    title: 'settings_ringtone'.tr,
+                    subtitle: 'settings_ringtone_desc'.tr,
+                    onTap: () => Get.toNamed(RouteName.ringtonePick),
+                  ),
                   Obx(
                     () => _Row(
                       icon: const _GradientIcon(Icons.sync_rounded),

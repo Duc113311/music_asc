@@ -11,6 +11,20 @@ class SystemUiChannel {
     'com.asctechsoft.muvik/system_ui',
   );
 
+  /// Keeps the CPU awake for [duration] (a self-releasing wake lock) while the
+  /// player opens the next track, so a locked phone cannot doze in the middle
+  /// of the change. Failures are ignored: it is a precaution.
+  static Future<void> holdCpu([
+    Duration duration = const Duration(seconds: 30),
+  ]) async {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
+    try {
+      await _ch.invokeMethod('holdCpu', {'ms': duration.inMilliseconds});
+    } on PlatformException catch (e) {
+      AppLog.info('SystemUiChannel.holdCpu: $e');
+    } on MissingPluginException catch (_) {}
+  }
+
   static Future<void> hideNavigationBar() async {
     if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
     try {

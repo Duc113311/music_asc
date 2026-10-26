@@ -10,8 +10,8 @@ import '../values/route_name.dart';
 
 /// Language picker, used twice: on first run between Splash and Onboarding
 /// (a "Continue" button finishes it) and from Settings (every tap applies at
-/// once, Back returns). Only languages with a real Muvik translation are
-/// offered ([AppLocalize.translatedLocales]).
+/// once, Back returns). Every language of [AppLocalize.translatedLocales] is
+/// offered (all 16 locale folders); untranslated ones show English text.
 class LanguageController extends GetxController {
   /// True when opened from Settings.
   final bool fromSettings;

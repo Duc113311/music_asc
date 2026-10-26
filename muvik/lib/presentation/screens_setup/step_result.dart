@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 import '../../controller/setup_controller.dart';
@@ -31,7 +32,7 @@ class StepResult extends GetView<SetupController> {
                 AppSpacing.md,
               ),
               children: [
-                Image.asset(AppAssets.step3, height: 200, fit: BoxFit.contain),
+                const SetupHero(asset: AppAssets.step3, aspect: 600 / 900),
                 const SizedBox(height: AppSpacing.md),
                 SetupTitle(
                   title: empty ? 'step3_empty_title'.tr : 'step3_title'.tr,
@@ -44,12 +45,12 @@ class StepResult extends GetView<SetupController> {
                 _CountRow(
                   children: [
                     _Count(
-                      icon: Icons.music_note_rounded,
+                      icon: AppAssets.iconSong,
                       value: songs,
                       label: 'count_songs'.tr,
                     ),
                     _Count(
-                      icon: Icons.album_rounded,
+                      icon: AppAssets.iconPlaylist,
                       value: lib.albums.length,
                       label: 'count_albums'.tr,
                     ),
@@ -59,12 +60,12 @@ class StepResult extends GetView<SetupController> {
                 _CountRow(
                   children: [
                     _Count(
-                      icon: Icons.person_rounded,
+                      icon: AppAssets.iconPeople,
                       value: lib.artists.length,
                       label: 'count_artists'.tr,
                     ),
                     _Count(
-                      icon: Icons.folder_rounded,
+                      icon: AppAssets.iconFloppy,
                       value: lib.folders.length,
                       label: 'count_folders'.tr,
                     ),
@@ -135,7 +136,8 @@ class _CountRow extends StatelessWidget {
 
 class _Count extends StatelessWidget {
   const _Count({required this.icon, required this.value, required this.label});
-  final IconData icon;
+  /// SVG asset path.
+  final String icon;
   final int value;
   final String label;
 
@@ -156,7 +158,12 @@ class _Count extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: c.primary),
+            SvgPicture.asset(
+              icon,
+              width: 28,
+              height: 28,
+              colorFilter: ColorFilter.mode(c.primary, BlendMode.srcIn),
+            ),
             const SizedBox(height: AppSpacing.xxs),
             FittedBox(
               child: Text(

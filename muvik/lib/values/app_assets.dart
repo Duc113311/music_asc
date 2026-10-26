@@ -1,5 +1,5 @@
 /// Asset paths (ASCII snake_case). Screen mapping:
-/// - img_logo_muvik_v4 (png): splash, about, rate dialog; also the source of the launcher icons
+/// - img_logo_app_v5 (png): splash, about, rate dialog; also the source of the launcher icons
 /// - bg_on_01..03 (webp): backgrounds of sc_onBrg_01..03
 /// - ic_step_01..03: sc_step_01..03
 /// - bg_theme_dark/light: splash backgrounds
@@ -17,10 +17,21 @@ class AppAssets {
   static const String homeSlide1 = '$_webp/slide_1.webp';
   static const String homeSlide2 = '$_webp/slide_2.webp';
   static const String homeSlide3 = '$_webp/slide_3.webp';
-  static const String logo = 'assets/images/png/img_logo_muvik_v4.png';
+  // Gradient music note: the cover shown for a song without artwork.
+  static const String noteIcon = '$_webp/img_not_nhac.webp';
+  static const String logo = 'assets/images/png/img_logo_app_v5.png';
   static const String onboarding1 = '$_webp/bg_on_01.webp';
   static const String onboarding2 = '$_webp/bg_on_02.webp';
   static const String onboarding3 = '$_webp/bg_on_03.webp';
+  // Onboarding background videos (1080x1920, 4 s loop, muted at play time).
+  static const String onboardingVideo1 = 'assets/images/mp4/mp4_slide_1.mp4';
+  static const String onboardingVideo2 = 'assets/images/mp4/mp4_slide_2.mp4';
+  static const String onboardingVideo3 = 'assets/images/mp4/mp4_slide_3.mp4';
+  // Counter icons of the setup result (SVG, recolored with the accent).
+  static const String iconSong = 'assets/images/png/ic_song.svg';
+  static const String iconPlaylist = 'assets/images/png/ic_playlist.svg';
+  static const String iconPeople = 'assets/images/png/ic_people.svg';
+  static const String iconFloppy = 'assets/images/png/ic_floppy_disk.svg';
   static const String step1 = '$_webp/ic_step_01.webp';
   static const String step2 = '$_webp/ic_step_02.webp';
   static const String step3 = '$_webp/ic_step_03.webp';

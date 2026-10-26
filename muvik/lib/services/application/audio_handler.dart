@@ -17,6 +17,7 @@ import '../../models/ui_models/repeat_mode.dart';
 import '../../models/ui_models/shuffle_mode.dart';
 import '../../repository/playback_repository.dart';
 import '../native/media_library_channel.dart';
+import '../native/system_ui_channel.dart';
 import '../storage/database_helper.dart';
 import '../storage/pref_store.dart';
 import 'library_data_service.dart';
@@ -489,6 +490,9 @@ class MuvikAudioHandler extends BaseAudioHandler with SeekHandler {
 
   // ------------------------------------------------------------ loading
 
+  /// How long a track may take to open before it counts as unplayable.
+  static const Duration _loadTimeout = Duration(seconds: 12);
+
   Future<void> _loadCurrent({
     required bool play,
     required Duration position,
@@ -509,10 +513,20 @@ class MuvikAudioHandler extends BaseAudioHandler with SeekHandler {
     mediaItem.add(_mediaItem(song, entry));
     _publish();
     try {
-      await _player.setAudioSource(
-        AudioSource.uri(Uri.parse(song.uri)),
-        initialPosition: position,
-      );
+      // A file the decoder never finishes opening (broken header, a very short
+      // or truncated MP3...) must not leave the notification spinning forever
+      // when the previous track ended with the screen off: give up after
+      // [_loadTimeout], report it and go on to the next song.
+      await _player
+          .setAudioSource(
+            AudioSource.uri(Uri.parse(song.uri)),
+            initialPosition: position,
+          )
+          .timeout(
+            _loadTimeout,
+            onTimeout: () =>
+                throw TimeoutException('load timed out', _loadTimeout),
+          );
     } catch (e) {
       AppLog.info('AudioHandler.load ${song.uri}: $e');
       if (token != _loadToken) return;
@@ -570,6 +584,8 @@ class MuvikAudioHandler extends BaseAudioHandler with SeekHandler {
   Future<void> _onCompleted() async {
     if (_handlingCompletion || _loadedEntryId == null) return;
     _handlingCompletion = true;
+    // The next track is opened from Dart; keep the CPU awake meanwhile.
+    unawaited(SystemUiChannel.holdCpu());
     try {
       _events.add(
         PlayerEvent(

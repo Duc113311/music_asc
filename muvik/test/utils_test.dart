@@ -66,9 +66,13 @@ void main() {
     expect(current['count_songs_n'], contains('@args1'));
   });
 
-  test('locale resolution falls back to English', () {
+  test('locale resolution: own language, country variant, else English', () {
     expect(AppLocalize.resolve(const Locale('vi')).languageCode, 'vi');
-    expect(AppLocalize.resolve(const Locale('ja')).languageCode, 'en');
+    expect(AppLocalize.resolve(const Locale('ja')).languageCode, 'ja');
+    expect(AppLocalize.resolve(const Locale('zh', 'TW')).toString(), 'zh_TW');
+    expect(AppLocalize.resolve(const Locale('zh', 'HK')).languageCode, 'zh');
+    // A language with no locale folder falls back to English.
+    expect(AppLocalize.resolve(const Locale('hi')).languageCode, 'en');
     expect(AppLocalize.resolve(null), AppLocalize.fallbackLocale);
   });
 
