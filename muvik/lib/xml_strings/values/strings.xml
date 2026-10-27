@@ -605,7 +605,7 @@ your library</string>
     <string name="ringtone_start">Start</string>
     <string name="ringtone_end">End</string>
     <string name="ringtone_length">Length</string>
-    <string name="ringtone_limit">A clip is 3 to 40 seconds long.</string>
+    <string name="ringtone_limit">A clip is 3 to 180 seconds long.</string>
     <string name="ringtone_type">Use it as</string>
     <string name="ringtone_type_ringtone">Ringtone</string>
     <string name="ringtone_type_notification">Notification</string>

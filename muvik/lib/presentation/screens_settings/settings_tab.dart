@@ -183,21 +183,6 @@ class SettingsTab extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Obx(
-                    () => _Row(
-                      icon: const _GradientIcon(Icons.music_note_rounded),
-                      title: 'settings_ongoing'.tr,
-                      subtitle: 'settings_ongoing_desc'.tr,
-                      chevron: false,
-                      trailing: Switch(
-                        value: settings.ongoingNotification.value,
-                        onChanged: settings.setOngoingNotification,
-                      ),
-                      onTap: () => settings.setOngoingNotification(
-                        !settings.ongoingNotification.value,
-                      ),
-                    ),
-                  ),
                   _Row(
                     icon: const _GradientIcon(Icons.shield_outlined),
                     title: 'settings_permissions'.tr,
@@ -540,4 +525,3 @@ class _Row extends StatelessWidget {
     );
   }
 }
-

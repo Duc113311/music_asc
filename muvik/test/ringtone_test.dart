@@ -45,23 +45,21 @@ void main() {
       expect(tiny.withEnd(500).endMs, 2000);
     });
 
-    test('length stays between 3 s and 40 s', () {
-      var r = RingtoneRange.initial(200000); // 15..45 s
-      r = r.withStart(0); // would be 45 s: the start is held at end - 40 s
+    test('length stays between 3 s and 180 s', () {
+      var r = RingtoneRange.initial(400000); // 15..45 s
+      r = r.withStart(0); // 45 s is fine: the longest clip is 180 s
+      expect(r.lengthMs, 45000);
+      r = r.withEnd(399000); // far past the cap: held at start + 180 s
       expect(r.lengthMs, RingtoneRange.maxMs);
-      expect(r.startMs, 5000);
-      r = r.withStart(44000); // would be 1 s: held at end - 3 s
+      r = r.withStart(r.endMs - 1000); // would be 1 s: held at end - 3 s
       expect(r.lengthMs, RingtoneRange.minMs);
-      r = r.withEnd(500000); // past the song and past 40 s
-      expect(r.endMs <= 200000, isTrue);
-      expect(r.lengthMs, lessThanOrEqualTo(RingtoneRange.maxMs));
       r = r.withEnd(0);
       expect(r.lengthMs, RingtoneRange.minMs);
     });
 
     test('the end never goes past the song', () {
       final r = RingtoneRange.initial(60000).withEnd(999999);
-      expect(r.endMs, 55000); // start 15 s + 40 s max
+      expect(r.endMs, 60000); // the song ends first
       final late = r.shifted(999999);
       expect(late.endMs, 60000);
       expect(late.lengthMs, r.lengthMs);
@@ -190,7 +188,7 @@ void main() {
     test('waveform is parsed and the real duration replaces the library one', () async {
       final c = Get.put(RingtoneEditorController(_song(durationMs: 100000)));
       await Future<void>.delayed(const Duration(milliseconds: 50));
-      expect(c.peaks.toList(), [0.2, 1.0, 0.5]);
+      expect(c.peaks.value, [0.2, 1.0, 0.5]);
       expect(c.range.value.durationMs, 180000);
       expect(c.loadingWave.value, isFalse);
     });

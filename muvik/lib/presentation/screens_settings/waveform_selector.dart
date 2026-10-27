@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -33,11 +34,13 @@ enum _Drag { none, start, end, body }
 class _WaveformSelectorState extends State<WaveformSelector> {
   _Drag _drag = _Drag.none;
   double _carryMs = 0;
+  double _grabDx = 0;
 
   /// How close (px) a touch must be to a handle to grab it.
   static const double _grab = 30;
 
-  double get _dur => widget.range.durationMs.toDouble().clamp(1, double.infinity);
+  double get _dur =>
+      widget.range.durationMs.toDouble().clamp(1, double.infinity);
 
   void _start(DragStartDetails d, double width) {
     final r = widget.range;
@@ -56,10 +59,16 @@ class _WaveformSelectorState extends State<WaveformSelector> {
       _drag = _Drag.none;
     }
     _carryMs = 0;
+    // The handle keeps its distance from the finger instead of jumping to it.
+    _grabDx = switch (_drag) {
+      _Drag.start => sx - x,
+      _Drag.end => ex - x,
+      _ => 0,
+    };
   }
 
   void _update(DragUpdateDetails d, double width) {
-    final x = d.localPosition.dx.clamp(0, width);
+    final x = (d.localPosition.dx + _grabDx).clamp(0, width);
     switch (_drag) {
       case _Drag.start:
         widget.onChanged(widget.range.withStart((x / width * _dur).round()));
@@ -87,24 +96,28 @@ class _WaveformSelectorState extends State<WaveformSelector> {
           label: 'ringtone_hint_handles'.tr,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
+            dragStartBehavior: DragStartBehavior.down,
             onHorizontalDragStart: (d) => _start(d, w),
             onHorizontalDragUpdate: (d) => _update(d, w),
             onHorizontalDragEnd: (_) => _drag = _Drag.none,
-            child: SizedBox(
-              height: widget.height,
-              width: w,
-              child: CustomPaint(
-                painter: _WavePainter(
-                  peaks: widget.peaks,
-                  startFrac: widget.range.startMs / _dur,
-                  endFrac: widget.range.endMs / _dur,
-                  playFrac: widget.playheadMs == null
-                      ? null
-                      : widget.playheadMs! / _dur,
-                  active: c.primary,
-                  idle: c.textMuted.withValues(alpha: 0.35),
-                  handle: c.secondary,
-                  playhead: Colors.white,
+            onHorizontalDragCancel: () => _drag = _Drag.none,
+            child: RepaintBoundary(
+              child: SizedBox(
+                height: widget.height,
+                width: w,
+                child: CustomPaint(
+                  painter: _WavePainter(
+                    peaks: widget.peaks,
+                    startFrac: widget.range.startMs / _dur,
+                    endFrac: widget.range.endMs / _dur,
+                    playFrac: widget.playheadMs == null
+                        ? null
+                        : widget.playheadMs! / _dur,
+                    active: c.primary,
+                    idle: c.textMuted.withValues(alpha: 0.35),
+                    handle: c.secondary,
+                    playhead: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -142,7 +155,9 @@ class _WavePainter extends CustomPainter {
     final slot = size.width / n;
     final barW = (slot * 0.62).clamp(1.5, 6.0);
     final mid = size.height / 2;
-    final paint = Paint()..strokeCap = StrokeCap.round..strokeWidth = barW;
+    final paint = Paint()
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = barW;
 
     for (var i = 0; i < n; i++) {
       final frac = (i + 0.5) / n;

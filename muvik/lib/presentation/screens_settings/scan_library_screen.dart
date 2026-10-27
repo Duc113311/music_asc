@@ -105,8 +105,7 @@ class ScanLibraryScreen extends StatelessWidget {
                     const SizedBox(height: 20),
                     _SourcesHeader(
                       showToggle: accessible.length > 1,
-                      allOn:
-                          accessible.isNotEmpty &&
+                      allOn: accessible.isNotEmpty &&
                           accessible.every((x) => x.enabled),
                       onToggle: (allOn) => scan.setSourcesEnabled(
                         allOn ? <int>{} : accessible.map((x) => x.id!).toSet(),
@@ -149,9 +148,9 @@ class _Hero extends StatelessWidget {
       ScanStatus.scanning => ('scan_finding'.tr, 'scan_subtitle'.tr),
       ScanStatus.idle => ('scan_ready'.tr, 'scan_subtitle'.tr),
       ScanStatus.success => (
-        s.hasChanges ? 'scan_done'.tr : 'scan_no_changes'.tr,
-        _summary(s),
-      ),
+          s.hasChanges ? 'scan_done'.tr : 'scan_no_changes'.tr,
+          _summary(s),
+        ),
       ScanStatus.partial => ('scan_partial'.tr, _summary(s)),
       ScanStatus.error => ('scan_error'.tr, ''),
       ScanStatus.cancelled => ('scan_cancelled'.tr, _summary(s)),
@@ -232,11 +231,11 @@ class _Hero extends StatelessWidget {
   }
 
   static String _summary(ScanState s) => [
-    '${'scan_new'.tr}: ${s.added}',
-    '${'scan_updated'.tr}: ${s.updated}',
-    '${'scan_skipped'.tr}: ${s.skipped}',
-    if (s.markedMissing > 0) '${'scan_missing'.tr}: ${s.markedMissing}',
-  ].join(' · ');
+        '${'scan_new'.tr}: ${s.added}',
+        '${'scan_updated'.tr}: ${s.updated}',
+        '${'scan_skipped'.tr}: ${s.skipped}',
+        if (s.markedMissing > 0) '${'scan_missing'.tr}: ${s.markedMissing}',
+      ].join(' · ');
 }
 
 /// 140pt ring: determinate arc + "78%", a spinning arc + processed count
@@ -472,14 +471,14 @@ class _SoundWave extends StatelessWidget {
   }
 
   Widget _dot(Color color) => Container(
-    width: 1.8,
-    height: 1.8,
-    margin: const EdgeInsets.symmetric(horizontal: 1.6),
-    decoration: BoxDecoration(
-      color: color.withValues(alpha: 0.8),
-      shape: BoxShape.circle,
-    ),
-  );
+        width: 1.8,
+        height: 1.8,
+        margin: const EdgeInsets.symmetric(horizontal: 1.6),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.8),
+          shape: BoxShape.circle,
+        ),
+      );
 }
 
 class _Counts extends StatelessWidget {
@@ -630,16 +629,15 @@ class _StepsState extends State<_Steps> {
         ? _StepStatus.done
         : (p == s.phase ? _StepStatus.running : _StepStatus.waiting);
     String detail(ScanPhase p) => switch (p) {
-      ScanPhase.reading =>
-        s.total != null
-            ? 'scan_processed_of'.trParams({
-                'args1': '${s.processed}',
-                'args2': '${s.total}',
-              })
-            : 'scan_processed'.trParams({'args1': '${s.processed}'}),
-      ScanPhase.albums => '${widget.albums} ${'count_albums'.tr}',
-      ScanPhase.updating => _Hero._summary(s),
-    };
+          ScanPhase.reading => s.total != null
+              ? 'scan_processed_of'.trParams({
+                  'args1': '${s.processed}',
+                  'args2': '${s.total}',
+                })
+              : 'scan_processed'.trParams({'args1': '${s.processed}'}),
+          ScanPhase.albums => '${widget.albums} ${'count_albums'.tr}',
+          ScanPhase.updating => _Hero._summary(s),
+        };
     const titles = {
       ScanPhase.reading: 'scan_step_read',
       ScanPhase.albums: 'scan_step_albums',
@@ -689,28 +687,28 @@ class _StepRow extends StatelessWidget {
     };
     final Widget icon = switch (status) {
       _StepStatus.done => Container(
-        width: 26,
-        height: 26,
-        decoration: BoxDecoration(color: c.primary, shape: BoxShape.circle),
-        child: Icon(Icons.check_rounded, size: 17, color: c.onPrimary),
-      ),
+          width: 26,
+          height: 26,
+          decoration: BoxDecoration(color: c.primary, shape: BoxShape.circle),
+          child: Icon(Icons.check_rounded, size: 17, color: c.onPrimary),
+        ),
       _StepStatus.running => SizedBox.square(
-        dimension: 26,
-        child: CircularProgressIndicator(
-          strokeWidth: 3,
-          strokeCap: StrokeCap.round,
-          color: c.primary,
-          backgroundColor: p.border,
+          dimension: 26,
+          child: CircularProgressIndicator(
+            strokeWidth: 3,
+            strokeCap: StrokeCap.round,
+            color: c.primary,
+            backgroundColor: p.border,
+          ),
         ),
-      ),
       _StepStatus.waiting => Container(
-        width: 26,
-        height: 26,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: p.muted, width: 2.5),
+          width: 26,
+          height: 26,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: p.muted, width: 2.5),
+          ),
         ),
-      ),
     };
     return Semantics(
       button: true,

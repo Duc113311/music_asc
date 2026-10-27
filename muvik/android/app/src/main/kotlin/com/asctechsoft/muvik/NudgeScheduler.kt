@@ -119,10 +119,6 @@ class NudgeReceiver : BroadcastReceiver() {
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED -> {
                 NudgeScheduler.restore(context)
-                if (OngoingNotification.isEnabled(context)) {
-                    OngoingService.start(context)
-                    OngoingHealthCheckReceiver.schedule(context)
-                }
             }
             else -> NudgeScheduler.fire(context)
         }

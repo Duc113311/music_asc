@@ -625,7 +625,7 @@ S = {
     'ringtone_start': ('Start', 'Bắt đầu'),
     'ringtone_end': ('End', 'Kết thúc'),
     'ringtone_length': ('Length', 'Độ dài'),
-    'ringtone_limit': ('A clip is 3 to 40 seconds long.', 'Đoạn nhạc dài từ 3 đến 40 giây.'),
+    'ringtone_limit': ('A clip is 3 to 180 seconds long.', 'Đoạn nhạc dài từ 3 đến 180 giây.'),
     'ringtone_type': ('Use it as', 'Dùng làm'),
     'ringtone_type_ringtone': ('Ringtone', 'Nhạc chuông'),
     'ringtone_type_notification': ('Notification', 'Thông báo'),

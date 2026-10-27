@@ -19,9 +19,8 @@ class PlaybackQualityScreen extends StatelessWidget {
   const PlaybackQualityScreen({super.key});
 
   String _format(String? mime, String fileName) {
-    final ext = fileName.contains('.')
-        ? fileName.split('.').last.toUpperCase()
-        : null;
+    final ext =
+        fileName.contains('.') ? fileName.split('.').last.toUpperCase() : null;
     if (mime == null) return ext ?? 'unknown_value'.tr;
     final sub = mime.split('/').last.toUpperCase().replaceAll('MPEG', 'MP3');
     return ext != null && ext != sub ? '$sub ($ext)' : sub;
@@ -83,11 +82,10 @@ class PlaybackQualityScreen extends StatelessWidget {
                       final f = snap.data;
                       final unknown = 'unknown_value'.tr;
                       // Average bitrate from size/duration when the codec doesn't report it.
-                      final bitrate =
-                          f?.bitrate ??
+                      final bitrate = f?.bitrate ??
                           (song.sizeBytes > 0 && song.durationMs > 0
                               ? (song.sizeBytes * 8 * 1000 / song.durationMs)
-                                    .round()
+                                  .round()
                               : null);
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,10 +136,10 @@ class PlaybackQualityScreen extends StatelessWidget {
                                   f?.channels == null
                                       ? unknown
                                       : (f!.channels == 1
-                                            ? 'channels_mono'.tr
-                                            : (f.channels == 2
-                                                  ? 'channels_stereo'.tr
-                                                  : '${f.channels}')),
+                                          ? 'channels_mono'.tr
+                                          : (f.channels == 2
+                                              ? 'channels_stereo'.tr
+                                              : '${f.channels}')),
                                 ),
                                 (
                                   'info_size'.tr,

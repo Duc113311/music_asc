@@ -33,7 +33,6 @@ class PrefDefaults {
   static const bool headphoneButtonsEnabled = true;
   static const bool nudgeEnabled = true;
   static const bool autoScanNewMusic = false;
-  static const bool ongoingNotification = true;
 
   static const String songSort = 'title_asc';
 

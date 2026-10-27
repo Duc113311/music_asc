@@ -8,7 +8,7 @@ class RingtoneRange {
   const RingtoneRange._(this.startMs, this.endMs, this.durationMs);
 
   static const int minMs = 3000;
-  static const int maxMs = 40000;
+  static const int maxMs = 180000;
 
   /// First suggested length of a clip.
   static const int defaultMs = 30000;

@@ -11,9 +11,9 @@ class DetailPalette {
   DetailPalette._(this.dark, this._c);
 
   factory DetailPalette.of(BuildContext context) => DetailPalette._(
-    Theme.of(context).brightness == Brightness.dark,
-    context.colors,
-  );
+        Theme.of(context).brightness == Brightness.dark,
+        context.colors,
+      );
 
   final bool dark;
   final AppColors _c;

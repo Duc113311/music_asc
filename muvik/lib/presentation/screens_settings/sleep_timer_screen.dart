@@ -295,9 +295,8 @@ class _RadioRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = DetailPalette.of(context);
-    final tint = p.dark
-        ? const Color(0xFF1E2033)
-        : context.colors.surfaceSelected;
+    final tint =
+        p.dark ? const Color(0xFF1E2033) : context.colors.surfaceSelected;
     return Semantics(
       selected: selected,
       button: true,

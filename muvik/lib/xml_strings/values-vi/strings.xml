@@ -605,7 +605,7 @@ thư viện của bạn</string>
     <string name="ringtone_start">Bắt đầu</string>
     <string name="ringtone_end">Kết thúc</string>
     <string name="ringtone_length">Độ dài</string>
-    <string name="ringtone_limit">Đoạn nhạc dài từ 3 đến 40 giây.</string>
+    <string name="ringtone_limit">Đoạn nhạc dài từ 3 đến 180 giây.</string>
     <string name="ringtone_type">Dùng làm</string>
     <string name="ringtone_type_ringtone">Nhạc chuông</string>
     <string name="ringtone_type_notification">Thông báo</string>

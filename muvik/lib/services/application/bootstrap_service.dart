@@ -7,7 +7,6 @@ import '../../controller/library_controller.dart';
 import '../../controller/playback_controller.dart';
 import '../../configs/pref_const.dart';
 import '../../configs/pref_defaults.dart';
-import '../native/ongoing_notification_service.dart';
 import '../storage/database_helper.dart';
 import '../storage/pref_store.dart';
 import 'audio_handler.dart';
@@ -57,11 +56,6 @@ class BootstrapService {
       ).timeout(const Duration(seconds: 15));
       Get.put(handler, permanent: true);
       await handler.init();
-
-      handler.view.addListener(
-        () => OngoingNotificationService.sync(handler.view.value),
-      );
-      unawaited(OngoingNotificationService.sync(handler.view.value));
 
       final eq = _ensure(EqualizerService.new)..loadPrefs();
       handler.audioSessionId.addListener(

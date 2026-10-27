@@ -42,7 +42,6 @@ class PrefConst {
   static const String nudgeEnabled = 'nudge_enabled';
   // Scan by itself (and say so) when new music is found; off = only offer.
   static const String autoScanNewMusic = 'auto_scan_new_music';
-  static const String ongoingNotification = 'ongoing_notification';
 
   // Library
   static const String songSort = 'song_sort';

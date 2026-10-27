@@ -20,10 +20,10 @@ class RingtoneEditorScreen extends GetView<RingtoneEditorController> {
   const RingtoneEditorScreen({super.key});
 
   String _setLabel(RingtoneType t) => switch (t) {
-    RingtoneType.ringtone => 'ringtone_set_ringtone'.tr,
-    RingtoneType.notification => 'ringtone_set_notification'.tr,
-    RingtoneType.alarm => 'ringtone_set_alarm'.tr,
-  };
+        RingtoneType.ringtone => 'ringtone_set_ringtone'.tr,
+        RingtoneType.notification => 'ringtone_set_notification'.tr,
+        RingtoneType.alarm => 'ringtone_set_alarm'.tr,
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -76,91 +76,79 @@ class RingtoneEditorScreen extends GetView<RingtoneEditorController> {
                           ],
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        AppCard(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'ringtone_hint_handles'.tr,
-                                style: AppTypography.caption.copyWith(
-                                  color: c.textSecondary,
-                                ),
-                              ),
-                              const SizedBox(height: AppSpacing.sm),
-                              Obx(
-                                () => Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    WaveformSelector(
-                                      peaks: controller.peaks.toList(),
-                                      range: controller.range.value,
-                                      playheadMs: controller.playheadMs.value,
-                                      onChanged: controller.setRange,
-                                    ),
-                                    if (controller.loadingWave.value)
-                                      Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const SizedBox(
-                                            width: 22,
-                                            height: 22,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2.5,
+                        Obx(
+                          () => AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 280),
+                            child: controller.loadingWave.value
+                                ? const _WaveLoading(key: ValueKey('loading'))
+                                : AppCard(
+                                    key: const ValueKey('wave'),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'ringtone_hint_handles'.tr,
+                                          style: AppTypography.caption.copyWith(
+                                            color: c.textSecondary,
+                                          ),
+                                        ),
+                                        const SizedBox(height: AppSpacing.sm),
+                                        Obx(
+                                          () => WaveformSelector(
+                                            peaks: controller.peaks.value,
+                                            range: controller.range.value,
+                                            playheadMs:
+                                                controller.playheadMs.value,
+                                            onChanged: controller.setRange,
+                                          ),
+                                        ),
+                                        Obx(() {
+                                          if (!controller.waveFailed.value) {
+                                            return const SizedBox.shrink();
+                                          }
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                              top: AppSpacing.xs,
                                             ),
-                                          ),
-                                          const SizedBox(height: 6),
-                                          Text(
-                                            'ringtone_loading'.tr,
-                                            style: AppTypography.caption
-                                                .copyWith(
-                                                  color: c.textSecondary,
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              Obx(() {
-                                if (!controller.waveFailed.value) {
-                                  return const SizedBox.shrink();
-                                }
-                                return Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: AppSpacing.xs,
-                                  ),
-                                  child: Text(
-                                    'ringtone_wave_failed'.tr,
-                                    style: AppTypography.caption.copyWith(
-                                      color: c.warning,
+                                            child: Text(
+                                              'ringtone_wave_failed'.tr,
+                                              style: AppTypography.caption
+                                                  .copyWith(
+                                                color: c.warning,
+                                              ),
+                                            ),
+                                          );
+                                        }),
+                                        const SizedBox(height: AppSpacing.sm),
+                                        Obx(() {
+                                          final r = controller.range.value;
+                                          return Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              _Readout(
+                                                label: 'ringtone_start'.tr,
+                                                value: RingtoneRange.format(
+                                                    r.startMs),
+                                              ),
+                                              _Readout(
+                                                label: 'ringtone_length'.tr,
+                                                value: RingtoneRange.format(
+                                                    r.lengthMs),
+                                                highlight: true,
+                                              ),
+                                              _Readout(
+                                                label: 'ringtone_end'.tr,
+                                                value: RingtoneRange.format(
+                                                    r.endMs),
+                                              ),
+                                            ],
+                                          );
+                                        }),
+                                      ],
                                     ),
                                   ),
-                                );
-                              }),
-                              const SizedBox(height: AppSpacing.sm),
-                              Obx(() {
-                                final r = controller.range.value;
-                                return Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    _Readout(
-                                      label: 'ringtone_start'.tr,
-                                      value: RingtoneRange.format(r.startMs),
-                                    ),
-                                    _Readout(
-                                      label: 'ringtone_length'.tr,
-                                      value: RingtoneRange.format(r.lengthMs),
-                                      highlight: true,
-                                    ),
-                                    _Readout(
-                                      label: 'ringtone_end'.tr,
-                                      value: RingtoneRange.format(r.endMs),
-                                    ),
-                                  ],
-                                );
-                              }),
-                            ],
                           ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
@@ -171,8 +159,10 @@ class RingtoneEditorScreen extends GetView<RingtoneEditorController> {
                               _Stepper(
                                 label: 'ringtone_start'.tr,
                                 value: RingtoneRange.format(r.startMs),
-                                onMinus: () => controller.setStart(r.startMs - 100),
-                                onPlus: () => controller.setStart(r.startMs + 100),
+                                onMinus: () =>
+                                    controller.setStart(r.startMs - 100),
+                                onPlus: () =>
+                                    controller.setStart(r.startMs + 100),
                               ),
                               _Stepper(
                                 label: 'ringtone_end'.tr,
@@ -250,7 +240,8 @@ class RingtoneEditorScreen extends GetView<RingtoneEditorController> {
                             label: 'ringtone_save'.tr,
                             icon: Icons.save_alt_rounded,
                             variant: ButtonVariant.secondary,
-                            onPressed: () => controller.save(makeDefault: false),
+                            onPressed: () =>
+                                controller.save(makeDefault: false),
                           ),
                         ],
                       ),
@@ -284,6 +275,37 @@ class RingtoneEditorScreen extends GetView<RingtoneEditorController> {
               }),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Same frame as the waveform card, shown while the waveform is being read.
+class _WaveLoading extends StatelessWidget {
+  const _WaveLoading({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return AppCard(
+      child: SizedBox(
+        height: 200,
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(
+              width: 26,
+              height: 26,
+              child: CircularProgressIndicator(strokeWidth: 2.5),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              'ringtone_loading'.tr,
+              style: AppTypography.caption.copyWith(color: c.textSecondary),
+            ),
+          ],
         ),
       ),
     );

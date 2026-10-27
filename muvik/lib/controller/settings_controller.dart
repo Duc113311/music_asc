@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import '../configs/pref_const.dart';
 import '../configs/pref_defaults.dart';
 import '../services/native/nudge_service.dart';
-import '../services/native/ongoing_notification_service.dart';
 import '../services/storage/pref_store.dart';
 import '../values/app_colors.dart';
 
@@ -34,8 +33,6 @@ class SettingsController extends GetxController {
   /// Scan automatically when music is added or removed (off: toast + button).
   final RxBool autoScanNewMusic = PrefDefaults.autoScanNewMusic.obs;
 
-  /// Always-visible quick-player notification (OngoingNotificationService).
-  final RxBool ongoingNotification = PrefDefaults.ongoingNotification.obs;
 
   @override
   void onInit() {
@@ -74,10 +71,6 @@ class SettingsController extends GetxController {
     autoScanNewMusic.value = PrefStore.getBool(
       PrefConst.autoScanNewMusic,
       PrefDefaults.autoScanNewMusic,
-    );
-    ongoingNotification.value = PrefStore.getBool(
-      PrefConst.ongoingNotification,
-      PrefDefaults.ongoingNotification,
     );
   }
 
@@ -131,12 +124,6 @@ class SettingsController extends GetxController {
     nudgeEnabled.value = v;
     await PrefStore.setBool(PrefConst.nudgeEnabled, v);
     await NudgeService.refresh();
-  }
-
-  Future<void> setOngoingNotification(bool v) async {
-    ongoingNotification.value = v;
-    await PrefStore.setBool(PrefConst.ongoingNotification, v);
-    await OngoingNotificationService.refresh();
   }
 
   Future<void> setPauseOnDisconnect(bool v) async {

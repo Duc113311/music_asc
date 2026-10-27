@@ -141,15 +141,15 @@ class _PermissionsScreenState extends State<PermissionsScreen>
                     s.type == SourceType.tree
                         ? Icons.folder_rounded
                         : (s.removable
-                              ? Icons.sd_card_rounded
-                              : Icons.smartphone_rounded),
+                            ? Icons.sd_card_rounded
+                            : Icons.smartphone_rounded),
                     color: s.accessible ? c.primary : c.textDisabled,
                   ),
                   title: Text(
                     s.type == SourceType.volume
                         ? (s.removable
-                              ? 'source_sd_card'.tr
-                              : 'source_device'.tr)
+                            ? 'source_sd_card'.tr
+                            : 'source_device'.tr)
                         : s.displayName,
                     style: AppTypography.bodyL.copyWith(color: c.textPrimary),
                   ),

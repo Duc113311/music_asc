@@ -21,7 +21,7 @@ class RingtoneEditorController extends GetxController {
   final Song song;
 
   final Rx<RingtoneRange> range = RingtoneRange.initial(0).obs;
-  final RxList<double> peaks = <double>[].obs;
+  final Rx<List<double>> peaks = Rx<List<double>>(const []);
   final RxBool loadingWave = true.obs;
   final RxBool waveFailed = false.obs;
   final Rx<RingtoneType> type = RingtoneType.ringtone.obs;
@@ -60,7 +60,7 @@ class RingtoneEditorController extends GetxController {
       if (w.durationMs > 0 && w.durationMs != range.value.durationMs) {
         range.value = RingtoneRange.initial(w.durationMs);
       }
-      peaks.assignAll(w.peaks);
+      peaks.value = List<double>.unmodifiable(w.peaks);
     } catch (e) {
       AppLog.info('RingtoneEditor.waveform: $e');
       waveFailed.value = true;
