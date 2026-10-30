@@ -6,6 +6,8 @@ class PrefConst {
   static const String languageChosen = 'language_chosen';
   static const String onboardingCompleted = 'onboarding_completed';
   static const String setupCompleted = 'setup_completed';
+  // First-run guided tour (lib/tour) has been shown or skipped.
+  static const String tourSeen = 'tour_seen';
   static const String setupStep = 'setup_step';
   static const String permissionDeferred = 'permission_deferred';
   // One rescan after DB v2 so existing songs get their genre tag.

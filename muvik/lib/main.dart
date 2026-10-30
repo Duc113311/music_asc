@@ -16,6 +16,8 @@ import 'controller/settings_controller.dart';
 import 'services/application/app_lifecycle_service.dart';
 import 'services/native/system_ui_channel.dart';
 import 'services/storage/pref_store.dart';
+import 'tour/tour_controller.dart';
+import 'tour/tour_overlay.dart';
 import 'utils/app_localize.dart';
 import 'utils/app_log.dart';
 import 'utils/route_analytics.dart';
@@ -84,6 +86,9 @@ final List<StartupStep> _steps = [
     }
     if (!Get.isRegistered<SettingsController>()) {
       Get.put(SettingsController(), permanent: true);
+    }
+    if (!Get.isRegistered<TourController>()) {
+      Get.put(TourController(), permanent: true);
     }
   }, critical: true),
 ];
@@ -154,7 +159,7 @@ class MuvikApp extends StatelessWidget {
               ).clamp(minScaleFactor: 0.85, maxScaleFactor: 1.3),
             ),
           ),
-          child: child!,
+          child: TourOverlay(child: child!),
         ),
       );
     });

@@ -8,6 +8,7 @@ import '../../controller/settings_controller.dart';
 import '../../models/ui_models/scan_state.dart';
 import '../../services/application/app_lifecycle_service.dart';
 import '../../services/native/nudge_service.dart';
+import '../../tour/tour_controller.dart';
 import '../../services/application/listening_stats_service.dart';
 import '../../utils/toast_utils.dart';
 import '../../values/app_colors.dart';
@@ -45,6 +46,11 @@ class _HomeShellState extends State<HomeShell> {
       ..addBackgroundListener(_onBackground);
     WidgetsBinding.instance.addPostFrameCallback((_) => NudgeService.refresh());
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkNewMusic());
+    // First visit only: the tour waits for its first anchor, then shows itself.
+    TourController.to.selectTab = _select;
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => TourController.to.start(),
+    );
     // Cold start from the media notification: show Now Playing (P17-06).
     if (AudioService.notificationClicked.value) {
       WidgetsBinding.instance.addPostFrameCallback(
@@ -55,6 +61,10 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   void dispose() {
+    if (Get.isRegistered<TourController>() &&
+        TourController.to.selectTab == _select) {
+      TourController.to.selectTab = null;
+    }
     AppLifecycleService.to
       ..removeResumedListener(_onResumed)
       ..removeBackgroundListener(_onBackground);

@@ -24,6 +24,8 @@ import '../common_components/cards.dart';
 import '../common_components/mini_player.dart';
 import '../common_components/song_artwork.dart';
 import '../common_components/state_views.dart';
+import '../../tour/tour_anchor.dart';
+import '../../tour/tour_steps.dart';
 import '../dialogs/period_picker_dialogs.dart';
 import 'statistics_artist_screen.dart';
 import 'statistics_songs_screen.dart';
@@ -168,14 +170,18 @@ class StatisticsTab extends StatelessWidget {
                     AppSpacing.screenH,
                     0,
                   ),
-                  child: SegmentedTabs(
-                    labels: [
-                      'period_week'.tr,
-                      'period_month'.tr,
-                      'period_year'.tr,
-                    ],
-                    index: p.type.index,
-                    onChanged: (i) => controller.setType(PeriodType.values[i]),
+                  child: TourAnchor(
+                    id: TourAnchors.statsPeriod,
+                    child: SegmentedTabs(
+                      labels: [
+                        'period_week'.tr,
+                        'period_month'.tr,
+                        'period_year'.tr,
+                      ],
+                      index: p.type.index,
+                      onChanged: (i) =>
+                          controller.setType(PeriodType.values[i]),
+                    ),
                   ),
                 ),
                 Padding(

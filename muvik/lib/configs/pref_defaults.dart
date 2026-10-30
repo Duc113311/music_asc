@@ -6,6 +6,7 @@ class PrefDefaults {
   static const bool onboardingCompleted = false;
   static const int lastDeviceAudioCount = -1;
   static const bool setupCompleted = false;
+  static const bool tourSeen = false;
   static const int setupStep = 0;
   static const bool permissionDeferred = false;
   static const bool genreBackfillDone = false;

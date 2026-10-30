@@ -6,6 +6,8 @@ import '../../controller/library_controller.dart';
 import '../../controller/playback_controller.dart';
 import '../../models/data_models/playlist.dart';
 import '../../models/ui_models/library_groups.dart';
+import '../../tour/tour_anchor.dart';
+import '../../tour/tour_steps.dart';
 import '../../utils/toast_utils.dart';
 import '../../values/app_colors.dart';
 import '../../values/app_dimensions.dart';
@@ -294,12 +296,16 @@ class _SongsTab extends StatelessWidget {
         itemBuilder: (context, i) {
           if (i == songs.length) return const MiniPlayerSpacer();
           final s = songs[i];
-          return SongTile(
+          final tile = SongTile(
             song: s,
             isCurrent: s.id == currentId,
             onTap: () => pc.playFrom(songs, s),
             onMore: () => showSongActions(s),
           );
+          // First-run tour spotlights the first song.
+          return i == 0
+              ? TourAnchor(id: TourAnchors.librarySong, child: tile)
+              : tile;
         },
       );
     });

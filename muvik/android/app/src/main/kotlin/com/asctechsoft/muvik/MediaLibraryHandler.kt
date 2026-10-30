@@ -125,9 +125,17 @@ class MediaLibraryHandler(private val activity: Activity) : MethodChannel.Method
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) MediaStore.Audio.Media.getContentUri(volume)
         else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
+    // Not music: phone sounds. Some firmware (e.g. Samsung's "Over the Horizon")
+    // ships ringtones in /system without the IS_RINGTONE flag, so the folder is
+    // checked too, as are the shared Ringtones / Notifications / Alarms folders.
+    @Suppress("DEPRECATION")
     private val audioSelection =
         "${MediaStore.Audio.Media.IS_ALARM} = 0 AND ${MediaStore.Audio.Media.IS_NOTIFICATION} = 0 AND " +
-            "${MediaStore.Audio.Media.IS_RINGTONE} = 0"
+            "${MediaStore.Audio.Media.IS_RINGTONE} = 0 AND " +
+            listOf("/system/", "/system_ext/", "/product/", "/vendor/", "/odm/")
+                .joinToString(" AND ") { "${MediaStore.Audio.Media.DATA} NOT LIKE '$it%'" } + " AND " +
+            listOf("Ringtones", "Notifications", "Alarms")
+                .joinToString(" AND ") { "${MediaStore.Audio.Media.DATA} NOT LIKE '/storage/%/$it/%'" }
 
     private fun countVolume(volume: String): Int {
         context.contentResolver.query(

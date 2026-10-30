@@ -21,6 +21,8 @@ import '../common_components/mini_player.dart';
 import '../common_components/song_artwork.dart';
 import '../common_components/song_tile.dart';
 import '../common_components/state_views.dart';
+import '../../tour/tour_anchor.dart';
+import '../../tour/tour_steps.dart';
 
 /// Greeting by device hour (spec §4.2): morning 05–10, noon 11–13,
 /// afternoon 14–17, evening 18–04.
@@ -260,6 +262,7 @@ class _SlideData {
     required this.buttonFill,
     required this.buttonText,
     required this.onTap,
+    this.tourAnchor,
   });
 
   final String image;
@@ -274,6 +277,9 @@ class _SlideData {
   final Color buttonFill;
   final Color buttonText;
   final VoidCallback onTap;
+
+  /// Set on the slide whose button the first-run tour spotlights.
+  final String? tourAnchor;
 
   String get title => titleSpans.map((s) => s.text).join();
 }
@@ -344,6 +350,7 @@ class _HomeBannersState extends State<_HomeBanners> {
         buttonFill: const Color(0xFF7C5CF4),
         buttonText: Colors.white,
         onTap: () => _pc.playAll(_lib.songs.toList(), shuffle: true),
+        tourAnchor: TourAnchors.homeShuffle,
       ),
       _SlideData(
         image: AppAssets.homeSlide2,
@@ -554,7 +561,12 @@ class _SlideCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          _SlideButton(data: data),
+                          data.tourAnchor == null
+                              ? _SlideButton(data: data)
+                              : TourAnchor(
+                                  id: data.tourAnchor!,
+                                  child: _SlideButton(data: data),
+                                ),
                         ],
                       ),
                     ),
